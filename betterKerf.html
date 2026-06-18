@@ -33,13 +33,13 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:-apple-
 
 /* Header (shared) */
 .header{padding:14px 16px 10px;border-bottom:.5px solid var(--border);display:flex;align-items:center;gap:11px;background:var(--bg)}
-.header-back{border:none;background:var(--bg3);color:var(--text2);width:34px;height:34px;border-radius:9px;font-size:17px;cursor:pointer;flex-shrink:0;display:none;align-items:center;justify-content:center;border:.5px solid var(--border)}
+.header-back{border:none;background:var(--bg3);color:var(--text2);width:34px;height:34px;border-radius:9px;font-size:20px;cursor:pointer;flex-shrink:0;display:none;align-items:center;justify-content:center;border:.5px solid var(--border)}
 .header-back:active{background:var(--bg2)}
 .header-back.show{display:flex}
 .header-icon{width:34px;height:34px;background:var(--accent);border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .header-icon svg{width:19px;height:19px;fill:none;stroke:#fff;stroke-width:2;stroke-linecap:round}
 .header-titles{flex:1;min-width:0}
-.header h1{font-size:17px;font-weight:600;letter-spacing:-.3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.header h1{font-size:20px;font-weight:600;letter-spacing:-.3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .header h1 .bk-better{color:var(--text2);font-weight:400}
 .header h1 .bk-kerf{color:var(--text);font-weight:700}
 .header p{font-size:11px;color:var(--text3);margin-top:1px}
@@ -57,7 +57,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:-apple-
 .unit-chip{border:none;background:transparent;color:var(--text3);font-size:13px;font-family:inherit;padding:6px 14px;border-radius:7px;cursor:pointer;font-weight:500;min-width:44px}
 .unit-chip.active{background:var(--accent);color:#fff}
 .unit-chip:active{opacity:.8}
-.header-gear{border:.5px solid var(--border);background:var(--bg3);color:var(--text2);width:34px;height:34px;border-radius:9px;font-size:17px;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;margin-left:4px}
+.header-gear{border:.5px solid var(--border);background:var(--bg3);color:var(--text2);width:34px;height:34px;border-radius:9px;font-size:20px;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;margin-left:4px}
 .header-gear:active{background:var(--bg2)}
 .header-gear.hidden{display:none}
 .module-grid{display:flex;flex-direction:column;gap:12px}
@@ -83,7 +83,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:-apple-
 .pane{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:16px 14px;padding-bottom:calc(16px + var(--safe-bottom));display:none}
 .pane.active{display:block}
 
-.slabel{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);margin-bottom:8px;font-weight:600}
+.slabel{font-size:13px;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);margin-bottom:8px;font-weight:600}
 .slabel-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
 .slabel-row .slabel{margin-bottom:0}
 .info-btn{width:22px;height:22px;border-radius:50%;border:.5px solid var(--border2);background:var(--bg3);color:var(--text3);font-size:13px;line-height:1;display:flex;align-items:center;justify-content:center;cursor:pointer;font-family:inherit;padding:0;flex-shrink:0}
@@ -117,7 +117,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:-apple-
 .row input{font-family:'Menlo','Courier New',monospace;font-size:15px;height:40px;padding:0 10px;border:.5px solid var(--border2);border-radius:9px;background:var(--bg2);color:var(--text);width:100%;-webkit-appearance:none}
 .row input[type=number]{text-align:center;padding:0 4px}
 .row input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(196,132,42,.2)}
-.del-btn{border:.5px solid var(--border);background:var(--bg3);color:var(--text3);cursor:pointer;font-size:17px;height:40px;width:30px;display:flex;align-items:center;justify-content:center;border-radius:9px;flex-shrink:0}
+.del-btn{border:.5px solid var(--border);background:var(--bg3);color:var(--text3);cursor:pointer;font-size:20px;height:40px;width:30px;display:flex;align-items:center;justify-content:center;border-radius:9px;flex-shrink:0}
 .del-btn:active{background:#3A1818;color:var(--danger)}
 .dup-btn{border:.5px solid var(--border);background:var(--bg3);color:var(--text3);cursor:pointer;font-size:13px;height:40px;width:26px;display:flex;align-items:center;justify-content:center;border-radius:9px;flex-shrink:0;padding:0}
 .dup-btn:active{background:var(--bg2);color:var(--accent2)}
@@ -140,10 +140,10 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:-apple-
 .radio-group{display:flex;flex-direction:column;gap:8px;width:100%}
 .radio-lbl{display:flex;align-items:center;gap:10px;font-size:15px;color:var(--text2);cursor:pointer}
 .radio-lbl input{width:18px;height:18px;accent-color:var(--accent)}
-.toggle{width:24px;height:24px;accent-color:var(--accent);cursor:pointer;flex-shrink:0}
+.toggle{width:20px;height:20px;accent-color:var(--accent);cursor:pointer;flex-shrink:0}
 .stat-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:14px}
 .stat{background:var(--bg2);border-radius:12px;padding:12px 8px;text-align:center;border:.5px solid var(--border)}
-.stat-val{font-size:22px;font-weight:600;font-family:'Menlo',monospace}
+.stat-val{font-size:24px;font-weight:600;font-family:'Menlo',monospace}
 .stat-lbl{font-size:11px;color:var(--text3);margin-top:3px;text-transform:uppercase;letter-spacing:.07em}
 .err{background:rgba(192,80,80,.15);border:.5px solid rgba(192,80,80,.4);color:#E08080;border-radius:10px;padding:11px 13px;font-size:13px;margin-bottom:12px}
 .warn-box{background:rgba(192,80,80,.12);border:.5px solid rgba(192,80,80,.45);border-radius:12px;padding:13px 15px;margin-bottom:14px}
@@ -155,7 +155,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:-apple-
 .cost-state-info{background:rgba(91,141,184,.12);border-color:rgba(91,141,184,.4)}
 .cost-state-ok{background:rgba(107,143,94,.13);border-color:rgba(107,143,94,.45)}
 .cost-state-hint{background:var(--bg2)}
-.cost-state-icon{font-size:18px;line-height:1.3;flex-shrink:0}
+.cost-state-icon{font-size:20px;line-height:1.3;flex-shrink:0}
 .cost-state-body{flex:1;min-width:0}
 .cost-state-title{font-size:15px;font-weight:600;color:var(--text);margin-bottom:2px}
 .cost-state-sub{font-size:13px;color:var(--text2);line-height:1.5}
@@ -238,7 +238,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:-apple-
 .zoom-overlay.show{display:flex}
 .zoom-bar{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;flex-shrink:0}
 .zoom-bar span{font-size:13px;color:var(--text2)}
-.zoom-close{border:.5px solid var(--border2);background:var(--bg2);color:var(--text);width:38px;height:38px;border-radius:10px;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.zoom-close{border:.5px solid var(--border2);background:var(--bg2);color:var(--text);width:34px;height:34px;border-radius:9px;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center}
 .zoom-stage{flex:1;overflow:auto;-webkit-overflow-scrolling:touch;display:flex;align-items:center;justify-content:center;padding:12px}
 .zoom-stage svg{width:auto;height:auto;max-width:none}
 .sheet-overlay{position:fixed;inset:0;z-index:1100;display:none}
@@ -248,7 +248,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:-apple-
 @keyframes sheetUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
 .sheet-handle{width:36px;height:4px;border-radius:3px;background:var(--border2);margin:6px auto 10px}
 .sheet-head{display:flex;align-items:center;justify-content:space-between;font-size:15px;font-weight:600;color:var(--text);margin-bottom:6px}
-.sheet-head .zoom-close{width:32px;height:32px;font-size:17px;border-radius:9px}
+.sheet-head .zoom-close{width:34px;height:34px;font-size:20px;border-radius:9px}
 .sheet-body{overflow-y:auto;-webkit-overflow-scrolling:touch}
 .info-item{padding:13px 0;border-bottom:.5px solid var(--border)}
 .info-item:last-child{border-bottom:none}
@@ -535,12 +535,19 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:-apple-
           <button id="kp-bk-overlay" onclick="korpusSetBack('overlay')">aufgesetzt</button>
           <button id="kp-bk-none" onclick="korpusSetBack('none')">keine</button>
         </div>
-        <div class="kp-field kp-nut" id="kp-nut-wrap"><label>Nuttiefe <span class="ku">mm</span></label><input type="number" inputmode="decimal" id="kp-nut" placeholder="6" oninput="korpusCalc()"></div>
       </div>
 
       <div class="section">
-        <div class="srow"><div><div class="srow-label">Mittelseiten</div><div class="srow-hint">Senkrechte Trennwände teilen den Korpus in Fächer</div></div><div class="nm"><input type="number" inputmode="numeric" id="kp-dividers" value="0" min="0" max="20" oninput="korpusCalc()"><span>Stk</span></div></div>
+        <div class="srow"><div><div class="srow-label">Trennwände</div><div class="srow-hint">Senkrechte Trennwände teilen den Korpus in Fächer</div></div><div class="nm"><input type="number" inputmode="numeric" id="kp-dividers" value="0" min="0" max="20" oninput="korpusCalc()"><span>Stk</span></div></div>
+        <div id="kp-div-custom-wrap" style="display:none">
+          <div class="srow" style="margin-top:4px"><div><div class="srow-label">Fachbreiten</div><div class="srow-hint">Lichte Breite jedes Fachs selbst festlegen</div></div><input type="checkbox" id="kp-div-custom" class="toggle" onchange="korpusToggleCustomDividers()"></div>
+          <div id="kp-div-pos-list" style="display:none;margin-top:8px"></div>
+        </div>
         <div class="srow"><div><div class="srow-label" id="kp-shelves-label">Einlegeböden</div><div class="srow-hint" id="kp-shelves-hint">Anzahl loser Böden im Korpus</div></div><div class="nm"><input type="number" inputmode="numeric" id="kp-shelves" value="0" min="0" max="50" oninput="korpusCalc()"><span>Stk</span></div></div>
+        <div id="kp-shelf-custom-wrap" style="display:none">
+          <div class="srow" style="margin-top:4px"><div><div class="srow-label">Fachhöhen</div><div class="srow-hint">Lichte Höhe jedes Fachs selbst festlegen</div></div><input type="checkbox" id="kp-shelf-custom" class="toggle" onchange="korpusToggleCustomShelves()"></div>
+          <div id="kp-shelf-pos-list" style="display:none;margin-top:8px"></div>
+        </div>
       </div>
 
       <div id="kp-result" style="margin-top:6px"></div>
@@ -678,7 +685,6 @@ function setUnit(u){
       t:(parseFloat(document.getElementById('kp-t').value)||0)*oldF,
       s:(parseFloat(document.getElementById('kp-s').value)||0)*oldF,
       sr:(parseFloat(document.getElementById('kp-sr').value)||0)*oldF,
-      nut:(parseFloat(document.getElementById('kp-nut').value)||0)*oldF
     };
   }
   currentUnit=u;
@@ -692,7 +698,7 @@ function setUnit(u){
   if(kpMM){
     const setIf=(id,mm)=>{const el=document.getElementById(id);if(el)el.value=mm?inputVal(mm):'';};
     setIf('kp-h',kpMM.h);setIf('kp-b',kpMM.b);setIf('kp-t',kpMM.t);
-    setIf('kp-s',kpMM.s);setIf('kp-sr',kpMM.sr);setIf('kp-nut',kpMM.nut);
+    setIf('kp-s',kpMM.s);setIf('kp-sr',kpMM.sr);
     refreshKpUnits();
     if(typeof korpusCalc==='function')korpusCalc();
   }
@@ -805,7 +811,7 @@ function openModule(id){
   document.getElementById(m.screen).classList.add('active');
   document.getElementById('back-btn').classList.add('show');
   document.getElementById('gear-btn').classList.remove('hidden');
-  setHeader(`<span style="font-size:19px">${m.emoji}</span>`, m.title, m.sub, m.color);
+  setHeader(`<span style="font-size:20px">${m.emoji}</span>`, m.title, m.sub, m.color);
   if(m.init)m.init();
   document.getElementById(m.screen).scrollTop=0;
 }
@@ -825,7 +831,7 @@ function openSettings(){
   document.getElementById('screen-settings').classList.add('active');
   document.getElementById('back-btn').classList.add('show');
   document.getElementById('gear-btn').classList.add('hidden');
-  setHeader('<span style="font-size:19px">⚙️</span>','Einstellungen','Maßeinheit & App-Optionen','#7A7268');
+  setHeader('<span style="font-size:20px">⚙️</span>','Einstellungen','Maßeinheit & App-Optionen','#7A7268');
   renderUnitChips();
   document.getElementById('screen-settings').scrollTop=0;
 }
@@ -846,6 +852,20 @@ function goBack(){
 renderHome();
 renderUnitChips();
 refreshUnitSpans();
+
+// Swipe-Back: vom linken Rand nach rechts wischen → goBack()
+(function(){
+  let x0=0,y0=0;
+  document.addEventListener('touchstart',e=>{
+    x0=e.touches[0].clientX;
+    y0=e.touches[0].clientY;
+  },{passive:true});
+  document.addEventListener('touchend',e=>{
+    const dx=e.changedTouches[0].clientX-x0;
+    const dy=e.changedTouches[0].clientY-y0;
+    if(x0<30&&dx>60&&Math.abs(dy)<80)goBack();
+  },{passive:true});
+})();
 
 // ═══════════════════════════════════════════════════════════════════════
 //  MODULE: Cutlist Optimizer
@@ -1463,11 +1483,11 @@ function renderResult(result){
     const dimSVG=`<defs>
       <marker id="ah${mid}" markerWidth="5" markerHeight="5" refX="4" refY="2.5" orient="auto"><polygon points="0,0 5,2.5 0,5" fill="#9A8D7A"/></marker>
       <marker id="at${mid}" markerWidth="5" markerHeight="5" refX="1" refY="2.5" orient="auto-start-reverse"><polygon points="0,0 5,2.5 0,5" fill="#9A8D7A"/></marker></defs>
-      <line x1="${ML+5}" y1="12" x2="${Math.max(ML+5,ML+bW/2-40)}" y2="12" stroke="#9A8D7A" stroke-width=".8" marker-start="url(#at${mid})"/>
-      <line x1="${Math.min(ML+bW-5,ML+bW/2+40)}" y1="12" x2="${ML+bW-5}" y2="12" stroke="#9A8D7A" stroke-width=".8" marker-end="url(#ah${mid})"/>
+      <line x1="${ML+5}" y1="12" x2="${Math.max(ML+5,ML+bW/2-40)}" y2="12" stroke="#9A8D7A" stroke-width=".8" ${bW>90?`marker-start="url(#at${mid})"`:''}/>
+      <line x1="${Math.min(ML+bW-5,ML+bW/2+40)}" y1="12" x2="${ML+bW-5}" y2="12" stroke="#9A8D7A" stroke-width=".8" ${bW>90?`marker-end="url(#ah${mid})"`:''}/>
       <text x="${ML+bW/2}" y="14" text-anchor="middle" font-size="10" font-weight="600" fill="#9A8D7A"><tspan dx="0">L ${dispUnit(board.L)}</tspan></text>
-      <line x1="12" y1="${MT+5}" x2="12" y2="${Math.max(MT+5,MT+bH/2-40)}" stroke="#9A8D7A" stroke-width=".8" marker-start="url(#at${mid})"/>
-      <line x1="12" y1="${Math.min(MT+bH-5,MT+bH/2+40)}" x2="12" y2="${MT+bH-5}" stroke="#9A8D7A" stroke-width=".8" marker-end="url(#ah${mid})"/>
+      <line x1="12" y1="${MT+5}" x2="12" y2="${Math.max(MT+5,MT+bH/2-40)}" stroke="#9A8D7A" stroke-width=".8" ${bH>90?`marker-start="url(#at${mid})"`:''}/>
+      <line x1="12" y1="${Math.min(MT+bH-5,MT+bH/2+40)}" x2="12" y2="${MT+bH-5}" stroke="#9A8D7A" stroke-width=".8" ${bH>90?`marker-end="url(#ah${mid})"`:''}/>
       <text x="12" y="${MT+bH/2}" text-anchor="middle" dominant-baseline="middle" font-size="10" font-weight="600" fill="#9A8D7A" transform="rotate(-90,12,${MT+bH/2})">B ${dispUnit(board.W)}</text>`;
     const ticks='';
     const partsSVG=bA.map(a=>{const ex=a.rotated?a.part.W:a.part.L,ey=a.rotated?a.part.L:a.part.W;const x=ML+Math.round(a.x*scale),y=MT+Math.round(a.y*scale);const rw=Math.round(ex*scale),rh=Math.round(ey*scale);const col=getColor(a.part.name);const nameText=a.part.name+(a.part.qty>1?' #'+a.part.instance:'')+(a.rotated?' ↻':'');const exVal=dispVal(ex),eyVal=dispVal(ey);const fs=6,pad=3,cw=fs*0.56;const cx=x+rw/2,cy=y+rh/2;
@@ -1480,7 +1500,9 @@ function renderResult(result){
       let lbl='';
       if(canH)lbl+=`<text x="${cx}" y="${y+pad+fs}" text-anchor="middle" font-size="${fs}" fill="rgba(255,255,255,.85)">${exVal}</text>`;
       if(canV)lbl+=`<text x="${x+pad+fs*0.5}" y="${cy}" text-anchor="middle" dominant-baseline="middle" font-size="${fs}" fill="rgba(255,255,255,.85)" transform="rotate(-90,${x+pad+fs*0.5},${cy})">${eyVal}</text>`;
-      return `<rect x="${x+1}" y="${y+1}" width="${Math.max(2,rw-2)}" height="${Math.max(2,rh-2)}" fill="${col}" opacity=".92"/>${lbl}<rect x="${x}" y="${y}" width="${rw}" height="${rh}" fill="none" stroke="rgba(255,255,255,.3)" stroke-width=".5"/>`;}).join('');
+      const fw=Math.max(2,Math.min(ML+Math.round((a.x+ex+kerf)*scale)-x-1, ML+bW-x-1));
+      const fh=Math.max(2,Math.min(MT+Math.round((a.y+ey+kerf)*scale)-y-1, MT+bH-y-1));
+      return `<rect x="${x}" y="${y}" width="${fw}" height="${fh}" fill="${col}" opacity=".95"/>${lbl}`;}).join('');
     const svgMarkup=`<svg viewBox="0 0 ${svgW} ${svgH}" style="width:100%;height:${svgH}px;display:block">
         <rect x="${ML}" y="${MT}" width="${bW}" height="${bH}" fill="#F5EDD6"/>
         ${woodGrain(ML,MT,bW,bH)}${dimSVG}${ticks}${partsSVG}
@@ -1602,6 +1624,7 @@ async function doExport(){
   const {expandedBoards,assignment,unplaced,kerf}=lastResult;
   const usedBoards=expandedBoards.filter(b=>assignment.some(a=>a.boardIdx===b.boardIdx));
   let y=15;const lm=15,pw=180;const checkY=n=>{if(y+n>272){doc.addPage();y=15;}};
+  const pdfTxt=t=>t.replace(/→/g,'->').replace(/↻/g,'(ged.)').replace(/—/g,'-').replace(/–/g,'-').replace(/·/g,'-').replace(/[^\x00-\xFF]/g,'?');
   doc.setFont('helvetica','bold');doc.setFontSize(18);doc.text('betterKerf — Schnittplan',lm,y);y+=9;
   doc.setFont('helvetica','normal');doc.setFontSize(9);doc.setTextColor(120,110,100);
   doc.text(`Erstellt: ${new Date().toLocaleDateString('de-DE')} | Kerf: ${kerf} mm | Einheit: ${unitLabel()}`,lm,y);y+=11;doc.setTextColor(0);
@@ -1625,7 +1648,8 @@ async function doExport(){
     for(const block of visBlocks){
       const svg=block.querySelector('svg');
       if(!svg)continue;
-      const topText=(block.querySelector('.bvis-top')||{}).innerText||'';
+      const topSpans=[...((block.querySelector('.bvis-top')||{}).querySelectorAll?.('span')||[])];
+      const topText=topSpans.length?topSpans.map(s=>s.innerText.trim()).join('  '):(block.querySelector('.bvis-top')||{}).innerText||'';
       let png=null;
       try{ png=await svgToPng(svg,3); }catch(e){ png=null; }
       if(png){
@@ -1633,7 +1657,7 @@ async function doExport(){
         checkY(imgH+8);
         // caption
         doc.setFont('helvetica','bold');doc.setFontSize(9);
-        const cap=topText.replace(/\s+/g,' ').trim();
+        const cap=pdfTxt(topText.replace(/\s+/g,' ').trim());
         doc.text(doc.splitTextToSize(cap,pw),lm,y);y+=5;
         doc.addImage(png.data,'PNG',lm,y,imgW,imgH,undefined,'FAST');
         y+=imgH+3;
@@ -1660,11 +1684,11 @@ async function doExport(){
 
   checkY(24);doc.setFont('helvetica','bold');doc.setFontSize(12);doc.text('Schnittliste',lm,y);y+=6;
   const cols=[8,52,26,26,36,32];const heads=['#','Teil',`Länge (${unitLabel()})`,`Breite (${unitLabel()})`,'Brett',`Position (${unitLabel()})`];
-  doc.setFillColor(245,237,214);doc.rect(lm,y-4,pw,6,'F');doc.setFontSize(8);doc.setFont('helvetica','bold');
-  let x=lm;heads.forEach((h,i)=>{doc.text(h,x+1,y);x+=cols[i];});y+=4;doc.setFont('helvetica','normal');
+  doc.setFillColor(245,237,214);doc.rect(lm,y-5,pw,7,'F');doc.setFontSize(8);doc.setFont('helvetica','bold');
+  let x=lm;heads.forEach((h,i)=>{doc.text(h,x+1,y-1);x+=cols[i];});y+=4;doc.setFont('helvetica','normal');
   assignment.forEach((a,i)=>{checkY(6);if(i%2===0){doc.setFillColor(252,250,246);doc.rect(lm,y-3.5,pw,5.5,'F');}let x=lm;const bn=a.boardQty>1?`${a.boardName} (${a.boardInst})`:a.boardName;[String(i+1),a.part.name+(a.part.qty>1?' #'+a.part.instance:'')+(a.rotated?' (gedreht)':''),dispVal(a.part.L),dispVal(a.part.W),bn,dispVal(a.x)+' × '+dispVal(a.y)].forEach((v,ci)=>{doc.text(String(v),x+1,y);x+=cols[ci];});y+=5.5;});y+=8;
   checkY(22);doc.setFont('helvetica','bold');doc.setFontSize(12);doc.text('Schnittanleitung',lm,y);y+=6;doc.setFont('helvetica','normal');doc.setFontSize(9);
-  document.getElementById('steps-content').querySelectorAll('.step-card').forEach((s,i)=>{const title=s.querySelector('.step-action').innerText;const detail=s.querySelector('.step-detail').innerText;const lines=doc.splitTextToSize(detail,pw-6);checkY(7+lines.length*4+4);doc.setFont('helvetica','bold');doc.text(`Schritt ${i+1}: ${title}`,lm,y);y+=4.5;doc.setFont('helvetica','normal');doc.setTextColor(100);doc.text(lines,lm+4,y);y+=lines.length*4+4;doc.setTextColor(0);});
+  document.getElementById('steps-content').querySelectorAll('.step-card').forEach((s,i)=>{const title=pdfTxt(s.querySelector('.step-action').innerText);const detail=pdfTxt(s.querySelector('.step-detail').innerText);const lines=doc.splitTextToSize(detail,pw-6);checkY(7+lines.length*4+4);doc.setFont('helvetica','bold');doc.text(`Schritt ${i+1}: ${title}`,lm,y);y+=4.5;doc.setFont('helvetica','normal');doc.setTextColor(100);doc.text(lines,lm+4,y);y+=lines.length*4+4;doc.setTextColor(0);});
   doc.save('betterkerf-schnittplan.pdf');
 }
 
@@ -1839,7 +1863,7 @@ function holesSVG(L,centers){
     const cy=barY+barH/2;
     dots+=`<circle cx="${x}" cy="${cy}" r="${holeR}" fill="#1A1510" stroke="#5B8DB8" stroke-width="1.5"/><circle cx="${x}" cy="${cy}" r="1.5" fill="#5B8DB8"/>`;
     const lblY=barY-8;
-    labels+=`<line x1="${x}" y1="${barY}" x2="${x}" y2="${lblY+3}" stroke="#7A7268" stroke-width=".5" stroke-dasharray="2,2"/><text x="${x}" y="${lblY}" text-anchor="middle" font-size="8.5" fill="#B8AF9E" font-weight="600">${dispVal(c)}</text>`;
+    labels+=`<line x1="${x}" y1="${barY}" x2="${x}" y2="${lblY+3}" stroke="#7A7268" stroke-width=".5" stroke-dasharray="2,2"/><text x="${x}" y="${lblY}" text-anchor="middle" font-size="8" fill="#B8AF9E" font-weight="600">${dispVal(c)}</text>`;
     labels+=`<text x="${x}" y="${barY+barH+12}" text-anchor="middle" font-size="8" fill="#7A7268">#${i+1}</text>`;
   });
   dims=`<text x="${ML}" y="${barY+barH+26}" font-size="8" fill="#7A7268">0</text><text x="${ML+L*scale}" y="${barY+barH+26}" text-anchor="end" font-size="8" fill="#7A7268">${dispVal(L)}</text>`;
@@ -2072,8 +2096,8 @@ async function holesDoExport(){
   // Table
   checkY(20);doc.setFont('helvetica','bold');doc.setFontSize(12);doc.text('Lochmittelpunkte',lm,y);y+=6;
   const cols=[14,70,70];const heads=['#',`Position (${u})`,`Abstand zum vorigen (${u})`];
-  doc.setFillColor(245,237,214);doc.rect(lm,y-4,pw,6,'F');doc.setFontSize(9);doc.setFont('helvetica','bold');
-  let x=lm;heads.forEach((h,i)=>{doc.text(h,x+1,y);x+=cols[i];});y+=4;doc.setFont('helvetica','normal');
+  doc.setFillColor(245,237,214);doc.rect(lm,y-5,pw,7,'F');doc.setFontSize(9);doc.setFont('helvetica','bold');
+  let x=lm;heads.forEach((h,i)=>{doc.text(h,x+1,y-1);x+=cols[i];});y+=4;doc.setFont('helvetica','normal');
   centers.forEach((c,i)=>{checkY(6);if(i%2===0){doc.setFillColor(252,250,246);doc.rect(lm,y-3.5,pw,5.5,'F');}let x=lm;[String(i+1),dispVal(c),i>0?dispVal(gaps[i-1]):'–'].forEach((v,ci)=>{doc.text(String(v),x+1,y);x+=cols[ci];});y+=5.5;});
   doc.save('betterkerf-lochabstaende.pdf');
 }
@@ -2100,8 +2124,8 @@ async function gridDoExport(){
   // Full coordinate table
   checkY(20);doc.setFont('helvetica','bold');doc.setFontSize(12);doc.text(`Alle Bohrpunkte (${u})`,lm,y);y+=6;
   const tc=[14,40,55,55];const heads=['#','Punkt','X','Y'];
-  doc.setFillColor(245,237,214);doc.rect(lm,y-4,pw,6,'F');doc.setFontSize(9);doc.setFont('helvetica','bold');
-  let x=lm;heads.forEach((h,i)=>{doc.text(h,x+1,y);x+=tc[i];});y+=4;doc.setFont('helvetica','normal');
+  doc.setFillColor(245,237,214);doc.rect(lm,y-5,pw,7,'F');doc.setFontSize(9);doc.setFont('helvetica','bold');
+  let x=lm;heads.forEach((h,i)=>{doc.text(h,x+1,y-1);x+=tc[i];});y+=4;doc.setFont('helvetica','normal');
   pts.forEach((p,i)=>{checkY(6);if(i%2===0){doc.setFillColor(252,250,246);doc.rect(lm,y-3.5,pw,5.5,'F');}let x=lm;[String(i+1),`R${p.row} S${p.col}`,dispVal(p.x),dispVal(p.y)].forEach((v,ci)=>{doc.text(String(v),x+1,y);x+=tc[ci];});y+=5.5;});
   doc.save('betterkerf-lochraster.pdf');
 }
@@ -2622,8 +2646,8 @@ function costDoPDF(){
   // Tabelle: Bretter
   doc.setFont('helvetica','bold');doc.setFontSize(12);doc.text('Bretter & Preise',lm,y);y+=6;
   const cols=[14,86,40,40];const heads=['Anz.','Brett','Einzelpreis','Summe'];
-  doc.setFillColor(245,237,214);doc.rect(lm,y-4,pw,6,'F');doc.setFontSize(9);doc.setFont('helvetica','bold');
-  let x=lm;heads.forEach((h,i)=>{doc.text(h,x+1,y);x+=cols[i];});y+=4;doc.setFont('helvetica','normal');
+  doc.setFillColor(245,237,214);doc.rect(lm,y-5,pw,7,'F');doc.setFontSize(9);doc.setFont('helvetica','bold');
+  let x=lm;heads.forEach((h,i)=>{doc.text(h,x+1,y-1);x+=cols[i];});y+=4;doc.setFont('helvetica','normal');
   c.byType.forEach((b,i)=>{checkY(6);if(i%2===0){doc.setFillColor(252,250,246);doc.rect(lm,y-3.5,pw,5.5,'F');}
     let x=lm;const dim=b.L&&b.W?` (${dispVal(b.L)}×${dispVal(b.W)} ${u})`:'';
     [String(b.count),b.name+dim,eur(b.unit),eur(b.sum)].forEach((v,ci)=>{doc.text(String(v),x+1,y);x+=cols[ci];});y+=5.5;});
@@ -2633,8 +2657,8 @@ function costDoPDF(){
   if(c.linkValid){
     checkY(20);doc.setFont('helvetica','bold');doc.setFontSize(12);doc.text('Kosten pro Teil (anteilig nach Fläche)',lm,y);y+=6;
     const tc=[100,40,40];const th=['Teil','Anzahl','je Stück'];
-    doc.setFillColor(245,237,214);doc.rect(lm,y-4,pw,6,'F');doc.setFontSize(9);doc.setFont('helvetica','bold');
-    let x2=lm;th.forEach((h,i)=>{doc.text(h,x2+1,y);x2+=tc[i];});y+=4;doc.setFont('helvetica','normal');
+    doc.setFillColor(245,237,214);doc.rect(lm,y-5,pw,7,'F');doc.setFontSize(9);doc.setFont('helvetica','bold');
+    let x2=lm;th.forEach((h,i)=>{doc.text(h,x2+1,y-1);x2+=tc[i];});y+=4;doc.setFont('helvetica','normal');
     Object.entries(c.perPart).forEach(([name,d],i)=>{checkY(6);if(i%2===0){doc.setFillColor(252,250,246);doc.rect(lm,y-3.5,pw,5.5,'F');}
       let x=lm;[name,d.count+'×',eur(d.unit)].forEach((v,ci)=>{doc.text(String(v),x+1,y);x+=tc[ci];});y+=5.5;});
     y+=8;
@@ -2674,6 +2698,11 @@ function costReset(){
 let kpConstr='sides';   // 'sides' = Seiten durchgehend | 'topbot' = Boden/Deckel durchgehend
 let kpBack='inset';     // 'inset' eingenutet | 'overlay' aufgesetzt | 'none' keine
 let kpParts=[];         // zuletzt berechnete Teile (für Übergabe)
+let kpShelfCustom=false;
+let kpShelfStates=[];   // [{fixed:bool, posMM:number}]; Länge = Böden pro Fach
+                        // fixed=false → automatisch verteilt; fixed=true → individuelle Position
+let kpDivCustom=false;
+let kpDivStates=[];     // [{fixed:bool, posMM:number}]; Länge = Trennwände+1
 
 document.getElementById('korpus-tabs').addEventListener('click',e=>{const b=e.target.closest('.tab');if(b)korpusShowTab(b.dataset.tab);});
 function korpusShowTab(t){
@@ -2690,7 +2719,6 @@ function korpusInit(){
   const setDefault=(id,mm)=>{const el=document.getElementById(id);if(el&&el.value.trim()==='')el.value=inputVal(mm);};
   setDefault('kp-s',18);
   setDefault('kp-sr',5);
-  setDefault('kp-nut',6);
   korpusSetConstr(kpConstr);
   korpusSetBack(kpBack);
   korpusCalc();
@@ -2711,8 +2739,6 @@ function korpusSetBack(b){
   document.getElementById('kp-bk-framed').classList.toggle('on',b==='framed');
   document.getElementById('kp-bk-overlay').classList.toggle('on',b==='overlay');
   document.getElementById('kp-bk-none').classList.toggle('on',b==='none');
-  // Nuttiefe-Feld nur bei eingenuteter Rückwand zeigen
-  document.getElementById('kp-nut-wrap').style.display = b==='inset' ? '' : 'none';
   korpusCalc();
 }
 
@@ -2738,8 +2764,8 @@ function korpusGeometry(H,B,T,s,sr,constr,back,nut,shelves,dividers){
     add('Boden / Deckel', B, T, 2);
     add('Seite', H-2*s, T, 2);
   }
-  // Mittelseiten: sitzen wie Innenseiten zwischen Boden und Deckel, volle Tiefe.
-  if(n>0) add('Mittelseite', H-2*s, T, n);
+  // Trennwände: sitzen wie Innenseiten zwischen Boden und Deckel, volle Tiefe.
+  if(n>0) add('Trennwand', H-2*s, T, n);
   // Innenraum-Aufteilung: n Trennwände der Stärke s teilen die lichte Innenbreite.
   const innerW = B-2*s;                       // lichte Weite zwischen den Außenseiten
   const compW = (innerW - n*s) / (n+1);       // lichte Weite je Fach
@@ -2757,7 +2783,7 @@ function korpusGeometry(H,B,T,s,sr,constr,back,nut,shelves,dividers){
 }
 
 // Kontextabhängige Bau-Anleitung als Schritt-Array, je nach gewählten Optionen.
-function korpusGuide(constr,back,nut,shelves,dividers){
+function korpusGuide(constr,back,nut,shelves,dividers,shelfPos){
   const steps=[];
   // 1. Zuschnitt
   steps.push('Alle Teile gemäß Zuschnittliste zuschneiden. Auf rechtwinklige, saubere Kanten achten — besonders bei den Korpusteilen, da sich Ungenauigkeiten sonst aufsummieren.');
@@ -2765,7 +2791,7 @@ function korpusGuide(constr,back,nut,shelves,dividers){
   steps.push('Sichtbare Kanten nach Wunsch bekanten (Umleimer) oder verschleifen. Das geht vor dem Zusammenbau am leichtesten.');
   // 3. Rückwand-Vorbereitung (nur bei eingenutet)
   if(back==='inset'){
-    steps.push(`Für die Rückwand eine umlaufende Nut fräsen: ${dispVal(nut)} ${unitLabel()} tief, passend zur Rückwandstärke. Die Nut etwas von der hinteren Kante einrücken. In Seiten, Boden und Deckel (bei Mittelseiten auch dort) jeweils auf gleicher Höhe.`);
+    steps.push(`Für die Rückwand eine umlaufende Nut fräsen: ${dispVal(nut)} ${unitLabel()} tief, passend zur Rückwandstärke. Die Nut etwas von der hinteren Kante einrücken. In Seiten, Boden und Deckel (bei Trennwänden auch dort) jeweils auf gleicher Höhe.`);
   }
   // 4. Korpus-Korpusverbindung je nach Konstruktion
   if(constr==='sides'){
@@ -2775,7 +2801,8 @@ function korpusGuide(constr,back,nut,shelves,dividers){
   }
   // 5. Mittelseiten
   if(dividers>0){
-    steps.push(`${dividers} Mittelseite(n) gleichmäßig einsetzen, sodass ${dividers+1} gleich große Fächer entstehen. Positionen vorher anzeichnen und rechtwinklig zwischen Boden und Deckel verleimen/verdübeln.`);
+    const tw=dividers===1?'Trennwand':'Trennwände';
+    steps.push(`${dividers} ${tw} gleichmäßig einsetzen, sodass ${dividers+1} gleich große Fächer entstehen. Positionen vorher anzeichnen und rechtwinklig zwischen Boden und Deckel verleimen/verdübeln.`);
   }
   // 6. Verleimung kontrollieren
   steps.push('Korpus mit Zwingen verspannen und auf Rechtwinkligkeit prüfen (Diagonalen messen — beide gleich lang = rechtwinklig). Leim abbinden lassen.');
@@ -2790,11 +2817,207 @@ function korpusGuide(constr,back,nut,shelves,dividers){
   // 8. Einlegeböden
   if(shelves>0){
     const total=shelves*((dividers||0)+1);
-    steps.push(`Bohrungen für die Bodenträger setzen und die ${total} losen Einlegeböden einlegen. Höhe nach Bedarf wählen${dividers>0?' (pro Fach)':''}.`);
+    let posHint='';
+    if(kpShelfCustom&&shelfPos&&kpShelfStates.some(st=>st.fixed)){
+      const u=unitLabel();
+      const fixedParts=kpShelfStates.map((st,i)=>st.fixed?`Fach ${i+1}: ${dispVal(shelfPos[i])} ${u}`:null).filter(Boolean);
+      const autoCount=kpShelfStates.filter(st=>!st.fixed).length;
+      posHint=` Individuelle Fachhöhen: ${fixedParts.join(', ')}.${autoCount>0?` ${autoCount===1?'1 Fach verteilt sich':'Restliche Fächer verteilen sich'} automatisch gleichmäßig.`:''}`;
+    } else {
+      posHint=` Höhe nach Bedarf wählen${dividers>0?' (pro Fach)':''}.`;
+    }
+    steps.push(`Bohrungen für die Bodenträger setzen und die ${total} losen Einlegeböden einlegen.${posHint}`);
   }
   // 9. Finish
   steps.push('Oberfläche endbehandeln (Öl, Lack oder Wachs) und Beschläge montieren.');
   return steps;
+}
+
+// Berechnet Fachhöhen (lichte Höhe des Fachs unterhalb jedes Bodens, in mm).
+// Fixierte Böden behalten ihre explizite Position; auto-Böden werden in den
+// verbleibenden Lücken gleichmäßig verteilt.
+function computeShelfPositions(states,innerH,s){
+  // states hat shelves+1 Einträge: N Fächer unterhalb der Böden + 1 oberstes Fach
+  // Gibt Fachhöhen zurück: result[i] = lichte Höhe des Fachs i
+  const numBoards=states.length-1; // Anzahl physischer Böden = Fächer - 1
+  const fixedFH=states.map(st=>st&&st.fixed?(st.posMM||0):null);
+  const totalFixedFH=fixedFH.reduce((a,v)=>a+(v!==null?v:0),0);
+  const autoCount=fixedFH.filter(v=>v===null).length;
+  const freeH=Math.max(0,innerH-numBoards*s-totalFixedFH);
+  const autoFH=autoCount>0?freeH/autoCount:0;
+  return fixedFH.map(v=>Math.round(v!==null?v:autoFH));
+}
+
+function kpSketchRedraw(){
+  const H=toMM(document.getElementById('kp-h').value);
+  const B=toMM(document.getElementById('kp-b').value);
+  const T=toMM(document.getElementById('kp-t').value);
+  const s=toMM(document.getElementById('kp-s').value)||18;
+  const sr=toMM(document.getElementById('kp-sr').value)||5;
+  const nut=(toMM(document.getElementById('kp-sr').value)||5)+1;
+  const shelves=Math.max(0,parseInt(document.getElementById('kp-shelves').value)||0);
+  const dividers=Math.max(0,parseInt(document.getElementById('kp-dividers').value)||0);
+  const innerH=Math.max(0,H-2*s);
+  const sketchEl=document.getElementById('kp-sketch-area');
+  if(sketchEl&&H>0&&B>0&&T>0){
+    const pos=kpShelfCustom&&kpShelfStates.length>0?computeShelfPositions(kpShelfStates,innerH,s):null;
+    const innerW=Math.max(0,B-2*s);
+    const divPos=kpDivCustom&&kpDivStates.length>0?computeDivPositions(kpDivStates,innerW,s):null;
+    sketchEl.innerHTML=korpusSketch(H,B,T,s,sr,kpConstr,kpBack,nut,shelves,dividers,pos,divPos);
+  }
+}
+
+function korpusToggleCustomShelves(){
+  kpShelfCustom=document.getElementById('kp-shelf-custom').checked;
+  const posEl=document.getElementById('kp-shelf-pos-list');
+  if(posEl)posEl.style.display=kpShelfCustom?'':'none';
+  if(kpShelfCustom){
+    const H=toMM(document.getElementById('kp-h').value)||0;
+    const s=toMM(document.getElementById('kp-s').value)||18;
+    const shelves=Math.max(0,parseInt(document.getElementById('kp-shelves').value)||0);
+    const innerH=Math.max(0,H-2*s);
+    if(kpShelfStates.length!==shelves){
+      kpShelfStates=Array.from({length:shelves+1},(_,i)=>kpShelfStates[i]||{fixed:false,posMM:0});
+    }
+    if(shelves>0)renderKpShelfPositions(shelves,innerH);
+  }
+  korpusCalc();
+}
+
+function renderKpShelfPositions(count,innerH){
+  const el=document.getElementById('kp-shelf-pos-list');
+  if(!el)return;
+  const u=unitLabel();
+  const s=toMM(document.getElementById('kp-s').value)||18;
+  const computed=computeShelfPositions(kpShelfStates,innerH,s);
+  const lastIdx=kpShelfStates.length-1;
+  el.innerHTML=kpShelfStates.map((st,i)=>{
+    const pos=computed[i];
+    const isFixed=st.fixed;
+    const isTop=i===lastIdx;
+    const label=isTop?`Fach ${i+1} (oben)`:`Fach ${i+1}`;
+    const fixedHint=isTop?'Oberstes Fach · Fachhöhe individuell':'Fachhöhe individuell · lichtes Maß';
+    const lockBtn=`<button class="grain-btn${isFixed?' locked':''}" onclick="kpToggleShelfFixed(${i})" title="${isFixed?'Zurück zu Auto':'Individuell festlegen'}" style="font-size:17px;flex-shrink:0">${isFixed?'🔒':'🔓'}</button>`;
+    if(isFixed){
+      return `<div class="srow"><div><div class="srow-label">${label}</div><div class="srow-hint">${fixedHint}</div></div><div style="display:flex;align-items:center;gap:6px">${lockBtn}<div class="nm"><input id="kp-shelf-inp-${i}" type="number" inputmode="decimal" value="${st.posMM?inputVal(st.posMM):''}" min="1" oninput="kpSetShelfPos(${i},this.value)"><span data-unit-span>${u}</span></div></div></div>`;
+    } else {
+      return `<div class="srow"><div><div class="srow-label">${label}</div><div id="kp-shelf-hint-${i}" class="srow-hint">Auto · Fachhöhe: ${dispVal(pos)} ${u}</div></div><div style="display:flex;align-items:center;gap:6px">${lockBtn}<div class="nm"><input id="kp-shelf-inp-${i}" type="number" inputmode="decimal" value="${inputVal(pos)}" disabled style="opacity:.45"><span>${u}</span></div></div></div>`;
+    }
+  }).join('');
+}
+
+function kpToggleShelfFixed(idx){
+  if(!kpShelfStates[idx])return;
+  const H=toMM(document.getElementById('kp-h').value)||0;
+  const s=toMM(document.getElementById('kp-s').value)||18;
+  const innerH=Math.max(0,H-2*s);
+  if(!kpShelfStates[idx].fixed){
+    // Auto → Frei: aktuell berechnete Position als Startwert übernehmen
+    const computed=computeShelfPositions(kpShelfStates,innerH,s);
+    kpShelfStates[idx]={fixed:true,posMM:computed[idx]};
+  } else {
+    kpShelfStates[idx]={fixed:false,posMM:0};
+  }
+  renderKpShelfPositions(kpShelfStates.length,innerH);
+  kpSketchRedraw();
+}
+
+function kpSetShelfPos(idx,val){
+  if(kpShelfStates[idx])kpShelfStates[idx].posMM=toMM(val);
+  const H=toMM(document.getElementById('kp-h').value)||0;
+  const s=toMM(document.getElementById('kp-s').value)||18;
+  const innerH=Math.max(0,H-2*s);
+  const computed=computeShelfPositions(kpShelfStates,innerH,s);
+  const u=unitLabel();
+  kpShelfStates.forEach((st,i)=>{
+    if(st.fixed)return;
+    const inp=document.getElementById(`kp-shelf-inp-${i}`);
+    const hint=document.getElementById(`kp-shelf-hint-${i}`);
+    if(inp)inp.value=inputVal(computed[i]);
+    if(hint)hint.textContent=`Auto · Fachhöhe: ${dispVal(computed[i])} ${u}`;
+  });
+  kpSketchRedraw();
+}
+
+function computeDivPositions(states,innerW,s){
+  const numDividers=states.length-1;
+  const fixedFB=states.map(st=>st&&st.fixed?(st.posMM||0):null);
+  const totalFixed=fixedFB.reduce((a,v)=>a+(v!==null?v:0),0);
+  const autoCount=fixedFB.filter(v=>v===null).length;
+  const freeW=Math.max(0,innerW-numDividers*s-totalFixed);
+  const autoFB=autoCount>0?freeW/autoCount:0;
+  return fixedFB.map(v=>Math.round(v!==null?v:autoFB));
+}
+
+function korpusToggleCustomDividers(){
+  kpDivCustom=document.getElementById('kp-div-custom').checked;
+  const posEl=document.getElementById('kp-div-pos-list');
+  if(posEl)posEl.style.display=kpDivCustom?'':'none';
+  if(kpDivCustom){
+    const B=toMM(document.getElementById('kp-b').value)||0;
+    const s=toMM(document.getElementById('kp-s').value)||18;
+    const dividers=Math.max(0,parseInt(document.getElementById('kp-dividers').value)||0);
+    const innerW=Math.max(0,B-2*s);
+    if(kpDivStates.length!==dividers+1){
+      kpDivStates=Array.from({length:dividers+1},(_,i)=>kpDivStates[i]||{fixed:false,posMM:0});
+    }
+    if(dividers>0)renderKpDivPositions(dividers+1,innerW);
+  }
+  korpusCalc();
+}
+
+function renderKpDivPositions(count,innerW){
+  const el=document.getElementById('kp-div-pos-list');
+  if(!el)return;
+  const u=unitLabel();
+  const s=toMM(document.getElementById('kp-s').value)||18;
+  const computed=computeDivPositions(kpDivStates,innerW,s);
+  const lastIdx=kpDivStates.length-1;
+  el.innerHTML=kpDivStates.map((st,i)=>{
+    const pos=computed[i];
+    const isFixed=st.fixed;
+    const isRight=i===lastIdx;
+    const label=isRight?`Fach ${i+1} (rechts)`:`Fach ${i+1}`;
+    const fixedHint=isRight?'Rechtestes Fach · Fachbreite individuell':'Fachbreite individuell · lichtes Maß';
+    const lockBtn=`<button class="grain-btn${isFixed?' locked':''}" onclick="kpToggleDivFixed(${i})" title="${isFixed?'Zurück zu Auto':'Individuell festlegen'}" style="font-size:17px;flex-shrink:0">${isFixed?'🔒':'🔓'}</button>`;
+    if(isFixed){
+      return `<div class="srow"><div><div class="srow-label">${label}</div><div class="srow-hint">${fixedHint}</div></div><div style="display:flex;align-items:center;gap:6px">${lockBtn}<div class="nm"><input id="kp-div-inp-${i}" type="number" inputmode="decimal" value="${st.posMM?inputVal(st.posMM):''}" min="1" oninput="kpSetDivPos(${i},this.value)"><span data-unit-span>${u}</span></div></div></div>`;
+    } else {
+      return `<div class="srow"><div><div class="srow-label">${label}</div><div id="kp-div-hint-${i}" class="srow-hint">Auto · Fachbreite: ${dispVal(pos)} ${u}</div></div><div style="display:flex;align-items:center;gap:6px">${lockBtn}<div class="nm"><input id="kp-div-inp-${i}" type="number" inputmode="decimal" value="${inputVal(pos)}" disabled style="opacity:.45"><span>${u}</span></div></div></div>`;
+    }
+  }).join('');
+}
+
+function kpToggleDivFixed(idx){
+  if(!kpDivStates[idx])return;
+  const B=toMM(document.getElementById('kp-b').value)||0;
+  const s=toMM(document.getElementById('kp-s').value)||18;
+  const innerW=Math.max(0,B-2*s);
+  if(!kpDivStates[idx].fixed){
+    const computed=computeDivPositions(kpDivStates,innerW,s);
+    kpDivStates[idx]={fixed:true,posMM:computed[idx]};
+  } else {
+    kpDivStates[idx]={fixed:false,posMM:0};
+  }
+  renderKpDivPositions(kpDivStates.length,innerW);
+  kpSketchRedraw();
+}
+
+function kpSetDivPos(idx,val){
+  if(kpDivStates[idx])kpDivStates[idx].posMM=toMM(val);
+  const B=toMM(document.getElementById('kp-b').value)||0;
+  const s=toMM(document.getElementById('kp-s').value)||18;
+  const innerW=Math.max(0,B-2*s);
+  const computed=computeDivPositions(kpDivStates,innerW,s);
+  const u=unitLabel();
+  kpDivStates.forEach((st,i)=>{
+    if(st.fixed)return;
+    const inp=document.getElementById(`kp-div-inp-${i}`);
+    const hint=document.getElementById(`kp-div-hint-${i}`);
+    if(inp)inp.value=inputVal(computed[i]);
+    if(hint)hint.textContent=`Auto · Fachbreite: ${dispVal(computed[i])} ${u}`;
+  });
+  kpSketchRedraw();
 }
 
 function korpusCalc(){
@@ -2803,7 +3026,7 @@ function korpusCalc(){
   const T=toMM(document.getElementById('kp-t').value);
   const s=toMM(document.getElementById('kp-s').value);
   const sr=toMM(document.getElementById('kp-sr').value);
-  const nut=toMM(document.getElementById('kp-nut').value);
+  const nut=(sr||5)+1;
   const shelves=Math.max(0,parseInt(document.getElementById('kp-shelves').value)||0);
   const dividers=Math.max(0,parseInt(document.getElementById('kp-dividers').value)||0);
   const res=document.getElementById('kp-result');
@@ -2814,6 +3037,37 @@ function korpusCalc(){
   if(shLabel)shLabel.textContent = dividers>0 ? 'Einlegeböden je Fach' : 'Einlegeböden';
   if(shHint)shHint.textContent = dividers>0 ? `Pro Fach — bei ${dividers+1} Fächern ergibt das ${shelves*(dividers+1)} Böden` : 'Anzahl loser Böden im Korpus';
 
+  // Eigene Abstände UI steuern
+  const innerH_mm=Math.max(0,(H||0)-2*(s||0));
+  const innerW_mm=Math.max(0,(B||0)-2*(s||0));
+  const customWrap=document.getElementById('kp-shelf-custom-wrap');
+  if(customWrap)customWrap.style.display=shelves>0?'':'none';
+  if(shelves===0){kpShelfCustom=false;kpShelfStates=[];}
+  const customChk=document.getElementById('kp-shelf-custom');
+  if(customChk)customChk.checked=kpShelfCustom;
+  if(kpShelfCustom&&shelves>0){
+    const posEl=document.getElementById('kp-shelf-pos-list');
+    if(posEl)posEl.style.display='';
+    if(kpShelfStates.length!==shelves){
+      kpShelfStates=Array.from({length:shelves+1},(_,i)=>kpShelfStates[i]||{fixed:false,posMM:0});
+    }
+    renderKpShelfPositions(shelves,innerH_mm);
+  }
+  // Fachbreiten (Trennwände) UI steuern
+  const divCustomWrap=document.getElementById('kp-div-custom-wrap');
+  if(divCustomWrap)divCustomWrap.style.display=dividers>0?'':'none';
+  if(dividers===0){kpDivCustom=false;kpDivStates=[];}
+  const divCustomChk=document.getElementById('kp-div-custom');
+  if(divCustomChk)divCustomChk.checked=kpDivCustom;
+  if(kpDivCustom&&dividers>0){
+    const divPosEl=document.getElementById('kp-div-pos-list');
+    if(divPosEl)divPosEl.style.display='';
+    if(kpDivStates.length!==dividers+1){
+      kpDivStates=Array.from({length:dividers+1},(_,i)=>kpDivStates[i]||{fixed:false,posMM:0});
+    }
+    renderKpDivPositions(dividers+1,innerW_mm);
+  }
+
   if(H<=0||B<=0||T<=0){kpParts=[];res.innerHTML='';return;}
   // Plausibilität: Plattenstärke darf Korpus nicht „auffressen"
   if(2*s>=B||2*s>=H){
@@ -2821,10 +3075,10 @@ function korpusCalc(){
     res.innerHTML=`<div class="warn-box"><div class="warn-head">⚠️ Maße prüfen</div><div class="warn-hint">Die Plattenstärke ist zu groß für die angegebenen Außenmaße. Bitte Werte korrigieren.</div></div>`;
     return;
   }
-  // Plausibilität: passen die Mittelseiten in die Breite?
+  // Plausibilität: passen die Trennwände in die Breite?
   if(dividers>0 && (B-2*s-dividers*s)/(dividers+1) < 10){
     kpParts=[];
-    res.innerHTML=`<div class="warn-box"><div class="warn-head">⚠️ Zu viele Mittelseiten</div><div class="warn-hint">Bei dieser Breite bleibt für ${dividers+1} Fächer kein sinnvoller Platz. Reduziere die Anzahl der Mittelseiten oder vergrößere die Breite.</div></div>`;
+    res.innerHTML=`<div class="warn-box"><div class="warn-head">⚠️ Zu viele Trennwände</div><div class="warn-hint">Bei dieser Breite bleibt für ${dividers+1} Fächer kein sinnvoller Platz. Reduziere die Anzahl der Trennwände oder vergrößere die Breite.</div></div>`;
     return;
   }
 
@@ -2834,7 +3088,9 @@ function korpusCalc(){
   const totalPieces=parts.reduce((a,p)=>a+p.qty,0);
   const totalArea=parts.reduce((a,p)=>a+p.l*p.w*p.qty,0)/1e6; // m²
 
-  let html=`<div class="section"><div class="slabel">✏️ Skizze</div>${korpusSketch(H,B,T,s,sr,kpConstr,kpBack,nut,shelves,dividers)}</div>`;
+  const shelfPos=kpShelfCustom&&kpShelfStates.length>0?computeShelfPositions(kpShelfStates,innerH_mm,s||18):null;
+  const divPos=kpDivCustom&&kpDivStates.length>0?computeDivPositions(kpDivStates,innerW_mm,s||18):null;
+  let html=`<div class="section"><div class="slabel">✏️ Skizze</div><div id="kp-sketch-area">${korpusSketch(H,B,T,s,sr,kpConstr,kpBack,nut,shelves,dividers,shelfPos,divPos)}</div></div>`;
 
   html+=`<div class="section"><div class="slabel">📋 Zuschnittliste</div>
     <div class="kp-cut-head"><span>Bauteil</span><span>Maß (${unitLabel()})</span><span>Anz.</span></div>`;
@@ -2853,7 +3109,7 @@ function korpusCalc(){
   </div>`;
 
   // Bau-Anleitung (kontextabhängig)
-  const guide=korpusGuide(kpConstr,kpBack,nut,shelves,dividers);
+  const guide=korpusGuide(kpConstr,kpBack,nut,shelves,dividers,shelfPos);
   html+=`<div class="section" style="margin-top:18px"><div class="slabel">🔨 Bau-Anleitung</div>
     <div class="kp-guide">${guide.map((g,i)=>`<div class="kp-step"><span class="kp-step-num">${i+1}</span><span class="kp-step-txt">${g}</span></div>`).join('')}</div>
   </div>`;
@@ -2866,10 +3122,10 @@ function korpusCalc(){
 }
 
 // Maßstäbliche Skizze: Vorderansicht (Höhe×Breite) + kleine Seitenansicht (Tiefe).
-function korpusSketch(H,B,T,s,sr,constr,back,nut,shelves,dividers){
+function korpusSketch(H,B,T,s,sr,constr,back,nut,shelves,dividers,shelfPosMM,divPosMM){
   const n=Math.max(0,dividers||0);
   // Vorderansicht-Layout
-  const pad=22, gap=30;             // Innenabstand & Lücke zwischen den Ansichten
+  const pad=22, gap=50;             // Innenabstand & Lücke zwischen den Ansichten
   const maxFrontW=200;              // max Breite der Vorderansicht in px
   const maxH=180;                   // max Höhe in px
   // Skalierung gemeinsam für beide Ansichten (damit Höhe konsistent)
@@ -2879,7 +3135,7 @@ function korpusSketch(H,B,T,s,sr,constr,back,nut,shelves,dividers){
   const t=Math.max(2, s*scale);     // Plattenstärke px (min sichtbar)
   const tr=Math.max(1.5, sr*scale); // Rückwandstärke px
   const svgW=pad*2+fW+gap+sd;
-  const svgH=pad*2+fH+16;           // +16 für Beschriftung unten
+  const svgH=pad*2+fH+28;           // +28 für Beschriftung + Breitenmaße unten
   const ox=pad, oy=pad;             // Ursprung Vorderansicht (oben-links)
   const sx=pad+fW+gap;              // Ursprung Seitenansicht x
 
@@ -2903,29 +3159,58 @@ function korpusSketch(H,B,T,s,sr,constr,back,nut,shelves,dividers){
   // Innenraum-Geometrie (Vorderansicht)
   const innerLeft=ox+t, innerRight=ox+fW-t, innerW=innerRight-innerLeft;
   const innerTop=oy+t, innerBot=oy+fH-t, innerH=innerBot-innerTop;
-  // Mittelseiten: n Trennwände teilen den Innenraum in (n+1) gleich breite Fächer
-  const compW=(innerW - n*t)/(n+1); // Fachbreite in px (Plattenstärke als Trennwand abgezogen)
-  const compEdges=[]; // linke Kante jedes Fachs
+  // Trennwände: n Trennwände teilen den Innenraum in (n+1) Fächer
+  const availCompW=innerW-n*t; // verfügbarer Px-Raum für alle Fächer
+  const compEdges=[]; // linke Kante jedes Fachs (px)
+  const compWidths=[]; // Breite jedes Fachs (px)
+  const compWidths_mm=[]; // Breite jedes Fachs (mm, für Beschriftung)
   let cx=innerLeft;
-  for(let i=0;i<=n;i++){
-    compEdges.push(cx);
-    if(i<n){
-      // Trennwand zeichnen
-      p+=`<rect x="${cx+compW}" y="${innerTop}" width="${t}" height="${innerH}" fill="${col.body}" opacity=".55"/>`;
+  if(divPosMM&&divPosMM.length===n+1){
+    const totalFB=divPosMM.reduce((a,v)=>a+v,0);
+    const scW=totalFB>0?availCompW/totalFB:1;
+    for(let i=0;i<=n;i++){
+      const cW=divPosMM[i]*scW;
+      compEdges.push(cx);compWidths.push(cW);compWidths_mm.push(divPosMM[i]);
+      if(i<n)p+=`<rect x="${(cx+cW).toFixed(1)}" y="${innerTop}" width="${t}" height="${innerH}" fill="${col.body}" opacity=".55"/>`;
+      cx+=cW+t;
     }
-    cx+=compW+t;
+  } else {
+    const cW=availCompW/(n+1);
+    const cW_mm=(B-2*s-n*s)/(n+1);
+    for(let i=0;i<=n;i++){
+      compEdges.push(cx);compWidths.push(cW);compWidths_mm.push(cW_mm);
+      if(i<n)p+=`<rect x="${(cx+cW).toFixed(1)}" y="${innerTop}" width="${t}" height="${innerH}" fill="${col.body}" opacity=".55"/>`;
+      cx+=cW+t;
+    }
   }
-  // Einlegeböden je Fach (gleichmäßig verteilt)
-  if(shelves>0){
-    for(const left of compEdges){
-      for(let i=1;i<=shelves;i++){
-        const yy=innerTop+innerH*i/(shelves+1);
-        p+=`<rect x="${left}" y="${yy-t/2}" width="${compW}" height="${t}" fill="${col.shelf}" opacity=".7"/>`;
-      }
-    }
+  // Einlegeböden je Fach
+  // shelfPosMM enthält Fachhöhen (lichte Höhe je Fach unterhalb jedes Bodens)
+  // _shelfPos: absolute Unterkante ab Innenboden (intern für Zeichnung)
+  const tiH_mm=Math.max(0,H-2*s);
+  let _shelfPos=null;
+  if(shelves>0&&tiH_mm>0){
+    // shelfPosMM hat shelves+1 Einträge (alle Fächer inkl. oberstem); nur die ersten
+    // shelves Fachhöhen bestimmen Böden-Positionen; der letzte Eintrag = oberstes Fach
+    const fhFull=shelfPosMM&&shelfPosMM.length>0
+      ? shelfPosMM
+      : new Array(shelves+1).fill(Math.max(0,(tiH_mm-shelves*s)/(shelves+1)));
+    const fhArr=fhFull.slice(0,shelves); // nur die N Böden-Fachhöhen für Positionierung
+    _shelfPos=[];
+    let cum=0;
+    for(const fh of fhArr){cum+=fh;if(cum>=0&&cum+s<=tiH_mm)_shelfPos.push(cum);cum+=s;}
+    if(!_shelfPos.length)_shelfPos=null;
+  }
+  if(_shelfPos){
+    compEdges.forEach((left,ci)=>{
+      const cW=compWidths[ci];
+      _shelfPos.forEach(pos=>{
+        const yy=innerBot-(pos+s/2)/tiH_mm*innerH;
+        p+=`<rect x="${left}" y="${yy-t/2}" width="${cW.toFixed(1)}" height="${t}" fill="${col.shelf}" opacity=".7"/>`;
+      });
+    });
   }
   // Label Vorderansicht
-  p+=`<text x="${ox+fW/2}" y="${oy+fH+12}" text-anchor="middle" font-size="9" fill="${col.txt}">Vorderansicht</text>`;
+  p+=`<text x="${ox+fW/2}" y="${oy+fH+22}" text-anchor="middle" font-size="10" fill="${col.txt}">Vorderansicht</text>`;
 
   // --- Seitenansicht ---
   p+=`<rect x="${sx}" y="${oy}" width="${sd}" height="${fH}" fill="${col.bodyFill}" stroke="${col.body}" stroke-width="1.2"/>`;
@@ -2942,12 +3227,56 @@ function korpusSketch(H,B,T,s,sr,constr,back,nut,shelves,dividers){
     // bündig hinten, zwischen Deckel und Boden eingerahmt (ohne Nut)
     p+=`<rect x="${sx+sd-tr}" y="${oy+t}" width="${tr}" height="${fH-2*t}" fill="${col.backFill}" stroke="${col.back}" stroke-width="1"/>`;
   }
-  p+=`<text x="${sx+sd/2}" y="${oy+fH+12}" text-anchor="middle" font-size="9" fill="${col.txt}">Seite</text>`;
+  p+=`<text x="${sx+sd/2}" y="${oy+fH+22}" text-anchor="middle" font-size="10" fill="${col.txt}">Seite</text>`;
+
+  // ---- Innere Maßannotationen ----
+  // _shelfPos ist bereits oben berechnet (Unterkante ab Innenboden = lichte Höhe)
+  // Böden: SVG-y-Zentren und Unterkanten-mm, sortiert oben→unten (aufsteigendes SVG-y)
+  const _sYC=[],_sMM=[];
+  if(_shelfPos){
+    _shelfPos.forEach(pos=>{
+      _sYC.push(innerBot-(pos+s/2)/tiH_mm*innerH);
+      _sMM.push(pos);
+    });
+    const _pr=_sYC.map((y,i)=>[y,_sMM[i]]).sort((a,b)=>a[0]-b[0]);
+    _sYC.length=0;_sMM.length=0;_pr.forEach(([y,m])=>{_sYC.push(y);_sMM.push(m);});
+  }
+  // Höhen-Lücken: [y1px, y2px, mm] — lichte Maße zwischen den Bauteilen
+  const _hG=[];
+  if(_sYC.length===0){if(tiH_mm>0)_hG.push([innerTop,innerBot,tiH_mm]);}
+  else{
+    // _sMM[0] = oberster Boden, _sMM[last] = unterster Boden (absteigend nach Unterkante)
+    _hG.push([innerTop,_sYC[0]-t/2,tiH_mm-_sMM[0]-s]);           // über oberstem Boden
+    for(let i=0;i<_sYC.length-1;i++)_hG.push([_sYC[i]+t/2,_sYC[i+1]-t/2,_sMM[i]-_sMM[i+1]-s]); // zwischen Böden
+    _hG.push([_sYC[_sYC.length-1]+t/2,innerBot,_sMM[_sMM.length-1]]); // unter unterstem Boden = lichte Höhe
+  }
+  // Höhen-Maßlinie rechts der Vorderansicht (im Abstandsbereich zum Seitenriss)
+  if(tiH_mm>0){
+    const dX=ox+fW+9,dC=col.line;
+    p+=`<line x1="${dX}" y1="${innerTop}" x2="${dX}" y2="${innerBot}" stroke="${dC}" stroke-width="0.7"/>`;
+    const _bY=[innerTop];
+    _sYC.forEach(y=>{_bY.push(y-t/2);_bY.push(y+t/2);});
+    _bY.push(innerBot);
+    _bY.forEach(by=>p+=`<line x1="${(dX-3).toFixed(1)}" y1="${by.toFixed(1)}" x2="${(dX+4).toFixed(1)}" y2="${by.toFixed(1)}" stroke="${dC}" stroke-width="0.7"/>`);
+    _hG.forEach(([y1,y2,mm])=>{
+      if(y2-y1<8)return;
+      p+=`<text x="${(dX+7).toFixed(1)}" y="${((y1+y2)/2).toFixed(1)}" font-size="7.5" fill="${dC}" text-anchor="start" dominant-baseline="middle">${dispVal(mm)}</text>`;
+    });
+  }
+  // Breiten-Maßlabels unterhalb jedes Fachs
+  if(compWidths.length>0&&tiH_mm>0){
+    const wY=(oy+fH+10).toFixed(1);
+    compEdges.forEach((ex,ci)=>{
+      const cW=compWidths[ci];
+      if(cW<15)return;
+      p+=`<text x="${(ex+cW/2).toFixed(1)}" y="${wY}" font-size="7.5" fill="${col.line}" text-anchor="middle" dominant-baseline="middle">${dispVal(compWidths_mm[ci])}</text>`;
+    });
+  }
 
   // Maßangaben (Außen)
-  p+=`<text x="${ox+fW/2}" y="${oy-7}" text-anchor="middle" font-size="9" fill="${col.txt}">B ${dispVal(B)}</text>`;
-  p+=`<text x="${ox-7}" y="${oy+fH/2}" text-anchor="middle" font-size="9" fill="${col.txt}" transform="rotate(-90 ${ox-7} ${oy+fH/2})">H ${dispVal(H)}</text>`;
-  p+=`<text x="${sx+sd/2}" y="${oy-7}" text-anchor="middle" font-size="9" fill="${col.txt}">T ${dispVal(T)}</text>`;
+  p+=`<text x="${ox+fW/2}" y="${oy-7}" text-anchor="middle" font-size="10" fill="${col.txt}">B ${dispVal(B)}</text>`;
+  p+=`<text x="${ox-7}" y="${oy+fH/2}" text-anchor="middle" font-size="10" fill="${col.txt}" transform="rotate(-90 ${ox-7} ${oy+fH/2})">H ${dispVal(H)}</text>`;
+  p+=`<text x="${sx+sd/2}" y="${oy-7}" text-anchor="middle" font-size="10" fill="${col.txt}">T ${dispVal(T)}</text>`;
 
   // Legende
   let legend=`<div class="kp-legend"><span class="kp-leg"><i style="background:${col.body}"></i>Korpus</span>`;
@@ -2965,12 +3294,17 @@ function korpusReset(){
   document.getElementById('kp-t').value='';
   document.getElementById('kp-s').value=inputVal(18);  // 18 mm Standard-Plattenstärke
   document.getElementById('kp-sr').value=inputVal(5);  // 5 mm Rückwand
-  document.getElementById('kp-nut').value=inputVal(6); // 6 mm Nuttiefe
   document.getElementById('kp-shelves').value='0';
   document.getElementById('kp-dividers').value='0';
   korpusSetConstr('sides');
   korpusSetBack('inset');
   kpParts=[];
+  kpShelfCustom=false;kpShelfStates=[];
+  kpDivCustom=false;kpDivStates=[];
+  const rChk=document.getElementById('kp-shelf-custom');if(rChk)rChk.checked=false;
+  const rPos=document.getElementById('kp-shelf-pos-list');if(rPos)rPos.style.display='none';
+  const rDivChk=document.getElementById('kp-div-custom');if(rDivChk)rDivChk.checked=false;
+  const rDivPos=document.getElementById('kp-div-pos-list');if(rDivPos)rDivPos.style.display='none';
   document.getElementById('kp-result').innerHTML='';
 }
 
@@ -2985,10 +3319,14 @@ function korpusSaveProject(){
   const proj={
     name, saved:new Date().toLocaleDateString('de-DE'),
     // Maße in mm speichern, damit sie einheitenunabhängig sind
-    dims:{H:toMM(gv('kp-h')),B:toMM(gv('kp-b')),T:toMM(gv('kp-t')),s:toMM(gv('kp-s')),sr:toMM(gv('kp-sr')),nut:toMM(gv('kp-nut'))},
+    dims:{H:toMM(gv('kp-h')),B:toMM(gv('kp-b')),T:toMM(gv('kp-t')),s:toMM(gv('kp-s')),sr:toMM(gv('kp-sr'))},
     shelves:parseInt(gv('kp-shelves'))||0,
     dividers:parseInt(gv('kp-dividers'))||0,
-    constr:kpConstr, back:kpBack
+    constr:kpConstr, back:kpBack,
+    shelfCustom:kpShelfCustom,
+    shelfStates:kpShelfCustom?kpShelfStates.map(s=>({...s})):[],
+    divCustom:kpDivCustom,
+    divStates:kpDivCustom?kpDivStates.map(s=>({...s})):[]
   };
   if(!proj.dims.H||!proj.dims.B||!proj.dims.T){alert('Bitte zuerst gültige Außenmaße eingeben.');return;}
   const projects=kpGetProjects();const idx=projects.findIndex(p=>p.name===name);
@@ -3000,11 +3338,19 @@ function korpusLoadProject(name){
   if(!confirm(`Projekt "${name}" laden?\n\nDie aktuelle Eingabe wird dabei überschrieben.`))return;
   const setMM=(id,mm)=>{const el=document.getElementById(id);if(el)el.value=mm?inputVal(mm):'';};
   setMM('kp-h',p.dims.H);setMM('kp-b',p.dims.B);setMM('kp-t',p.dims.T);
-  setMM('kp-s',p.dims.s);setMM('kp-sr',p.dims.sr);setMM('kp-nut',p.dims.nut);
+  setMM('kp-s',p.dims.s);setMM('kp-sr',p.dims.sr);
   document.getElementById('kp-shelves').value=p.shelves||0;
   document.getElementById('kp-dividers').value=p.dividers||0;
   korpusSetConstr(p.constr||'sides');
   korpusSetBack(p.back||'inset');
+  kpShelfCustom=p.shelfCustom||false;
+  kpShelfStates=(p.shelfStates||[]).map(s=>({...s}));
+  kpDivCustom=p.divCustom||false;
+  kpDivStates=(p.divStates||[]).map(s=>({...s}));
+  const lChk=document.getElementById('kp-shelf-custom');if(lChk)lChk.checked=kpShelfCustom;
+  const lPos=document.getElementById('kp-shelf-pos-list');if(lPos)lPos.style.display=kpShelfCustom?'':'none';
+  const lDivChk=document.getElementById('kp-div-custom');if(lDivChk)lDivChk.checked=kpDivCustom;
+  const lDivPos=document.getElementById('kp-div-pos-list');if(lDivPos)lDivPos.style.display=kpDivCustom?'':'none';
   korpusCalc();
   document.getElementById('screen-korpus').scrollTop=0;
 }
@@ -3017,7 +3363,7 @@ function renderKpProjects(){
   const projects=kpGetProjects();
   if(!projects.length){el.innerHTML=`<div class="empty-proj">📂 Noch keine Korpus-Projekte gespeichert.<br>Daten bleiben lokal auf diesem Gerät.</div>`;return;}
   el.innerHTML=projects.map(p=>{
-    const desc=`${dispVal(p.dims.H)}×${dispVal(p.dims.B)}×${dispVal(p.dims.T)} ${unitLabel()}`+(p.dividers?` · ${p.dividers} Mittels.`:'')+(p.shelves?` · ${p.shelves} Böden`:'');
+    const desc=`${dispVal(p.dims.H)}×${dispVal(p.dims.B)}×${dispVal(p.dims.T)} ${unitLabel()}`+(p.dividers?` · ${p.dividers} Trennw.`:'')+(p.shelves?` · ${p.shelves} Böden`:'');
     const nm=p.name.replace(/'/g,"\\'");
     return `<div class="proj-item"><div><div class="proj-name">${p.name}</div><div class="proj-meta">${p.saved} · ${desc}</div></div><div class="proj-btns"><button class="btn-load" onclick="korpusLoadProject('${nm}')">📥 Laden</button><button class="btn-del" onclick="korpusDeleteProject('${nm}')">🗑</button></div></div>`;
   }).join('');
@@ -3048,7 +3394,7 @@ async function korpusDoPDF(){
   const u=unitLabel();
   let y=15;const lm=15,pw=180;const checkY=k=>{if(y+k>278){doc.addPage();y=15;}};
   const gv=id=>document.getElementById(id).value;
-  const H=toMM(gv('kp-h')),B=toMM(gv('kp-b')),T=toMM(gv('kp-t')),s=toMM(gv('kp-s')),sr=toMM(gv('kp-sr')),nut=toMM(gv('kp-nut'));
+  const H=toMM(gv('kp-h')),B=toMM(gv('kp-b')),T=toMM(gv('kp-t')),s=toMM(gv('kp-s')),sr=toMM(gv('kp-sr')),nut=(sr||5)+1;
   const shelves=Math.max(0,parseInt(gv('kp-shelves'))||0);
   const dividers=Math.max(0,parseInt(gv('kp-dividers'))||0);
 
@@ -3067,9 +3413,19 @@ async function korpusDoPDF(){
   const constrTxt = kpConstr==='sides' ? 'Seiten durchgehend' : 'Boden/Deckel durchgehend';
   const backTxt = {inset:'eingenutet',framed:'eingelassen',overlay:'aufgesetzt',none:'keine'}[kpBack];
   doc.setFont('helvetica','normal');doc.setFontSize(9.5);
-  const cfg=`Plattenstärke ${dispVal(s)} ${u}  ·  Konstruktion: ${constrTxt}  ·  Rückwand: ${backTxt}${kpBack!=='none'?` (${dispVal(sr)} ${u}`+(kpBack==='inset'?`, Nut ${dispVal(nut)} ${u}`:'')+')':''}`;
+  const cfg=`Plattenstärke ${dispVal(s)} ${u}  ·  Konstruktion: ${constrTxt}  ·  Rückwand: ${backTxt}${kpBack!=='none'?` (${dispVal(sr)} ${u}`+(kpBack==='inset'?`, Nut ${dispVal(nut)} ${u} (auto)`:'')+')'  :''}`;
   doc.text(doc.splitTextToSize(cfg,pw),lm,y);y+= (kpBack==='none'?5:5)+ (doc.splitTextToSize(cfg,pw).length>1?4:0);
-  if(dividers>0||shelves>0){doc.text(`Mittelseiten: ${dividers}  ·  Einlegeböden: ${shelves*(dividers+1)}${dividers>0?` (${shelves} je Fach)`:''}`,lm,y);y+=5;}
+  const innerH_pdf=Math.max(0,H-2*s);
+  const shelfPos_pdf=kpShelfCustom&&kpShelfStates.length>0?computeShelfPositions(kpShelfStates,innerH_pdf,s||18):null;
+  if(dividers>0||shelves>0){
+    let shelfTxt=`Trennwände: ${dividers}  ·  Einlegeböden: ${shelves*(dividers+1)}${dividers>0?` (${shelves} je Fach)`:''}`;
+    if(shelfPos_pdf&&kpShelfStates.some(st=>st.fixed)){
+      const fixedParts=kpShelfStates.map((st,i)=>st.fixed?`B${i+1}=${dispVal(shelfPos_pdf[i])}`:'').filter(Boolean);
+      shelfTxt+=`  ·  Individuell: ${fixedParts.join(', ')} ${unitLabel()}`;
+    }
+    const shelfLines=doc.splitTextToSize(shelfTxt,pw);
+    doc.text(shelfLines,lm,y);y+=shelfLines.length*5;
+  }
   y+=5;
 
   // Skizze (aus dem DOM rasterisieren)
@@ -3089,8 +3445,8 @@ async function korpusDoPDF(){
   checkY(16);
   doc.setFont('helvetica','bold');doc.setFontSize(12);doc.text('Zuschnittliste',lm,y);y+=6;
   const cols=[96,54,30];const heads=['Bauteil',`Maß (${u})`,'Anzahl'];
-  doc.setFillColor(245,237,214);doc.rect(lm,y-4,pw,6,'F');doc.setFontSize(9);doc.setFont('helvetica','bold');
-  let x=lm;heads.forEach((h,i)=>{doc.text(h,x+1,y);x+=cols[i];});y+=4;doc.setFont('helvetica','normal');
+  doc.setFillColor(245,237,214);doc.rect(lm,y-5,pw,7,'F');doc.setFontSize(9);doc.setFont('helvetica','bold');
+  let x=lm;heads.forEach((h,i)=>{doc.text(h,x+1,y-1);x+=cols[i];});y+=4;doc.setFont('helvetica','normal');
   kpParts.forEach((p,i)=>{checkY(6);if(i%2===0){doc.setFillColor(252,250,246);doc.rect(lm,y-3.5,pw,5.5,'F');}
     let x=lm;[p.name,`${dispVal(p.l)} × ${dispVal(p.w)}`,`${p.qty}×`].forEach((v,ci)=>{doc.text(String(v),x+1,y);x+=cols[ci];});y+=5.5;});
   const totalPieces=kpParts.reduce((a,p)=>a+p.qty,0);
@@ -3100,7 +3456,7 @@ async function korpusDoPDF(){
   doc.setFont('helvetica','normal');
 
   // Bau-Anleitung
-  const guide=korpusGuide(kpConstr,kpBack,nut,shelves,dividers);
+  const guide=korpusGuide(kpConstr,kpBack,nut,shelves,dividers,shelfPos_pdf);
   checkY(14);
   doc.setFont('helvetica','bold');doc.setFontSize(12);doc.text('Bau-Anleitung',lm,y);y+=7;
   doc.setFontSize(9.5);
