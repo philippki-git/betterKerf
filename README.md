@@ -6,6 +6,22 @@
 
 ---
 
+## Inhaltsverzeichnis
+
+- [Module](#module)
+  - [📐 Zuschnitt-Optimierer](#-zuschnitt-optimierer)
+  - [🎯 Bohrlochplaner](#-bohrlochplaner)
+  - [💰 Kostenkalkulator](#-kostenkalkulator)
+  - [🗄️ Korpusplaner](#️-korpusplaner)
+  - [♻️ Reststück-Lager](#️-reststück-lager)
+- [Wie die Module zusammenarbeiten](#wie-die-module-zusammenarbeiten)
+- [Installation auf dem iPhone](#installation-auf-dem-iphone)
+- [Einstellungen](#einstellungen)
+- [Status](#status)
+- [Technisch](#technisch)
+
+---
+
 ## Module
 
 ### 📐 Zuschnitt-Optimierer
@@ -19,7 +35,7 @@ Berechnet den optimalen Zuschnittplan aus vorhandenen Brettern für eine Liste b
 - Schritt-für-Schritt-Anleitung für die Ausführung am Sägetisch
 - Projekte lokal speichern und später wieder laden
 
-### 🎯 Lochabstände
+### 🎯 Bohrlochplaner
 Berechnet gleichmäßige Bohrungsabstände für eine Lochreihe oder ein Lochraster.
 
 - **Reihenmodus:** Anzahl Löcher auf einer definierten Strecke gleichmäßig verteilen — mit optionalem Randabstand (symmetrisch oder individuell)
@@ -27,7 +43,7 @@ Berechnet gleichmäßige Bohrungsabstände für eine Lochreihe oder ein Lochrast
 - Optionaler Lochdurchmesser für maßstäbliche Darstellung und Randabstands-Warnung
 - Ausgabe als 1:1-Schablone (SVG), die man direkt auf dem Gerät ansehen oder zoomen kann
 
-### 💰 Materialkosten
+### 💰 Kostenkalkulator
 Berechnet den Materialpreis pro Projekt und den Geldwert des anfallenden Verschnitts.
 
 - Preis pro Brett als Stückpreis oder pro m² eingeben
@@ -36,7 +52,7 @@ Berechnet den Materialpreis pro Projekt und den Geldwert des anfallenden Verschn
 - Hochrechnung für Kleinserien: Multiplikator für Stückzahl
 - Kann direkt aus dem Zuschnitt-Optimierer befüllt werden — die Bretter aus dem Schnittplan werden übernommen
 
-### 🗄️ Korpusrechner
+### 🗄️ Korpusplaner
 Berechnet aus den Außenmaßen eines Korpus automatisch alle Zuschnittmaße für die Einzelteile.
 
 - Eingabe: Höhe, Breite, Tiefe, Plattenstärke, Rückwandstärke
@@ -46,15 +62,20 @@ Berechnet aus den Außenmaßen eines Korpus automatisch alle Zuschnittmaße für
 - Ausgabe: vollständige Zuschnittliste aller Teile mit Maßen und Stückzahl
 - Projekte lokal speichern und wieder laden
 
+### ♻️ Reststück-Lager
+> ⏳ **In Entwicklung** — noch nicht verfügbar.
+
+Speichert nutzbare Reststücke aus Projekten und plant sie in Folgeprojekten automatisch mit ein.
+
 ---
 
 ## Wie die Module zusammenarbeiten
 
 Die Module sind bewusst miteinander verknüpft:
 
-1. **Korpusrechner → Zuschnitt-Optimierer:** Die Zuschnittliste aus dem Korpusrechner kann direkt in den Zuschnitt-Optimierer übernommen werden — mit einem Klick werden alle Teile als Eingabe übertragen.
+1. **Korpusplaner → Zuschnitt-Optimierer:** Die Zuschnittliste aus dem Korpusplaner kann direkt in den Zuschnitt-Optimierer übernommen werden — mit einem Klick werden alle Teile als Eingabe übertragen.
 
-2. **Zuschnitt-Optimierer → Materialkosten:** Nach einer Berechnung im Zuschnitt-Optimierer können die verwendeten Bretter automatisch in das Materialkosten-Modul übernommen werden, um den Materialpreis sofort zu kalkulieren.
+2. **Zuschnitt-Optimierer → Kostenkalkulator:** Nach einer Berechnung im Zuschnitt-Optimierer können die verwendeten Bretter automatisch in den Kostenkalkulator übernommen werden, um den Materialpreis sofort zu kalkulieren.
 
 3. **Globale Einheit:** Die gewählte Maßeinheit (mm, cm, m) gilt für alle Module gleichzeitig. Intern wird immer in Millimetern gerechnet; die Umrechnung erfolgt nur in der Anzeige. Die Sägeblattbreite (Kerf) bleibt immer in mm.
 
@@ -81,9 +102,6 @@ Die Module sind bewusst miteinander verknüpft:
 ## Status
 
 > ⚠️ **v0.9.0 — In aktiver Entwicklung.** Die App ist funktionsfähig, aber noch nicht feature-complete. Feedback und Issues sind willkommen.
-
-Geplant:
-- **♻️ Reststück-Lager** — Verschnitt aus Projekten speichern und in Folgeprojekten wiederverwenden
 
 ---
 
