@@ -206,7 +206,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:-apple-
 .kp-field input:focus{outline:none;border-color:var(--accent)}
 .kp-seg{height:42px;margin-bottom:8px}
 .kp-seg.kp-seg-4 button{font-size:11px;padding:0 2px;line-height:1.15}
-.kp-seg-label{font-size:13px;color:var(--text2);margin-bottom:6px}
+.kp-seg-label{font-size:11px;color:var(--text3);margin-bottom:6px}
 .kp-nut{max-width:50%;margin-top:4px}
 .kp-cut-head{display:grid;grid-template-columns:1fr auto 44px;gap:10px;font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--text3);padding:0 2px 6px;border-bottom:.5px solid var(--border)}
 .kp-cut-head span:nth-child(2){text-align:right}
@@ -403,7 +403,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:-apple-
     <div class="pane" id="pane-steps"><div id="steps-content"></div></div>
   </div>
 
-  <!-- MODULE: HOLES (Lochabstände) -->
+  <!-- MODULE: HOLES (Bohrlochplaner) -->
   <div class="screen" id="screen-holes">
     <div class="pane active" style="display:block">
       <div class="hsub-tabs">
@@ -434,7 +434,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:-apple-
             <div class="srow" id="h-symrow"><div><div class="srow-label">Beide gleich (symmetrisch)</div><div class="srow-hint">Endabstand = Anfangsabstand</div></div><input type="checkbox" id="h-sym" class="toggle" checked onchange="toggleSym()"></div>
           </div>
         </div>
-        <button class="calc-btn" onclick="holesCalc()">▶ Lochabstände berechnen</button>
+        <button class="calc-btn" onclick="holesCalc()">▶ Bohrlochplaner berechnen</button>
         <button class="action-btn" onclick="holesReset()">↺ Zurücksetzen</button>
       </div>
 
@@ -532,6 +532,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:-apple-
 
       <div class="section">
         <div class="slabel-row"><div class="slabel">🚪 Rückwand</div><button class="info-btn" onclick="openBackInfo()" aria-label="Erklärung zu den Rückwand-Varianten">ⓘ</button></div>
+        <div class="kp-seg-label">Befestigung &amp; Einbauart der Rückwand</div>
         <div class="cost-seg kp-seg kp-seg-4">
           <button id="kp-bk-inset" class="on" onclick="korpusSetBack('inset')">eingenutet</button>
           <button id="kp-bk-framed" onclick="korpusSetBack('framed')">eingelassen</button>
@@ -738,7 +739,7 @@ const MODULES=[
   // ── Geplante Module (Platzhalter, noch nicht aktiv) ──
   {
     id:'holes',
-    title:'Lochabstände',
+    title:'Bohrlochplaner',
     sub:'Bohrungen gleichmäßig verteilen',
     emoji:'🎯',
     color:'#5B8DB8',
@@ -758,7 +759,7 @@ const MODULES=[
   },
   {
     id:'cost',
-    title:'Materialkosten',
+    title:'Kostenkalkulator',
     sub:'Preis & Verschnittwert',
     emoji:'💰',
     color:'#9B6B9B',
@@ -769,7 +770,7 @@ const MODULES=[
   },
   {
     id:'korpus',
-    title:'Korpusrechner',
+    title:'Korpusplaner',
     sub:'Schränke & Möbel planen',
     emoji:'🗄️',
     color:'#5B8DB8',
@@ -1715,7 +1716,7 @@ document.addEventListener('focusin',e=>{
 });
 
 // ═══════════════════════════════════════════════════════════════════════
-//  MODULE: Lochabstände (hole spacing)
+//  MODULE: Bohrlochplaner (hole spacing)
 // ═══════════════════════════════════════════════════════════════════════
 function toggleMarginInputs(){
   const on=document.getElementById('h-usemargin').checked;
@@ -1884,7 +1885,7 @@ function holesCopy(){
   if(!lastHoles)return;
   const u=unitLabel();
   const txt=lastHoles.centers.map((c,i)=>`Loch ${i+1}: ${dispVal(c)} ${u}`).join('\n');
-  const full=`Lochabstände — ${lastHoles.n} Löcher auf ${dispVal(lastHoles.L)} ${u}\n\n${txt}`;
+  const full=`Bohrlochplaner — ${lastHoles.n} Löcher auf ${dispVal(lastHoles.L)} ${u}\n\n${txt}`;
   if(navigator.clipboard&&navigator.clipboard.writeText){
     navigator.clipboard.writeText(full).then(()=>alert('Positionen in die Zwischenablage kopiert.')).catch(()=>holesCopyFallback(full));
   } else holesCopyFallback(full);
@@ -2088,7 +2089,7 @@ async function holesDoExport(){
   const {jsPDF}=window.jspdf;const doc=new jsPDF({unit:'mm',format:'a4'});
   const {L,n,centers,gaps}=lastHoles;const u=unitLabel();
   let y=15;const lm=15,pw=180;const checkY=k=>{if(y+k>272){doc.addPage();y=15;}};
-  doc.setFont('helvetica','bold');doc.setFontSize(18);doc.text('betterKerf — Lochabstände (Reihe)',lm,y);y+=9;
+  doc.setFont('helvetica','bold');doc.setFontSize(18);doc.text('betterKerf — Bohrlochplaner (Reihe)',lm,y);y+=9;
   doc.setFont('helvetica','normal');doc.setFontSize(9);doc.setTextColor(120,110,100);
   doc.text(`Erstellt: ${new Date().toLocaleDateString('de-DE')} | Einheit: ${u}`,lm,y);y+=11;doc.setTextColor(0);
   doc.setFont('helvetica','bold');doc.setFontSize(12);doc.text('Übersicht',lm,y);y+=6;
@@ -2339,7 +2340,7 @@ function gridTemplate(){
 }
 
 // ═══════════════════════════════════════════════════════════════════════
-//  MODULE: Materialkosten
+//  MODULE: Kostenkalkulator
 // ═══════════════════════════════════════════════════════════════════════
 // Brett-Eintrag: {id,name,L,W,count,priceMode:'piece'|'area',price}
 //  - L,W in mm; price in € (pro Stück oder pro m² je nach priceMode)
@@ -2637,7 +2638,7 @@ function costDoPDF(){
   let y=15;const lm=15,pw=180;const checkY=k=>{if(y+k>272){doc.addPage();y=15;}};
   // eur-Formatierung ohne € (jsPDF Helvetica hat kein €-Glyph zuverlässig) -> 'EUR'
   const eur=v=>v.toLocaleString('de-DE',{minimumFractionDigits:2,maximumFractionDigits:2})+' EUR';
-  doc.setFont('helvetica','bold');doc.setFontSize(18);doc.text('betterKerf — Materialkosten',lm,y);y+=9;
+  doc.setFont('helvetica','bold');doc.setFontSize(18);doc.text('betterKerf — Kostenkalkulator',lm,y);y+=9;
   doc.setFont('helvetica','normal');doc.setFontSize(9);doc.setTextColor(120,110,100);
   doc.text(`Erstellt: ${new Date().toLocaleDateString('de-DE')}${c.qty>1?`  |  Hochrechnung: ${c.qty} Sets`:''}`,lm,y);y+=11;doc.setTextColor(0);
 
@@ -2686,7 +2687,7 @@ function costDoPDF(){
 }
 
 function costReset(){
-  if(!confirm('Materialkosten zurücksetzen?\n\nAlle eingegebenen Bretter und Preise werden gelöscht.'))return;
+  if(!confirm('Kostenkalkulator zurücksetzen?\n\nAlle eingegebenen Bretter und Preise werden gelöscht.'))return;
   costBoards=[];
   costLinkedResult=null;
   lastCost=null;
@@ -2697,7 +2698,7 @@ function costReset(){
 }
 
 // ═══════════════════════════════════════════════════════════════════════
-//  MODULE: Korpusrechner
+//  MODULE: Korpusplaner
 // ═══════════════════════════════════════════════════════════════════════
 let kpConstr='sides';   // 'sides' = Seiten durchgehend | 'topbot' = Boden/Deckel durchgehend
 let kpBack='inset';     // 'inset' eingenutet | 'overlay' aufgesetzt | 'none' keine
@@ -3294,7 +3295,7 @@ function korpusSketch(H,B,T,s,sr,constr,back,nut,shelves,dividers,shelfPosMM,div
 }
 
 function korpusReset(){
-  if(!confirm('Korpusrechner zurücksetzen?\n\nAlle eingegebenen Maße werden auf die Standardwerte zurückgesetzt.'))return;
+  if(!confirm('Korpusplaner zurücksetzen?\n\nAlle eingegebenen Maße werden auf die Standardwerte zurückgesetzt.'))return;
   document.getElementById('kp-h').value='';
   document.getElementById('kp-b').value='';
   document.getElementById('kp-t').value='';
