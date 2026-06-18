@@ -111,3 +111,5 @@ Die Module sind bewusst miteinander verknüpft:
 - PWA mit Service Worker (Offline-Nutzung)
 - Alle Daten lokal via `localStorage`
 - Optimiert für iOS Safari (iPhone)
+
+> **Hinweis PDF-Export:** Beim allerersten PDF-Export wird die Bibliothek [jsPDF](https://github.com/parallax/jsPDF) einmalig aus dem Internet nachgeladen (~300 KB). Danach steht der Export vollständig offline zur Verfügung.

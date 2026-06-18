@@ -25,9 +25,9 @@ if ('serviceWorker' in navigator) {
 </script>
 <style>
 :root{
-  --bg:#1C1A17;--bg2:#252320;--bg3:#2E2B27;--border:#3A3730;--border2:#4A4740;
-  --text:#F5EDD6;--text2:#B8AF9E;--text3:#7A7268;--accent:#C4842A;--accent2:#D4944A;
-  --green:#6B8F5E;--blue:#5B8DB8;--purple:#9B6B9B;--danger:#C05050;
+  --bg:#1B1A1C;--bg2:#242426;--bg3:#2C2C2F;--border:#383739;--border2:#47474A;
+  --text:#F2EEE8;--text2:#B0ADA6;--text3:#706E6A;--accent:#2E7D5E;--accent2:#3E9E74;
+  --green:#62966A;--blue:#5090BE;--purple:#9068A4;--danger:#C04848;
   --safe-top:env(safe-area-inset-top,0px);--safe-bottom:env(safe-area-inset-bottom,0px);
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
@@ -40,7 +40,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:-apple-
 .header-back:active{background:var(--bg2)}
 .header-back.show{display:flex}
 .header-icon{width:34px;height:34px;background:var(--accent);border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.header-icon svg{width:19px;height:19px;fill:none;stroke:#fff;stroke-width:2;stroke-linecap:round}
+.header-icon svg{width:20px;height:20px;fill:#fff}
 .header-titles{flex:1;min-width:0}
 .header h1{font-size:20px;font-weight:600;letter-spacing:-.3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .header h1 .bk-better{color:var(--text2);font-weight:400}
@@ -68,11 +68,11 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:-apple-
 .module-card:active{transform:scale(.985);background:var(--bg3)}
 .module-card.disabled{opacity:.5;cursor:default}
 .module-card.disabled:active{transform:none;background:var(--bg2)}
-.mc-icon{width:48px;height:48px;border-radius:12px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:24px}
+.mc-icon{width:48px;height:48px;border-radius:12px;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:var(--bg3);border:.5px solid var(--border);color:var(--accent)}
 .mc-body{flex:1;min-width:0}
 .mc-title{font-size:15px;font-weight:600;margin-bottom:2px}
 .mc-desc{font-size:13px;color:var(--text3);line-height:1.4}
-.mc-badge{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--accent2);background:rgba(196,132,42,.15);padding:2px 7px;border-radius:6px;margin-left:6px;white-space:nowrap}
+.mc-badge{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--accent2);background:rgba(46,125,94,.15);padding:2px 7px;border-radius:6px;margin-left:6px;white-space:nowrap}
 .mc-soon{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);background:var(--bg3);padding:2px 7px;border-radius:6px;white-space:nowrap}
 .mc-arrow{color:var(--text3);font-size:20px;flex-shrink:0}
 .home-foot{margin-top:24px;font-size:11px;color:var(--text3);text-align:center;line-height:1.6}
@@ -92,7 +92,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:-apple-
 .info-btn{width:22px;height:22px;border-radius:50%;border:.5px solid var(--border2);background:var(--bg3);color:var(--text3);font-size:13px;line-height:1;display:flex;align-items:center;justify-content:center;cursor:pointer;font-family:inherit;padding:0;flex-shrink:0}
 .info-btn:active{background:var(--accent);color:#fff;border-color:var(--accent)}
 .edit-toggle{border:.5px solid var(--border2);background:var(--bg2);color:var(--text3);font-size:13px;font-family:inherit;padding:5px 12px;border-radius:8px;cursor:pointer}
-.edit-toggle.on{background:rgba(196,132,42,.18);border-color:var(--accent);color:var(--accent2)}
+.edit-toggle.on{background:rgba(46,125,94,.18);border-color:var(--accent);color:var(--accent2)}
 .edit-toggle:active{opacity:.8}
 .section{margin-bottom:20px}
 .hint-box{font-size:11px;color:var(--text3);margin-bottom:10px;line-height:1.5}
@@ -114,12 +114,12 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:-apple-
 .hsub-tab.active{background:var(--bg3);color:var(--text);border-color:var(--accent)}
 .hsub-tab:active{opacity:.8}
 .grain-btn{height:40px;width:34px;border:.5px solid var(--border2);background:var(--bg2);border-radius:9px;cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--text3)}
-.grain-btn.locked{background:rgba(196,132,42,.18);border-color:var(--accent);color:var(--accent2)}
+.grain-btn.locked{background:rgba(46,125,94,.18);border-color:var(--accent);color:var(--accent2)}
 .grain-btn:active{opacity:.7}
 .row{display:grid;gap:5px;align-items:center;margin-bottom:6px}
 .row input{font-family:'Menlo','Courier New',monospace;font-size:15px;height:40px;padding:0 10px;border:.5px solid var(--border2);border-radius:9px;background:var(--bg2);color:var(--text);width:100%;-webkit-appearance:none}
 .row input[type=number]{text-align:center;padding:0 4px}
-.row input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(196,132,42,.2)}
+.row input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(46,125,94,.2)}
 .del-btn{border:.5px solid var(--border);background:var(--bg3);color:var(--text3);cursor:pointer;font-size:20px;height:40px;width:30px;display:flex;align-items:center;justify-content:center;border-radius:9px;flex-shrink:0}
 .del-btn:active{background:#3A1818;color:var(--danger)}
 .dup-btn{border:.5px solid var(--border);background:var(--bg3);color:var(--text3);cursor:pointer;font-size:13px;height:40px;width:26px;display:flex;align-items:center;justify-content:center;border-radius:9px;flex-shrink:0;padding:0}
@@ -163,9 +163,9 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:-apple-
 .cost-state-title{font-size:15px;font-weight:600;color:var(--text);margin-bottom:2px}
 .cost-state-sub{font-size:13px;color:var(--text2);line-height:1.5}
 .cost-state-btn{flex-shrink:0;align-self:center;border:.5px solid var(--border2);background:var(--bg3);color:var(--text2);font-size:13px;font-family:inherit;padding:8px 12px;border-radius:9px;cursor:pointer;white-space:nowrap}
-.cost-state-btn.accent{border-color:var(--accent);background:rgba(196,132,42,.18);color:var(--accent2);font-weight:600}
+.cost-state-btn.accent{border-color:var(--accent);background:rgba(46,125,94,.18);color:var(--accent2);font-weight:600}
 .cost-state-btn:active{opacity:.8}
-.cost-state-link{margin-top:10px;border:.5px solid var(--accent);background:rgba(196,132,42,.18);color:var(--accent2);font-size:13px;font-weight:600;font-family:inherit;padding:9px 14px;border-radius:9px;cursor:pointer}
+.cost-state-link{margin-top:10px;border:.5px solid var(--accent);background:rgba(46,125,94,.18);color:var(--accent2);font-size:13px;font-weight:600;font-family:inherit;padding:9px 14px;border-radius:9px;cursor:pointer}
 .cost-state-link:active{opacity:.8}
 .cost-row{background:var(--bg2);border:.5px solid var(--border);border-radius:12px;padding:12px;margin-bottom:10px}
 .cost-row-top{display:flex;gap:8px;align-items:center;margin-bottom:9px}
@@ -294,8 +294,8 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:-apple-
 .opt-ring{width:34px;height:34px;display:block}
 #opt-ring-fill{transition:stroke-dashoffset .25s linear}
 .opt-text{flex:1;font-size:13px;color:var(--text2)}
-.opt-stop{padding:9px 14px;border:.5px solid var(--accent);border-radius:9px;background:rgba(196,132,42,.15);color:var(--accent2);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;flex-shrink:0;white-space:nowrap}
-.opt-stop:active{background:rgba(196,132,42,.28)}
+.opt-stop{padding:9px 14px;border:.5px solid var(--accent);border-radius:9px;background:rgba(46,125,94,.15);color:var(--accent2);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;flex-shrink:0;white-space:nowrap}
+.opt-stop:active{background:rgba(46,125,94,.28)}
 .opt-done{font-size:13px;color:var(--green);padding:8px 12px;background:rgba(107,143,94,.12);border:.5px solid rgba(107,143,94,.3);border-radius:10px}
 .action-btn:active{background:var(--bg3)}
 .info-note{font-size:11px;color:var(--text3);margin-top:10px;padding:8px 12px;background:var(--bg2);border-radius:8px;border:.5px solid var(--border)}
@@ -307,13 +307,13 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:-apple-
   <div class="header">
     <button class="header-back" id="back-btn" onclick="goBack()" aria-label="Zurück">‹</button>
     <div class="header-icon" id="header-icon">
-      <svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="3" rx="1"/><rect x="3" y="11" width="12" height="3" rx="1"/><rect x="3" y="17" width="15" height="3" rx="1"/><line x1="19" y1="14" x2="22" y2="17"/></svg>
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960" width="20" height="20" fill="#fff"><path d="M237-257 132-362l19-19 85 85 170-170 19 20-188 189Zm0-280L132-642l19-19 85 85 170-170 19 20-188 189Zm284 211v-28h308v28H521Zm0-280v-28h308v28H521Z"/></svg>
     </div>
     <div class="header-titles">
       <h1 id="header-title"><span class="bk-better">better</span><span class="bk-kerf">Kerf</span></h1>
       <p id="header-sub">Werkstatt-Rechner für die Holzbearbeitung</p>
     </div>
-    <button class="header-gear" id="gear-btn" onclick="openSettings()" aria-label="Einstellungen">⚙</button>
+    <button class="header-gear" id="gear-btn" onclick="openSettings()" aria-label="Einstellungen"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960" width="20" height="20" fill="currentColor"><path d="m416-132-14-112q-21-6-46.5-20T313-294l-103 44-64-112 89-67q-2-12-3.5-25t-1.5-25q0-11 1.5-23.5T235-531l-89-67 64-110 102 43q20-17 43.5-30.5T401-716l15-112h128l14 113q26 9 45.5 20.5T644-665l106-43 64 110-93 70q4 14 4.5 25.5t.5 22.5q0 10-1 21.5t-4 28.5l91 68-64 112-104-45q-21 18-42 30.5T558-245l-14 113H416Zm24-28h78l15-109q30-8 53.5-21.5T636-329l100 43 40-68-88-66q5-18 6.5-32t1.5-28q0-15-1.5-28t-6.5-30l90-68-40-68-103 43q-17-19-47.5-37T532-691l-12-109h-80l-12 108q-30 6-55 20t-51 40l-100-42-40 68 87 65q-5 13-7 29t-2 33q0 15 2 30t6 29l-86 66 40 68 99-42q24 24 49 38t57 22l13 108Zm38-232q37 0 62.5-25.5T566-480q0-37-25.5-62.5T478-568q-37 0-62.5 25.5T390-480q0 37 25.5 62.5T478-392Zm2-88Z"/></svg></button>
   </div>
 
   <!-- HOME SCREEN -->
@@ -329,7 +329,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:-apple-
   <div class="screen" id="screen-settings">
     <div class="home-wrap">
       <div class="section">
-        <div class="slabel">📐 Maßeinheit</div>
+        <div class="slabel">Maßeinheit</div>
         <div class="hint-box">Gilt für alle Module. Intern wird in Millimetern gerechnet; nur Ein- und Ausgabe werden umgerechnet. Die Sägeblattbreite (Kerf) bleibt immer in mm.</div>
         <div class="unit-bar">
           <span class="unit-bar-label">Einheit</span>
@@ -339,7 +339,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:-apple-
       </div>
 
       <div class="section" style="margin-top:22px">
-        <div class="slabel">📐 Zuschnitt-Optimierer</div>
+        <div class="slabel">Zuschnitt-Optimierer</div>
         <div class="hint-box">Einstellungen für das Zuschnitt-Modul — wirken sich auf die nächste Berechnung aus.</div>
         <div class="srow"><div><div class="srow-label">Schnittbreite (Kerf)</div><div class="srow-hint">Materialverlust pro Schnitt — immer in mm</div></div><div class="nm"><input type="number" id="kerf" value="3" min="0" max="10" step="0.5"><span>mm</span></div></div>
         <div class="srow srow-col" style="margin-top:6px">
@@ -366,22 +366,22 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:-apple-
   <!-- MODULE: CUTLIST -->
   <div class="screen" id="screen-cutlist">
     <div class="tabs" id="cutlist-tabs">
-      <button class="tab active" data-tab="input">✏️ Eingabe</button>
-      <button class="tab" data-tab="projects">📁 Projekte</button>
-      <button class="tab" id="tab-result" data-tab="result" style="display:none">📐 Plan</button>
-      <button class="tab" id="tab-steps" data-tab="steps" style="display:none">📋 Anleitung</button>
+      <button class="tab active" data-tab="input">Eingabe</button>
+      <button class="tab" data-tab="projects">Projekte</button>
+      <button class="tab" id="tab-result" data-tab="result" style="display:none">Schnittplan</button>
+      <button class="tab" id="tab-steps" data-tab="steps" style="display:none">Anleitung</button>
     </div>
 
     <div class="pane active" id="pane-input">
       <div class="section">
-        <div class="slabel-row"><div class="slabel">📦 Verfügbare Bretter</div><button class="edit-toggle" id="edit-stock" onclick="toggleEdit('stock')">Sortieren</button></div>
+        <div class="slabel-row"><div class="slabel">Verfügbare Bretter</div><button class="edit-toggle" id="edit-stock" onclick="toggleEdit('stock')">Sortieren</button></div>
         <div class="hint-box">Maße in beliebiger Reihenfolge — die längere Seite wird automatisch als Länge erkannt.</div>
         <div class="col-hd" id="stock-head"></div>
         <div id="stock-list"></div>
         <button class="add-btn" onclick="addStock()">+ Brett hinzufügen</button>
       </div>
       <div class="section">
-        <div class="slabel-row"><div class="slabel">🔧 Benötigte Teile</div><button class="edit-toggle" id="edit-parts" onclick="toggleEdit('parts')">Sortieren</button></div>
+        <div class="slabel-row"><div class="slabel">Benötigte Teile</div><button class="edit-toggle" id="edit-parts" onclick="toggleEdit('parts')">Sortieren</button></div>
         <div class="srow" style="margin-bottom:8px"><div><div class="srow-label">Maserungsrichtung beachten</div><div class="srow-hint">Pro Teil festlegen, ob es gedreht werden darf</div></div><input type="checkbox" id="grain-enabled" class="toggle" onchange="toggleGrainMode()"></div>
         <div class="col-hd" id="parts-head"></div>
         <div id="parts-list"></div>
@@ -414,19 +414,19 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:-apple-
       <!-- MODE: REIHE -->
       <div id="hmode-row">
         <div class="section">
-          <div class="slabel">📏 Maße & Anzahl</div>
+          <div class="slabel">Maße & Anzahl</div>
           <div class="hint-box">Gib die Strecke an, auf der die Löcher verteilt werden sollen, und wie viele Lochmittelpunkte du brauchst.</div>
           <div class="srow"><div><div class="srow-label">Gesamtlänge</div><div class="srow-hint">Strecke, auf der verteilt wird</div></div><div class="nm"><input type="number" inputmode="decimal" id="h-length" value="1000" min="0"><span data-unit-span>mm</span></div></div>
           <div class="srow"><div><div class="srow-label">Anzahl Löcher</div><div class="srow-hint">Anzahl der Lochmittelpunkte</div></div><div class="nm"><input type="number" inputmode="numeric" id="h-count" value="5" min="1" max="200"><span>×</span></div></div>
         </div>
         <div class="section">
-          <div class="slabel">📐 Werkstück &amp; Bohrung</div>
+          <div class="slabel">Werkstück &amp; Bohrung</div>
           <div class="hint-box">Optional, für eine maßstäblich realistische 1:1-Schablone. Die Löcher werden mittig über die Werkstückbreite platziert.</div>
           <div class="srow"><div><div class="srow-label">Werkstückbreite</div><div class="srow-hint">Breite quer zur Lochreihe</div></div><div class="nm"><input type="number" inputmode="decimal" id="h-width" placeholder="optional" min="0"><span data-unit-span>mm</span></div></div>
           <div class="srow"><div><div class="srow-label">Lochdurchmesser</div><div class="srow-hint">Für maßstäbliche Darstellung &amp; Randwarnung</div></div><div class="nm"><input type="number" inputmode="decimal" id="h-dia" placeholder="optional" min="0"><span data-unit-span>mm</span></div></div>
         </div>
         <div class="section">
-          <div class="slabel">🔲 Randabstand</div>
+          <div class="slabel">Randabstand</div>
           <div class="srow"><div><div class="srow-label">Eigener Randabstand</div><div class="srow-hint">Sonst gleichmäßig inkl. Kantenabstand</div></div><input type="checkbox" id="h-usemargin" class="toggle" onchange="toggleMarginInputs()"></div>
           <div id="h-margin-rows" style="display:none">
             <div class="srow"><div><div class="srow-label">Abstand am Anfang</div><div class="srow-hint">Erste Lochmitte ab linker Kante</div></div><div class="nm"><input type="number" inputmode="decimal" id="h-start" value="50" min="0" oninput="if(document.getElementById('h-sym').checked)document.getElementById('h-end').value=this.value"><span data-unit-span>mm</span></div></div>
@@ -441,7 +441,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:-apple-
       <!-- MODE: RASTER -->
       <div id="hmode-grid" style="display:none">
         <div class="section">
-          <div class="slabel">📐 Plattenmaße</div>
+          <div class="slabel">Plattenmaße</div>
           <div class="hint-box">Löcher werden als gleichmäßiges Raster über die Fläche verteilt — getrennt in Breite (X) und Höhe (Y).</div>
           <div class="srow"><div><div class="srow-label">Breite (X)</div><div class="srow-hint">Horizontale Ausdehnung</div></div><div class="nm"><input type="number" inputmode="decimal" id="g-width" value="800" min="0"><span data-unit-span>mm</span></div></div>
           <div class="srow"><div><div class="srow-label">Höhe (Y)</div><div class="srow-hint">Vertikale Ausdehnung</div></div><div class="nm"><input type="number" inputmode="decimal" id="g-height" value="400" min="0"><span data-unit-span>mm</span></div></div>
@@ -457,7 +457,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:-apple-
           <div class="srow"><div><div class="srow-label">Lochdurchmesser</div><div class="srow-hint">Für maßstäbliche Darstellung &amp; Randwarnung</div></div><div class="nm"><input type="number" inputmode="decimal" id="g-dia" placeholder="optional" min="0"><span data-unit-span>mm</span></div></div>
         </div>
         <div class="section">
-          <div class="slabel">🔲 Randabstand</div>
+          <div class="slabel">Randabstand</div>
           <div class="srow"><div><div class="srow-label">Eigener Randabstand</div><div class="srow-hint">Sonst gleichmäßig inkl. Kantenabstand</div></div><input type="checkbox" id="g-usemargin" class="toggle" onchange="toggleGridMargin()"></div>
           <div id="g-margin-rows" style="display:none">
             <div class="srow"><div><div class="srow-label">Rand horizontal (X)</div><div class="srow-hint">Abstand links &amp; rechts</div></div><div class="nm"><input type="number" inputmode="decimal" id="g-mx" value="50" min="0"><span data-unit-span>mm</span></div></div>
@@ -477,7 +477,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:-apple-
     <div class="pane active" style="display:block">
       <div id="cost-source"></div>
       <div class="section">
-        <div class="slabel-row"><div class="slabel">📋 Bretter & Preise</div></div>
+        <div class="slabel-row"><div class="slabel">Bretter & Preise</div></div>
         <div class="hint-box" id="cost-hint">Gib pro Brett den Preis ein — wahlweise als Stückpreis oder pro m².</div>
         <div id="cost-list"></div>
         <button class="add-btn" onclick="costAddBoard()">+ Brett hinzufügen</button>
@@ -498,13 +498,13 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:-apple-
   <!-- MODULE: KORPUSRECHNER -->
   <div class="screen" id="screen-korpus">
     <div class="tabs" id="korpus-tabs">
-      <button class="tab active" data-tab="input">✏️ Eingabe</button>
-      <button class="tab" data-tab="projects">📁 Projekte</button>
+      <button class="tab active" data-tab="input">Eingabe</button>
+      <button class="tab" data-tab="projects">Projekte</button>
     </div>
 
     <div class="pane active" id="kpane-input">
       <div class="section">
-        <div class="slabel">📐 Außenmaße</div>
+        <div class="slabel">Außenmaße</div>
         <div class="hint-box">Die fertigen Außenmaße des Korpus. Die App berechnet daraus die Zuschnittmaße der Einzelteile.</div>
         <div class="kp-dims">
           <div class="kp-field"><label>Höhe <span class="ku">mm</span></label><input type="number" inputmode="decimal" id="kp-h" placeholder="0" oninput="korpusCalc()"></div>
@@ -514,7 +514,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:-apple-
       </div>
 
       <div class="section">
-        <div class="slabel">🪵 Material</div>
+        <div class="slabel">Material</div>
         <div class="kp-dims kp-dims-2">
           <div class="kp-field"><label>Plattenstärke <span class="ku">mm</span></label><input type="number" inputmode="decimal" id="kp-s" placeholder="18" oninput="korpusCalc()"></div>
           <div class="kp-field"><label>Rückwandstärke <span class="ku">mm</span></label><input type="number" inputmode="decimal" id="kp-sr" placeholder="5" oninput="korpusCalc()"></div>
@@ -724,13 +724,33 @@ function renderUnitChips(){
   wrap.innerHTML=Object.keys(UNITS).map(u=>`<button class="unit-chip${u===currentUnit?' active':''}" onclick="setUnit('${u}')">${UNITS[u].label}</button>`).join('');
 }
 
+const MS={
+  carpenter:'M605-131q-9 9-20.5 13.5T562-113q-11 0-22-4.5T520-131l-48-47q-9-9-13-20t-4-22q0-11 4.5-22t12.5-20l12-13-326-466 122-122 486 486q9 9 13.5 20.5T784-334q0 11-4.5 22T766-292L605-131ZM503-295l154-152-377-377-86 86 309 443Zm38 144q10 9 23 9t22-9l160-160q9-9 9-22t-9-23l-70-72-184 184q-10 10-10 23.5t10 22.5l49 47Zm-38-144 154-152-154 152Z',
+  adjust:'M528.5-431.5Q548-451 548-480t-19.5-48.5Q509-548 480-548t-48.5 19.5Q412-509 412-480t19.5 48.5Q451-412 480-412t48.5-19.5ZM480.17-132q-72.17 0-135.73-27.39-63.56-27.39-110.57-74.35-47.02-46.96-74.44-110.43Q132-407.65 132-479.83q0-72.17 27.39-135.73 27.39-63.56 74.35-110.57 46.96-47.02 110.43-74.44Q407.65-828 479.83-828q72.17 0 135.73 27.39 63.56 27.39 110.57 74.35 47.02 46.96 74.44 110.43Q828-552.35 828-480.17q0 72.17-27.39 135.73-27.39 63.56-74.35 110.57-46.96 47.02-110.43 74.44Q552.35-132 480.17-132Zm-.17-28q134 0 227-93t93-227q0-134-93-227t-227-93q-134 0-227 93t-93 227q0 134 93 227t227 93Zm0-320Z',
+  recycling:'m390-566 72-117-48-79q-9-16-27.5-16t-27.99 16.07L281-631l109 65Zm309.86 218L629-466l111-64 51 85q8 14 9.5 31t-6.5 31q-8 17-24 26t-34.31 9h-35.83ZM608-124 480-252l128-128v64h152l-46.4 92.8q-8.8 16-24 25.6-15.2 9.6-33.6 9.6h-48v64Zm-309.95-64Q282-188 269-196t-19-21.91Q244-231 244-245t7.2-26.04L278.4-316H416v128H298.05ZM219-279l-52-104q-8-15-7-31.5t9.56-30.5L182-466l-54-33 175-44 44 176-55-34-73 122Zm432-274-175.2-43.96 55.2-32.78L431-796h112.8q16.8 0 31.6 8.35 14.8 8.34 23.6 22.65l42 70 54-34-44 176Z',
+  calculate:'M336-256h28v-80h80v-28h-80v-80h-28v80h-80v28h80v80Zm200-30h168v-28H536v28Zm0-100h168v-28H536v28Zm28-160 56-56 56 56 20-20-56-56 56-56-20-20-56 56-56-56-20 20 56 56-56 56 20 20Zm-298-62h168v-28H266v28Zm-34 436q-26 0-43-17t-17-43v-496q0-26 17-43t43-17h496q26 0 43 17t17 43v496q0 26-17 43t-43 17H232Zm0-28h496q12 0 22-10t10-22v-496q0-12-10-22t-22-10H232q-12 0-22 10t-10 22v496q0 12 10 22t22 10Zm-32-560v560-560Z',
+  shelves:'M172-87v-785h28v85h560v-85h28v785h-28v-85H200v85h-28Zm28-433h112v-148h176v148h272v-239H200v239Zm0 320h272v-148h176v148h112v-292H200v292Zm140-320h120v-120H340v120Zm160 320h120v-120H500v120ZM340-520h120-120Zm160 320h120-120Z',
+  settings:'m416-132-14-112q-21-6-46.5-20T313-294l-103 44-64-112 89-67q-2-12-3.5-25t-1.5-25q0-11 1.5-23.5T235-531l-89-67 64-110 102 43q20-17 43.5-30.5T401-716l15-112h128l14 113q26 9 45.5 20.5T644-665l106-43 64 110-93 70q4 14 4.5 25.5t.5 22.5q0 10-1 21.5t-4 28.5l91 68-64 112-104-45q-21 18-42 30.5T558-245l-14 113H416Zm24-28h78l15-109q30-8 53.5-21.5T636-329l100 43 40-68-88-66q5-18 6.5-32t1.5-28q0-15-1.5-28t-6.5-30l90-68-40-68-103 43q-17-19-47.5-37T532-691l-12-109h-80l-12 108q-30 6-55 20t-51 40l-100-42-40 68 87 65q-5 13-7 29t-2 33q0 15 2 30t6 29l-86 66 40 68 99-42q24 24 49 38t57 22l13 108Zm38-232q37 0 62.5-25.5T566-480q0-37-25.5-62.5T478-568q-37 0-62.5 25.5T390-480q0 37 25.5 62.5T478-392Zm2-88Z',
+  checklist:'M237-257 132-362l19-19 85 85 170-170 19 20-188 189Zm0-280L132-642l19-19 85 85 170-170 19 20-188 189Zm284 211v-28h308v28H521Zm0-280v-28h308v28H521Z',
+  straighten:'M192-292q-26 0-43-17t-17-43v-256q0-26 17-43t43-17h576q26 0 43 17t17 43v256q0 26-17 43t-43 17H192Zm0-28h576q12 0 22-10t10-22v-256q0-12-10-22t-22-10H654v120h-28v-120H494v120h-28v-120H334v120h-28v-120H192q-12 0-22 10t-10 22v256q0 12 10 22t22 10Zm114-200h28-28Zm160 0h28-28Zm160 0h28-28Zm-146 40Z',
+  build:'M720-142 452-410q-23 11-47.02 17.5Q380.95-386 354-386q-89.17 0-151.58-62.42Q140-510.83 140-600q0-23 4.5-44.5T158-686l140 138 108-108-136-138q20-9 40.59-14.5 20.6-5.5 43.41-5.5 89.17 0 151.58 62.42Q568-689.17 568-600q0 29-6 53t-18 45l268 268q8 8.35 8 20.17 0 11.83-7.78 19.61l-54.44 54.44Q750-132 739-133t-19-9Zm20-20 52-52-283-283q15-22 23-48.5t8-54.5q0-77-62-139t-160-45l107 107q9 9 9 21t-9 21L319-529q-9 9-21 9t-21-9L170-636q-14 109 49 165.5T354-414q26.67 0 53.33-7.5Q434-429 457-445l283 283ZM472-484Z',
+  forest:'M332-132v-160H98l160-240h-78l180-258 120 172 120-172 180 258h-78l160 240H628v160h-56v-160H388v160h-56Zm271-188h207L650-560h76L600-740 498-594l42 62h-78l141 212Zm-453 0h420L410-560h76L360-740 234-560h76L150-320Zm0 0h160-76 252-76 160-420Zm453 0H462h78-42 228-76 160-207Zm-31 28h56-56Zm50 0Z',
+  download:'M480-342 356-466l20-20 90 90v-352h28v352l90-90 20 20-124 124ZM272-212q-26 0-43-17t-17-43v-90h28v90q0 12 10 22t22 10h416q12 0 22-10t10-22v-90h28v90q0 26-17 43t-43 17H272Z',
+  content_copy:'M366-292q-26 0-43-17t-17-43v-416q0-26 17-43t43-17h296q26 0 43 17t17 43v416q0 26-17 43t-43 17H366Zm0-28h296q12 0 22-10t10-22v-416q0-12-10-22t-22-10H366q-12 0-22 10t-10 22v416q0 12 10 22t22 10ZM258-184q-26 0-43-17t-17-43v-444h28v444q0 12 10 22t22 10h324v28H258Zm76-136v-480 480Z',
+  restart_alt:'M440-176q-99-14-163.5-89T212-440q0-53 21-101.5t57-86.5l20 20q-35 33-52.5 76.5T240-440q0 88 56.5 154.5T440-204v28Zm80 2v-28q86-20 143-85.5T720-440q0-100-70-170t-170-70h-32l70 70-20 20-104-104 104-104 20 20-70 70h32q112 0 190 78t78 190q0 100-65 174t-163 92Z',
+  edit:'M200-200h40l439-439-40-40-439 439v40Zm-28 28v-80l527-528q4.39-3.83 9.7-5.91Q714-788 719.68-788q5.67 0 11 1.5Q736-785 741-780l39 39q5 5 6.5 10.41t1.5 10.82q0 5.77-1.91 11.07-1.92 5.31-6.09 9.7L252-172h-80Zm589-548-41-41 41 41Zm-102.35 61.35L639-679l40 40-20.35-19.65Z',
+  folder:'M192-212q-26 0-43-17t-17-43v-416q0-26 17-43t43-17h187l80 80h309q26 0 43 17t17 43v336q0 26-17 43t-43 17H192Zm0-28h576q14 0 23-9t9-23v-336q0-14-9-23t-23-9H448l-80-80H192q-14 0-23 9t-9 23v416q0 14 9 23t23 9Zm-32 0v-480 480Z',
+  grid_on:'M232-172q-26 0-43-17t-17-43v-496q0-26 17-43t43-17h496q26 0 43 17t17 43v496q0 26-17 43t-43 17H232Zm0-28h136v-168H200v136q0 14 9 23t23 9Zm164 0h168v-168H396v168Zm196 0h136q14 0 23-9t9-23v-136H592v168ZM200-396h168v-168H200v168Zm196 0h168v-168H396v168Zm196 0h168v-168H592v168ZM200-592h168v-168H232q-14 0-23 9t-9 23v136Zm196 0h168v-168H396v168Zm196 0h168v-136q0-14-9-23t-23-9H592v168Z',
+  menu_book:'M554-580v-28q32-17 69.5-25.5T700-642q21 0 40 2.5t40 7.5v28q-20-6-38.5-8t-41.5-2q-39 0-76.5 8.5T554-580Zm0 218v-30q30-17 69-25.5t77-8.5q21 0 40 2.5t40 7.5v28q-20-6-38.5-8t-41.5-2q-39 0-76.5 9.5T554-362Zm0-108v-30q32-17 69.5-25.5T700-534q21 0 40 2.5t40 7.5v28q-20-6-38.5-8t-41.5-2q-39 0-76.5 9.5T554-470ZM260-318q54 0 105 12.5T466-264v-392q-44-33-98-49.5T260-722q-36 0-60.5 3.5T142-704q-12 4-17 11.5t-5 16.5v350q0 14 10 20.5t22 1.5q18-6 45-10t63-4Zm234 54q50-29 101-41.5T700-318q36 0 63 4t45 10q12 5 22-1.5t10-20.5v-350q0-9-5-16t-17-12q-33-11-57.5-14.5T700-722q-54 0-108 16.5T494-656v392Zm-14 40q-49-32-105-49t-115-17q-28 0-55 3.5T152-274q-22 8-41-6.5T92-320v-358q0-16 8.5-29.5T124-726q32-13 66.5-18.5T260-750q59 0 115 17.5T480-682q49-33 105-50.5T700-750q35 0 69.5 5.5T836-726q15 5 23.5 18.5T868-678v358q0 25-21 38.5t-45 5.5q-25-8-50.5-11t-51.5-3q-59 0-115 17t-105 49ZM293-501Z'
+};
+function msIcon(name,size){size=size||20;return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960" width="${size}" height="${size}" fill="currentColor"><path d="${MS[name]}"/></svg>`;}
+
 const MODULES=[
   {
     id:'cutlist',
     title:'Zuschnitt-Optimierer',
     sub:'Plattenzuschnitt & Schnittplan',
-    emoji:'📐',
-    color:'#C4842A',
+    icon:'carpenter',
     desc:'Optimaler Zuschnitt aus Brettern mit minimalem Verschnitt, Schnittplan und Anleitung.',
     status:'ready',
     screen:'screen-cutlist',
@@ -741,8 +761,7 @@ const MODULES=[
     id:'holes',
     title:'Bohrlochplaner',
     sub:'Bohrungen gleichmäßig verteilen',
-    emoji:'🎯',
-    color:'#5B8DB8',
+    icon:'adjust',
     desc:'Abstände für eine Reihe von Bohrungen nach Anzahl und Materialbreite berechnen.',
     status:'ready',
     screen:'screen-holes',
@@ -752,8 +771,7 @@ const MODULES=[
     id:'rest',
     title:'Reststück-Lager',
     sub:'Verschnitt wiederverwenden',
-    emoji:'♻️',
-    color:'#6B8F5E',
+    icon:'recycling',
     desc:'Nutzbare Reststücke speichern und in Folgeprojekten automatisch mit einplanen.',
     status:'soon'
   },
@@ -761,8 +779,7 @@ const MODULES=[
     id:'cost',
     title:'Kostenkalkulator',
     sub:'Preis & Verschnittwert',
-    emoji:'💰',
-    color:'#9B6B9B',
+    icon:'calculate',
     desc:'Kosten pro Teil und Geldwert des Verschnitts aus dem Plattenpreis berechnen.',
     status:'ready',
     screen:'screen-cost',
@@ -772,8 +789,7 @@ const MODULES=[
     id:'korpus',
     title:'Korpusplaner',
     sub:'Schränke & Möbel planen',
-    emoji:'🗄️',
-    color:'#5B8DB8',
+    icon:'shelves',
     desc:'Aus Außenmaßen automatisch die Zuschnittliste für Korpusteile (Seiten, Boden, Deckel, Rückwand) berechnen.',
     status:'ready',
     screen:'screen-korpus',
@@ -781,14 +797,14 @@ const MODULES=[
   }
 ];
 
-const HEADER_DEFAULT={icon:'<svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="3" rx="1"/><rect x="3" y="11" width="12" height="3" rx="1"/><rect x="3" y="17" width="15" height="3" rx="1"/><line x1="19" y1="14" x2="22" y2="17"/></svg>',title:'<span class="bk-better">better</span><span class="bk-kerf">Kerf</span>',sub:'Werkstatt-Rechner für die Holzbearbeitung',color:'#C4842A'};
+const HEADER_DEFAULT={icon:msIcon('checklist',20),title:'<span class="bk-better">better</span><span class="bk-kerf">Kerf</span>',sub:'Werkstatt-Rechner für die Holzbearbeitung'};
 
 function renderHome(){
   const grid=document.getElementById('module-grid');
   grid.innerHTML=MODULES.map(m=>{
     const ready=m.status==='ready';
     return `<button class="module-card${ready?'':' disabled'}" ${ready?`onclick="openModule('${m.id}')"`:''}>
-      <div class="mc-icon" style="background:${m.color}22;color:${m.color}">${m.emoji}</div>
+      <div class="mc-icon">${msIcon(m.icon,26)}</div>
       <div class="mc-body">
         <div class="mc-title">${m.title}${ready?'':' '}<span class="${ready?'mc-badge':'mc-soon'}">${ready?'Bereit':'Bald'}</span></div>
         <div class="mc-desc">${m.desc}</div>
@@ -798,9 +814,8 @@ function renderHome(){
   }).join('');
 }
 
-function setHeader(icon,titleHTML,sub,color){
+function setHeader(icon,titleHTML,sub){
   document.getElementById('header-icon').innerHTML=icon;
-  document.getElementById('header-icon').style.background=color;
   document.getElementById('header-title').innerHTML=titleHTML;
   document.getElementById('header-sub').textContent=sub;
 }
@@ -816,7 +831,7 @@ function openModule(id){
   document.getElementById(m.screen).classList.add('active');
   document.getElementById('back-btn').classList.add('show');
   document.getElementById('gear-btn').classList.remove('hidden');
-  setHeader(`<span style="font-size:20px">${m.emoji}</span>`, m.title, m.sub, m.color);
+  setHeader(msIcon(m.icon,20), m.title, m.sub);
   if(m.init)m.init();
   document.getElementById(m.screen).scrollTop=0;
 }
@@ -827,7 +842,7 @@ function goHome(){
   document.getElementById('screen-home').classList.add('active');
   document.getElementById('back-btn').classList.remove('show');
   document.getElementById('gear-btn').classList.remove('hidden');
-  setHeader(HEADER_DEFAULT.icon,HEADER_DEFAULT.title,HEADER_DEFAULT.sub,HEADER_DEFAULT.color);
+  setHeader(HEADER_DEFAULT.icon,HEADER_DEFAULT.title,HEADER_DEFAULT.sub);
 }
 
 function openSettings(){
@@ -836,7 +851,7 @@ function openSettings(){
   document.getElementById('screen-settings').classList.add('active');
   document.getElementById('back-btn').classList.add('show');
   document.getElementById('gear-btn').classList.add('hidden');
-  setHeader('<span style="font-size:20px">⚙️</span>','Einstellungen','Maßeinheit & App-Optionen','#7A7268');
+  setHeader(msIcon('settings',20),'Einstellungen','Maßeinheit & App-Optionen');
   renderUnitChips();
   document.getElementById('screen-settings').scrollTop=0;
 }
@@ -886,7 +901,7 @@ let partsData=[
 ];
 let nextSId=20,nextPId=20,lastResult=null;
 let cutOptMode='waste'; // 'waste' = wenigster Verschnitt (Standard), 'boards' = wenigste Bretter
-const COLORS=['#C4842A','#5B8DB8','#6B8F5E','#9B6B9B','#B85B5B','#5B9B8D','#9B8B5B','#5B6B9B','#8B9B5B','#7B5B9B'];
+const COLORS=['#2E7D5E','#5B8DB8','#6B8F5E','#9B6B9B','#B85B5B','#5B9B8D','#9B8B5B','#5B6B9B','#8B9B5B','#7B5B9B'];
 const colorMap={};let ci=0;
 function getColor(n){if(!colorMap[n])colorMap[n]=COLORS[ci++%COLORS.length];return colorMap[n];}
 function escQ(s){return String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;');}
@@ -1514,7 +1529,7 @@ function renderResult(result){
         <rect x="${ML}" y="${MT}" width="${bW}" height="${bH}" fill="none" stroke="#4A4740" stroke-width="1"/>
       </svg>`;
     html+=`<div class="bvis">
-      <div class="bvis-top"><span><b>${boardLabel}</b> — ${dispVal(board.L)}×${dispUnit(board.W)} · ${bA.length} Teil(e)</span><span style="color:${wasteB>40?'#C4842A':'#6B8F5E'}">${wasteB}% Rest</span></div>
+      <div class="bvis-top"><span><b>${boardLabel}</b> — ${dispVal(board.L)}×${dispUnit(board.W)} · ${bA.length} Teil(e)</span><span style="color:${wasteB>40?'#C04848':'#6C9B6A'}">${wasteB}% Rest</span></div>
       <div class="vis-wrap" onclick="openZoom(this)" style="cursor:zoom-in">${svgMarkup}</div>
       <div class="legend">
         ${[...new Set(bA.map(a=>a.part.name))].map(n=>`<div class="legend-item"><div class="legend-dot" style="background:${getColor(n)}"></div>${n}</div>`).join('')}
@@ -1557,7 +1572,7 @@ function renderSteps(result){
     });
   });
   const icons={board:'📦',cut:'✂️',rip:'↔️',part:'✅'};
-  const colors={board:'#5B8DB8',cut:'#C4842A',rip:'#9B6B9B',part:'#6B8F5E'};
+  const colors={board:'#5B8DB8',cut:'#2E7D5E',rip:'#9B6B9B',part:'#6B8F5E'};
   document.getElementById('steps-content').innerHTML=`
     <div class="slabel" style="margin-bottom:14px">Schritt-für-Schritt Schnittanleitung</div>
     ${steps.map((s,i)=>`<div class="step-card" style="border-left-color:${colors[s.type]}">
@@ -2269,7 +2284,7 @@ function buildTemplate(points,sheetW,sheetH,titleText,holeDiameterMM){
         let lbl=`Abschnitt ${band.seg+1}/${layout.totalSegs}`;
         doc.text(lbl,ox+1.8,oy+4.2);
         if(bandIdx===0&&pageIdx>0&&band.seg>0){
-          doc.setFontSize(6);doc.setTextColor(196,132,42);
+          doc.setFontSize(6);doc.setTextColor(46,125,94);
           doc.text(`← Anschluss von Abschnitt ${band.seg} (Seite ${pageIdx})`,ox+1.8,oy+7.6);
         }
         doc.setTextColor(0);doc.setFont('helvetica','normal');
@@ -2283,25 +2298,25 @@ function buildTemplate(points,sheetW,sheetH,titleText,holeDiameterMM){
       const nextOnPage=page.bands[bandIdx+1];
       if((layout.mode==='stackV'||layout.mode==='stackH')){
         if(nextOnPage){
-          doc.setDrawColor(196,132,42);doc.setLineWidth(0.4);
+          doc.setDrawColor(46,125,94);doc.setLineWidth(0.4);
           if(layout.mode==='stackV'){
             const segY=oy+bh+layout.bandGap/2;
             doc.setLineDashPattern([1.2,1],0);
             doc.line(ox,segY,ox+bw,segY);
             doc.setLineDashPattern([],0);
-            doc.setFontSize(6.3);doc.setTextColor(196,132,42);
+            doc.setFontSize(6.3);doc.setTextColor(46,125,94);
             doc.text(`✂ Naht: Abschnitt ${band.seg+1} → ${band.seg+2} hier zusammenfügen`,ox+1.8,segY+2.0);
           } else {
             const segX=ox+bw+layout.bandGap/2;
             doc.setLineDashPattern([1.2,1],0);
             doc.line(segX,oy,segX,oy+bh);
             doc.setLineDashPattern([],0);
-            doc.setFontSize(6.3);doc.setTextColor(196,132,42);
+            doc.setFontSize(6.3);doc.setTextColor(46,125,94);
             doc.text(`✂ Naht ${band.seg+1}→${band.seg+2}`,segX-9,oy-0.8<headerH?oy+4.2:oy-0.8);
           }
           doc.setTextColor(0);
         } else if(band.seg<layout.totalSegs-1){
-          doc.setFontSize(6.3);doc.setTextColor(196,132,42);
+          doc.setFontSize(6.3);doc.setTextColor(46,125,94);
           const noteY = layout.mode==='stackV' ? oy+bh+4.5 : oy+bh+4.5;
           if(noteY<PH-4) doc.text(`→ Fortsetzung: Abschnitt ${band.seg+2} auf Seite ${pageIdx+2}`,ox+1.8,noteY);
           doc.setTextColor(0);
@@ -2674,11 +2689,11 @@ function costDoPDF(){
     // Balken
     const barW=pw, barH=7;const matW=barW*matPct/100;
     doc.setFillColor(107,143,94);doc.rect(lm,y,matW,barH,'F');
-    doc.setFillColor(196,132,42);doc.rect(lm+matW,y,barW-matW,barH,'F');
+    doc.setFillColor(46,125,94);doc.rect(lm+matW,y,barW-matW,barH,'F');
     y+=barH+5;
     doc.setFont('helvetica','normal');doc.setFontSize(9);
     doc.setTextColor(107,143,94);doc.text(`Verbaut: ${eur(c.materialValue)} (${matPct} %)`,lm,y);
-    doc.setTextColor(196,132,42);doc.text(`Verschnitt: ${eur(c.wasteValue)} (${wastePct} %)`,lm+pw,y,{align:'right'});
+    doc.setTextColor(46,125,94);doc.text(`Verschnitt: ${eur(c.wasteValue)} (${wastePct} %)`,lm+pw,y,{align:'right'});
     doc.setTextColor(0);y+=8;
   }
   doc.setFontSize(8);doc.setTextColor(150,140,130);
@@ -3097,9 +3112,9 @@ function korpusCalc(){
 
   const shelfPos=kpShelfCustom&&kpShelfStates.length>0?computeShelfPositions(kpShelfStates,innerH_mm,s||18):null;
   const divPos=kpDivCustom&&kpDivStates.length>0?computeDivPositions(kpDivStates,innerW_mm,s||18):null;
-  let html=`<div class="section"><div class="slabel">✏️ Skizze</div><div id="kp-sketch-area">${korpusSketch(H,B,T,s,sr,kpConstr,kpBack,nut,shelves,dividers,shelfPos,divPos)}</div></div>`;
+  let html=`<div class="section"><div class="slabel">Skizze</div><div id="kp-sketch-area">${korpusSketch(H,B,T,s,sr,kpConstr,kpBack,nut,shelves,dividers,shelfPos,divPos)}</div></div>`;
 
-  html+=`<div class="section"><div class="slabel">📋 Zuschnittliste</div>
+  html+=`<div class="section"><div class="slabel">Zuschnittliste</div>
     <div class="kp-cut-head"><span>Bauteil</span><span>Maß (${unitLabel()})</span><span>Anz.</span></div>`;
   parts.forEach(p=>{
     html+=`<div class="kp-cut-row">
@@ -3146,7 +3161,7 @@ function korpusSketch(H,B,T,s,sr,constr,back,nut,shelves,dividers,shelfPosMM,div
   const ox=pad, oy=pad;             // Ursprung Vorderansicht (oben-links)
   const sx=pad+fW+gap;              // Ursprung Seitenansicht x
 
-  const col={body:'#5B8DB8', bodyFill:'rgba(91,141,184,.18)', back:'#9B6B9B', backFill:'rgba(155,107,155,.28)', shelf:'#C4842A', line:'#7A7268', txt:'#B8AF9E'};
+  const col={body:'#5B8DB8', bodyFill:'rgba(91,141,184,.18)', back:'#9B6B9B', backFill:'rgba(155,107,155,.28)', shelf:'#2E7D5E', line:'#7A7268', txt:'#B8AF9E'};
   let p='';
   // --- Vorderansicht: äußerer Rahmen ---
   p+=`<rect x="${ox}" y="${oy}" width="${fW}" height="${fH}" fill="${col.bodyFill}" stroke="${col.body}" stroke-width="1.2"/>`;
@@ -3470,7 +3485,7 @@ async function korpusDoPDF(){
   guide.forEach((g,i)=>{
     const lines=doc.splitTextToSize(g,pw-9);
     checkY(lines.length*4.6+3);
-    doc.setFont('helvetica','bold');doc.setTextColor(196,132,42);doc.text(`${i+1}.`,lm,y);
+    doc.setFont('helvetica','bold');doc.setTextColor(46,125,94);doc.text(`${i+1}.`,lm,y);
     doc.setFont('helvetica','normal');doc.setTextColor(40,40,40);
     doc.text(lines,lm+7,y);
     y+=lines.length*4.6+3;
