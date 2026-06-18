@@ -28,7 +28,7 @@ if ('serviceWorker' in navigator) {
   --safe-top:env(safe-area-inset-top,0px);--safe-bottom:env(safe-area-inset-bottom,0px);
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-html,body{height:100%;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;font-size:15px;overscroll-behavior:none}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;font-size:15px;overscroll-behavior:none;-webkit-text-size-adjust:100%;text-size-adjust:100%}
 #app{display:flex;flex-direction:column;height:100%;padding-top:var(--safe-top)}
 
 /* Header (shared) */
@@ -535,6 +535,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:-apple-
           <button id="kp-bk-overlay" onclick="korpusSetBack('overlay')">aufgesetzt</button>
           <button id="kp-bk-none" onclick="korpusSetBack('none')">keine</button>
         </div>
+        <div id="kp-nut-auto-hint" class="srow-hint" style="margin-top:6px">Nuttiefe = Rückwandstärke + 1 mm (wird automatisch berechnet)</div>
       </div>
 
       <div class="section">
@@ -584,7 +585,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:-apple-
     <div class="sheet-body">
       <div class="info-item">
         <div class="info-item-title">Eingenutet</div>
-        <div class="info-item-txt">Die Rückwand sitzt in einer umlaufenden Nut, die in Seiten, Boden und Deckel gefräst wird. Sie ist von außen unsichtbar und der Korpus wirkt rundum geschlossen. Etwas aufwändiger in der Fertigung, da die Nut exakt sitzen muss.</div>
+        <div class="info-item-txt">Die Rückwand sitzt in einer umlaufenden Nut, die in Seiten, Boden und Deckel gefräst wird. Sie ist von außen unsichtbar und der Korpus wirkt rundum geschlossen. Etwas aufwändiger in der Fertigung, da die Nut exakt sitzen muss. <strong>Die Nuttiefe wird automatisch berechnet: Rückwandstärke + 1 mm.</strong></div>
       </div>
       <div class="info-item">
         <div class="info-item-title">Eingelassen</div>
@@ -2739,6 +2740,8 @@ function korpusSetBack(b){
   document.getElementById('kp-bk-framed').classList.toggle('on',b==='framed');
   document.getElementById('kp-bk-overlay').classList.toggle('on',b==='overlay');
   document.getElementById('kp-bk-none').classList.toggle('on',b==='none');
+  const nutHint=document.getElementById('kp-nut-auto-hint');
+  if(nutHint)nutHint.style.display=b==='inset'?'':'none';
   korpusCalc();
 }
 
