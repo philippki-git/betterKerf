@@ -2,23 +2,38 @@
 
 **betterKerf** ist ein mobiler Werkstatt-Rechner für die Holzbearbeitung — als Progressive Web App (PWA) konzipiert, läuft komplett offline und speichert alle Daten lokal auf dem Gerät. Keine Anmeldung, keine Cloud, keine Abhängigkeiten.
 
-🌐 **Live:** [philippki-git.github.io/betterKerf](https://philippki-git.github.io/betterKerf/)
+➡️ **[Zur App](https://philippki-git.github.io/betterKerf/)**
 
 ---
 
 ## Inhaltsverzeichnis
 
+- [Nutzung und Installation auf dem iPhone](#nutzung-und-installation-auf-dem-iphone)
 - [Module](#module)
   - [📐 Zuschnitt-Optimierer](#-zuschnitt-optimierer)
+  - [🗄️ Korpusplaner](#️-korpusplaner)
   - [🎯 Bohrlochplaner](#-bohrlochplaner)
   - [💰 Kostenkalkulator](#-kostenkalkulator)
-  - [🗄️ Korpusplaner](#️-korpusplaner)
-  - [♻️ Reststück-Lager](#️-reststück-lager)
 - [Wie die Module zusammenarbeiten](#wie-die-module-zusammenarbeiten)
-- [Installation auf dem iPhone](#installation-auf-dem-iphone)
 - [Einstellungen](#einstellungen)
-- [Status](#status)
 - [Technisch](#technisch)
+
+---
+
+## 📲 Nutzung und Installation auf dem iPhone
+
+betterKerf läuft direkt im Browser — einfach den Link öffnen und loslegen. Für den besten Komfort empfiehlt sich die Installation als App auf dem iPhone: Sie läuft dann vollständig offline, startet ohne Browser-Oberfläche und ist jederzeit direkt vom Home-Bildschirm erreichbar.
+
+**Im Browser nutzen:** Link in Safari öffnen — fertig.
+
+**Als App installieren (empfohlen):**
+
+1. Safari öffnen und die Seite aufrufen
+2. Teilen-Menü öffnen — entweder:
+   - auf das Teilen-Symbol **⬆** in der unteren Symbolleiste tippen, **oder**
+   - auf neueren iPhones (iOS 17+): die **Webseitenadresse in der URL-Leiste lange gedrückt halten**
+3. **„Zum Home-Bildschirm"** antippen
+4. Die App erscheint als Icon und läuft danach komplett offline
 
 ---
 
@@ -34,6 +49,16 @@ Berechnet den optimalen Zuschnittplan aus vorhandenen Brettern für eine Liste b
 - Ergebnis als visueller Schnittplan mit Zoom-Ansicht
 - Schritt-für-Schritt-Anleitung für die Ausführung am Sägetisch
 - Projekte lokal speichern und später wieder laden
+
+### 🗄️ Korpusplaner
+Berechnet aus den Außenmaßen eines Korpus automatisch alle Zuschnittmaße für die Einzelteile.
+
+- Eingabe: Höhe, Breite, Tiefe, Plattenstärke, Rückwandstärke
+- Konstruktionsart wählbar: **Seiten durchgehend** oder **Boden/Deckel durchgehend**
+- Vier Rückwand-Varianten: eingenutet, eingelassen, aufgesetzt oder keine
+- Trennwände (Mittelseiten) und Einlegeböden konfigurierbar
+- Ausgabe: vollständige Zuschnittliste aller Teile mit Maßen und Stückzahl
+- Projekte lokal speichern und wieder laden
 
 ### 🎯 Bohrlochplaner
 Berechnet gleichmäßige Bohrungsabstände für eine Lochreihe oder ein Lochraster.
@@ -52,20 +77,7 @@ Berechnet den Materialpreis pro Projekt und den Geldwert des anfallenden Verschn
 - Hochrechnung für Kleinserien: Multiplikator für Stückzahl
 - Kann direkt aus dem Zuschnitt-Optimierer befüllt werden — die Bretter aus dem Schnittplan werden übernommen
 
-### 🗄️ Korpusplaner
-Berechnet aus den Außenmaßen eines Korpus automatisch alle Zuschnittmaße für die Einzelteile.
-
-- Eingabe: Höhe, Breite, Tiefe, Plattenstärke, Rückwandstärke
-- Konstruktionsart wählbar: **Seiten durchgehend** oder **Boden/Deckel durchgehend**
-- Vier Rückwand-Varianten: eingenutet, eingelassen, aufgesetzt oder keine
-- Trennwände (Mittelseiten) und Einlegeböden konfigurierbar
-- Ausgabe: vollständige Zuschnittliste aller Teile mit Maßen und Stückzahl
-- Projekte lokal speichern und wieder laden
-
-### ♻️ Reststück-Lager
-> ⏳ **In Entwicklung** — noch nicht verfügbar.
-
-Speichert nutzbare Reststücke aus Projekten und plant sie in Folgeprojekten automatisch mit ein.
+> **Geplant — ♻️ Reststück-Lager:** Nutzbare Reststücke aus Projekten speichern und in Folgeprojekten automatisch mit einplanen.
 
 ---
 
@@ -81,14 +93,6 @@ Die Module sind bewusst miteinander verknüpft:
 
 ---
 
-## Installation auf dem iPhone
-
-1. Safari öffnen und [philippki-git.github.io/betterKerf](https://philippki-git.github.io/betterKerf/) aufrufen
-2. Teilen-Symbol antippen → **"Zum Home-Bildschirm"**
-3. Die App erscheint als Icon und läuft danach komplett offline
-
----
-
 ## Einstellungen
 
 - **Maßeinheit:** mm, cm oder m — wird auf dem Gerät gespeichert
@@ -99,13 +103,9 @@ Die Module sind bewusst miteinander verknüpft:
 
 ---
 
-## Status
+## Technisch
 
 > ⚠️ **v0.9.0 — In aktiver Entwicklung.** Die App ist funktionsfähig, aber noch nicht feature-complete. Feedback und Issues sind willkommen.
-
----
-
-## Technisch
 
 - Reines HTML/CSS/JavaScript — keine Frameworks, keine Build-Tools
 - PWA mit Service Worker (Offline-Nutzung)

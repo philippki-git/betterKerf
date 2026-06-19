@@ -1,4 +1,4 @@
-const CACHE = 'betterkerf-20260618-5';
+const CACHE = 'betterkerf-20260619-1';
 const ASSETS = [
   './betterKerf.html',
   './manifest.json',

@@ -76,6 +76,21 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:-apple-
 .mc-soon{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);background:var(--bg3);padding:2px 7px;border-radius:6px;white-space:nowrap}
 .mc-arrow{color:var(--text3);font-size:20px;flex-shrink:0}
 .home-foot{margin-top:24px;font-size:11px;color:var(--text3);text-align:center;line-height:1.6}
+.home-foot-link{color:var(--text3);text-decoration:underline;text-underline-offset:2px;cursor:pointer;background:none;border:none;font:inherit;padding:0;font-size:11px}
+.home-foot-link:active{color:var(--text2)}
+/* Legal modal */
+.legal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:999;align-items:flex-end;justify-content:center}
+.legal-overlay.open{display:flex}
+.legal-sheet{background:var(--bg2);border:.5px solid var(--border);border-radius:20px 20px 0 0;width:100%;max-width:600px;max-height:85vh;display:flex;flex-direction:column;padding-bottom:env(safe-area-inset-bottom,0px)}
+.legal-header{display:flex;align-items:center;justify-content:space-between;padding:16px 18px 12px;border-bottom:.5px solid var(--border);flex-shrink:0}
+.legal-header h2{font-size:17px;font-weight:600}
+.legal-close{border:none;background:var(--bg3);color:var(--text2);width:30px;height:30px;border-radius:50%;font-size:18px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.legal-close:active{background:var(--border)}
+.legal-body{overflow-y:auto;-webkit-overflow-scrolling:touch;padding:18px;font-size:13px;color:var(--text2);line-height:1.65}
+.legal-body h3{font-size:13px;font-weight:600;color:var(--text);margin:16px 0 5px}
+.legal-body h3:first-child{margin-top:0}
+.legal-body p{margin-bottom:8px}
+.legal-body a{color:var(--accent2)}
 
 /* Tabs (within a module) */
 .tabs{display:flex;gap:3px;padding:8px 12px;background:var(--bg);border-bottom:.5px solid var(--border);overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
@@ -299,21 +314,51 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:-apple-
 .opt-done{font-size:13px;color:var(--green);padding:8px 12px;background:rgba(107,143,94,.12);border:.5px solid rgba(107,143,94,.3);border-radius:10px}
 .action-btn:active{background:var(--bg3)}
 .info-note{font-size:11px;color:var(--text3);margin-top:10px;padding:8px 12px;background:var(--bg2);border-radius:8px;border:.5px solid var(--border)}
+/* ── Custom Dialog ── */
+.dlg-overlay{position:fixed;inset:0;z-index:2000;display:none;align-items:center;justify-content:center;padding:24px;background:rgba(10,8,5,.65);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px)}
+.dlg-overlay.show{display:flex}
+.dlg{background:var(--bg2);border:.5px solid var(--border2);border-radius:18px;width:100%;max-width:340px;padding:22px 20px 16px;box-shadow:0 12px 40px rgba(0,0,0,.55);animation:dlgIn .18s ease-out}
+@keyframes dlgIn{from{opacity:0;transform:scale(.94)}to{opacity:1;transform:scale(1)}}
+.dlg-icon{display:flex;align-items:center;justify-content:center;margin-bottom:10px;color:var(--text2)}
+.dlg-title{font-size:17px;font-weight:600;color:var(--text);margin-bottom:6px;text-align:center}
+.dlg-msg{font-size:13px;color:var(--text2);line-height:1.55;text-align:center;margin-bottom:18px}
+.dlg-btns{display:flex;flex-direction:column;gap:8px}
+.dlg-btn{width:100%;padding:13px;border-radius:12px;font-size:15px;font-weight:600;font-family:inherit;cursor:pointer;border:none;transition:opacity .1s}
+.dlg-btn:active{opacity:.75}
+.dlg-btn-cancel{background:var(--bg3);color:var(--text2);border:.5px solid var(--border2)!important;font-weight:500}
+.dlg-btn-confirm{background:var(--accent);color:#fff}
+.dlg-btn-danger{background:var(--danger);color:#fff}
+.dlg-btn-ok{background:var(--bg3);color:var(--text);border:.5px solid var(--border2)!important}
+
+/* ── Toast ── */
+.toast{position:fixed;bottom:calc(24px + var(--safe-bottom));left:50%;transform:translateX(-50%) translateY(20px);background:var(--bg3);border:.5px solid var(--border2);color:var(--text);font-size:13px;padding:10px 18px;border-radius:12px;pointer-events:none;opacity:0;transition:opacity .2s,transform .2s;z-index:3000;white-space:nowrap;box-shadow:0 6px 20px rgba(0,0,0,.4);display:flex;align-items:center;gap:7px}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 </style>
 </head>
 <body>
+<!-- Custom Dialog -->
+<div class="dlg-overlay" id="dlg-overlay">
+  <div class="dlg" id="dlg">
+    <div class="dlg-icon" id="dlg-icon"></div>
+    <div class="dlg-title" id="dlg-title"></div>
+    <div class="dlg-msg" id="dlg-msg"></div>
+    <div class="dlg-btns" id="dlg-btns"></div>
+  </div>
+</div>
+<!-- Toast -->
+<div class="toast" id="toast"></div>
 <div id="app">
   <!-- Shared header -->
   <div class="header">
     <button class="header-back" id="back-btn" onclick="goBack()" aria-label="Zurück">‹</button>
     <div class="header-icon" id="header-icon">
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960" width="20" height="20" fill="#fff"><path d="M237-257 132-362l19-19 85 85 170-170 19 20-188 189Zm0-280L132-642l19-19 85 85 170-170 19 20-188 189Zm284 211v-28h308v28H521Zm0-280v-28h308v28H521Z"/></svg>
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="#fff"><path d="M4 5V18H21V5H4M6 16V7H9V16H6M11 16V12.5H14V16H11M19 16H16V12.5H19V16M11 10.5V7H19V10.5H11Z"/></svg>
     </div>
     <div class="header-titles">
       <h1 id="header-title"><span class="bk-better">better</span><span class="bk-kerf">Kerf</span></h1>
       <p id="header-sub">Werkstatt-Rechner für die Holzbearbeitung</p>
     </div>
-    <button class="header-gear" id="gear-btn" onclick="openSettings()" aria-label="Einstellungen"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960" width="20" height="20" fill="currentColor"><path d="m416-132-14-112q-21-6-46.5-20T313-294l-103 44-64-112 89-67q-2-12-3.5-25t-1.5-25q0-11 1.5-23.5T235-531l-89-67 64-110 102 43q20-17 43.5-30.5T401-716l15-112h128l14 113q26 9 45.5 20.5T644-665l106-43 64 110-93 70q4 14 4.5 25.5t.5 22.5q0 10-1 21.5t-4 28.5l91 68-64 112-104-45q-21 18-42 30.5T558-245l-14 113H416Zm24-28h78l15-109q30-8 53.5-21.5T636-329l100 43 40-68-88-66q5-18 6.5-32t1.5-28q0-15-1.5-28t-6.5-30l90-68-40-68-103 43q-17-19-47.5-37T532-691l-12-109h-80l-12 108q-30 6-55 20t-51 40l-100-42-40 68 87 65q-5 13-7 29t-2 33q0 15 2 30t6 29l-86 66 40 68 99-42q24 24 49 38t57 22l13 108Zm38-232q37 0 62.5-25.5T566-480q0-37-25.5-62.5T478-568q-37 0-62.5 25.5T390-480q0 37 25.5 62.5T478-392Zm2-88Z"/></svg></button>
+    <button class="header-gear" id="gear-btn" onclick="openSettings()" aria-label="Einstellungen"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M12,15.5A3.5,3.5 0 0,1 8.5,12A3.5,3.5 0 0,1 12,8.5A3.5,3.5 0 0,1 15.5,12A3.5,3.5 0 0,1 12,15.5M19.43,12.97C19.47,12.65 19.5,12.33 19.5,12C19.5,11.67 19.47,11.34 19.43,11L21.54,9.37C21.73,9.22 21.78,8.95 21.66,8.73L19.66,5.27C19.54,5.05 19.27,4.96 19.05,5.05L16.56,6.05C16.04,5.66 15.5,5.32 14.87,5.07L14.5,2.42C14.46,2.18 14.25,2 14,2H10C9.75,2 9.54,2.18 9.5,2.42L9.13,5.07C8.5,5.32 7.96,5.66 7.44,6.05L4.95,5.05C4.73,4.96 4.46,5.05 4.34,5.27L2.34,8.73C2.21,8.95 2.27,9.22 2.46,9.37L4.57,11C4.53,11.34 4.5,11.67 4.5,12C4.5,12.33 4.53,12.65 4.57,12.97L2.46,14.63C2.27,14.78 2.21,15.05 2.34,15.27L4.34,18.73C4.46,18.95 4.73,19.03 4.95,18.95L7.44,17.94C7.96,18.34 8.5,18.68 9.13,18.93L9.5,21.58C9.54,21.82 9.75,22 10,22H14C14.25,22 14.46,21.82 14.5,21.58L14.87,18.93C15.5,18.67 16.04,18.34 16.56,17.94L19.05,18.95C19.27,19.03 19.54,18.95 19.66,18.73L21.66,15.27C21.78,15.05 21.73,14.78 21.54,14.63L19.43,12.97Z"/></svg></button>
   </div>
 
   <!-- HOME SCREEN -->
@@ -350,8 +395,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:-apple-
           </div>
           <div class="srow-hint" style="margin-top:0">Guillotine = durchgehende gerade Schnitte, kein Umsetzen nötig</div>
         </div>
-        <div class="srow" style="margin-top:6px"><div><div class="srow-label">Teile automatisch drehen</div><div class="srow-hint">90°-Rotation wenn platzsparender — mit ↻ markiert</div></div><input type="checkbox" id="allow-rotate" class="toggle" checked></div>
-        <div class="srow srow-col" style="margin-top:6px">
+        <div class="srow" style="margin-top:6px"><div><div class="srow-label">Teile automatisch drehen</div><div class="srow-hint">90°-Rotation wenn platzsparender — mit ↻ markiert</div></div><input type="checkbox" id="allow-rotate" class="toggle" checked></div>        <div class="srow srow-col" style="margin-top:6px">
           <div class="srow-label">Optimierungsziel</div>
           <div class="radio-group">
             <label class="radio-lbl"><input type="radio" name="optmode" value="waste" checked> Wenigster Verschnitt</label>
@@ -359,6 +403,24 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:-apple-
           </div>
           <div class="srow-hint" style="margin-top:0">Verschnitt = kleinste genutzte Materialfläche. Wenigste Bretter = lieber ein großes Brett statt mehrerer kleiner, auch wenn etwas mehr Verschnitt entsteht.</div>
         </div>
+      </div>
+
+      <div class="section" style="margin-top:22px">
+        <div class="slabel">Rechtliches</div>
+        <button class="module-card" onclick="document.getElementById('legal-overlay').classList.add('open')" style="border-radius:12px">
+          <div class="mc-body">
+            <div class="mc-title">Datenschutzerklärung</div>
+            <div class="mc-desc">Wie diese App mit deinen Daten umgeht</div>
+          </div>
+          <div class="mc-arrow">›</div>
+        </button>
+        <button class="module-card" onclick="document.getElementById('disclaimer-overlay').classList.add('open')" style="border-radius:12px;margin-top:8px">
+          <div class="mc-body">
+            <div class="mc-title">Haftungsausschluss</div>
+            <div class="mc-desc">Hinweise zur Nutzung der Berechnungen</div>
+          </div>
+          <div class="mc-arrow">›</div>
+        </button>
       </div>
     </div>
   </div>
@@ -388,12 +450,12 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:-apple-
         <button class="add-btn" onclick="addPart()">+ Teil hinzufügen</button>
       </div>
       <button class="calc-btn" onclick="calculate()">▶ Zuschnitt berechnen</button>
-      <button class="action-btn" onclick="resetToExample()">↺ Zurücksetzen</button>
+      <button class="action-btn" onclick="resetToExample()"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M12,4C14.1,4 16.1,4.8 17.6,6.3C20.7,9.4 20.7,14.5 17.6,17.6C15.8,19.5 13.3,20.2 10.9,19.9L11.4,17.9C13.1,18.1 14.9,17.5 16.2,16.2C18.5,13.9 18.5,10.1 16.2,7.7C15.1,6.6 13.5,6 12,6V10.6L7,5.6L12,0.6V4M6.3,17.6C3.7,15 3.3,11 5.1,7.9L6.6,9.4C5.5,11.6 5.9,14.4 7.8,16.2C8.3,16.7 8.9,17.1 9.6,17.4L9,19.4C8,19 7.1,18.4 6.3,17.6Z"/></svg> Zurücksetzen</button>
     </div>
 
     <div class="pane" id="pane-projects">
       <div class="slabel">Projekt speichern</div>
-      <div class="save-row"><input id="proj-name-input" placeholder="Projektname eingeben…" autocomplete="off" autocorrect="off"><button class="save-btn" onclick="saveProject()">💾 Speichern</button></div>
+      <div class="save-row"><input id="proj-name-input" placeholder="Projektname eingeben…" autocomplete="off" autocorrect="off"><button class="save-btn" onclick="saveProject()">Speichern</button></div>
       <div class="slabel" style="margin-top:18px">Gespeicherte Projekte</div>
       <div id="proj-list"></div>
       <div class="info-note">Projekte werden lokal auf diesem Gerät gespeichert und bleiben auch offline verfügbar.</div>
@@ -407,8 +469,8 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:-apple-
   <div class="screen" id="screen-holes">
     <div class="pane active" style="display:block">
       <div class="hsub-tabs">
-        <button class="hsub-tab active" data-hmode="row" onclick="holesMode('row')">— Reihe</button>
-        <button class="hsub-tab" data-hmode="grid" onclick="holesMode('grid')">⋮⋮ Raster</button>
+        <button class="hsub-tab active" data-hmode="row" onclick="holesMode('row')"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" fill="currentColor" style="vertical-align:-2px;margin-right:4px"><path d="M16,12A2,2 0 0,1 18,10A2,2 0 0,1 20,12A2,2 0 0,1 18,14A2,2 0 0,1 16,12M10,12A2,2 0 0,1 12,10A2,2 0 0,1 14,12A2,2 0 0,1 12,14A2,2 0 0,1 10,12M4,12A2,2 0 0,1 6,10A2,2 0 0,1 8,12A2,2 0 0,1 6,14A2,2 0 0,1 4,12Z"/></svg>Reihe</button>
+        <button class="hsub-tab" data-hmode="grid" onclick="holesMode('grid')"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" fill="currentColor" style="vertical-align:-2px;margin-right:4px"><path d="M12 16C13.1 16 14 16.9 14 18S13.1 20 12 20 10 19.1 10 18 10.9 16 12 16M12 10C13.1 10 14 10.9 14 12S13.1 14 12 14 10 13.1 10 12 10.9 10 12 10M12 4C13.1 4 14 4.9 14 6S13.1 8 12 8 10 7.1 10 6 10.9 4 12 4M6 16C7.1 16 8 16.9 8 18S7.1 20 6 20 4 19.1 4 18 4.9 16 6 16M6 10C7.1 10 8 10.9 8 12S7.1 14 6 14 4 13.1 4 12 4.9 10 6 10M6 4C7.1 4 8 4.9 8 6S7.1 8 6 8 4 7.1 4 6 4.9 4 6 4M18 16C19.1 16 20 16.9 20 18S19.1 20 18 20 16 19.1 16 18 16.9 16 18 16M18 10C19.1 10 20 10.9 20 12S19.1 14 18 14 16 13.1 16 12 16.9 10 18 10M18 4C19.1 4 20 4.9 20 6S19.1 8 18 8 16 7.1 16 6 16.9 4 18 4Z"/></svg>Raster</button>
       </div>
 
       <!-- MODE: REIHE -->
@@ -435,7 +497,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:-apple-
           </div>
         </div>
         <button class="calc-btn" onclick="holesCalc()">▶ Bohrlochplaner berechnen</button>
-        <button class="action-btn" onclick="holesReset()">↺ Zurücksetzen</button>
+        <button class="action-btn" onclick="holesReset()"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M12,4C14.1,4 16.1,4.8 17.6,6.3C20.7,9.4 20.7,14.5 17.6,17.6C15.8,19.5 13.3,20.2 10.9,19.9L11.4,17.9C13.1,18.1 14.9,17.5 16.2,16.2C18.5,13.9 18.5,10.1 16.2,7.7C15.1,6.6 13.5,6 12,6V10.6L7,5.6L12,0.6V4M6.3,17.6C3.7,15 3.3,11 5.1,7.9L6.6,9.4C5.5,11.6 5.9,14.4 7.8,16.2C8.3,16.7 8.9,17.1 9.6,17.4L9,19.4C8,19 7.1,18.4 6.3,17.6Z"/></svg> Zurücksetzen</button>
       </div>
 
       <!-- MODE: RASTER -->
@@ -447,12 +509,12 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:-apple-
           <div class="srow"><div><div class="srow-label">Höhe (Y)</div><div class="srow-hint">Vertikale Ausdehnung</div></div><div class="nm"><input type="number" inputmode="decimal" id="g-height" value="400" min="0"><span data-unit-span>mm</span></div></div>
         </div>
         <div class="section">
-          <div class="slabel">⋮⋮ Anzahl Löcher</div>
+          <div class="slabel">Anzahl Löcher</div>
           <div class="srow"><div><div class="srow-label">Spalten (in X)</div><div class="srow-hint">Löcher pro Reihe</div></div><div class="nm"><input type="number" inputmode="numeric" id="g-cols" value="4" min="1" max="100"><span>×</span></div></div>
           <div class="srow"><div><div class="srow-label">Reihen (in Y)</div><div class="srow-hint">Anzahl der Reihen</div></div><div class="nm"><input type="number" inputmode="numeric" id="g-rows" value="3" min="1" max="100"><span>×</span></div></div>
         </div>
         <div class="section">
-          <div class="slabel">🔘 Bohrung</div>
+          <div class="slabel">Bohrung</div>
           <div class="hint-box">Optional, für eine maßstäblich realistische 1:1-Schablone und eine Randabstands-Warnung.</div>
           <div class="srow"><div><div class="srow-label">Lochdurchmesser</div><div class="srow-hint">Für maßstäbliche Darstellung &amp; Randwarnung</div></div><div class="nm"><input type="number" inputmode="decimal" id="g-dia" placeholder="optional" min="0"><span data-unit-span>mm</span></div></div>
         </div>
@@ -465,7 +527,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:-apple-
           </div>
         </div>
         <button class="calc-btn" onclick="gridCalc()">▶ Raster berechnen</button>
-        <button class="action-btn" onclick="gridReset()">↺ Zurücksetzen</button>
+        <button class="action-btn" onclick="gridReset()"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M12,4C14.1,4 16.1,4.8 17.6,6.3C20.7,9.4 20.7,14.5 17.6,17.6C15.8,19.5 13.3,20.2 10.9,19.9L11.4,17.9C13.1,18.1 14.9,17.5 16.2,16.2C18.5,13.9 18.5,10.1 16.2,7.7C15.1,6.6 13.5,6 12,6V10.6L7,5.6L12,0.6V4M6.3,17.6C3.7,15 3.3,11 5.1,7.9L6.6,9.4C5.5,11.6 5.9,14.4 7.8,16.2C8.3,16.7 8.9,17.1 9.6,17.4L9,19.4C8,19 7.1,18.4 6.3,17.6Z"/></svg> Zurücksetzen</button>
       </div>
 
       <div id="h-result" style="margin-top:18px"></div>
@@ -483,14 +545,14 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:-apple-
         <button class="add-btn" onclick="costAddBoard()">+ Brett hinzufügen</button>
       </div>
       <div class="section">
-        <div class="slabel-row"><div class="slabel">🏷️ Gemerkte Preise</div><button class="edit-toggle" id="pricelist-toggle" onclick="togglePriceList()">Anzeigen</button></div>
+        <div class="slabel-row"><div class="slabel">Gemerkte Preise</div><button class="edit-toggle" id="pricelist-toggle" onclick="togglePriceList()">Anzeigen</button></div>
         <div id="pricelist" style="display:none"></div>
       </div>
       <div class="section">
         <div class="srow"><div><div class="srow-label">Anzahl Projekte / Sets</div><div class="srow-hint">Hochrechnung für Kleinserien — Material &amp; Kosten werden multipliziert</div></div><div class="nm"><input type="number" inputmode="numeric" id="cost-qty" value="1" min="1" max="999" oninput="if(lastCost)costCalc()"><span>×</span></div></div>
       </div>
       <button class="calc-btn" onclick="costCalc()">▶ Kosten berechnen</button>
-      <button class="action-btn" onclick="costReset()">↺ Zurücksetzen</button>
+      <button class="action-btn" onclick="costReset()"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M12,4C14.1,4 16.1,4.8 17.6,6.3C20.7,9.4 20.7,14.5 17.6,17.6C15.8,19.5 13.3,20.2 10.9,19.9L11.4,17.9C13.1,18.1 14.9,17.5 16.2,16.2C18.5,13.9 18.5,10.1 16.2,7.7C15.1,6.6 13.5,6 12,6V10.6L7,5.6L12,0.6V4M6.3,17.6C3.7,15 3.3,11 5.1,7.9L6.6,9.4C5.5,11.6 5.9,14.4 7.8,16.2C8.3,16.7 8.9,17.1 9.6,17.4L9,19.4C8,19 7.1,18.4 6.3,17.6Z"/></svg> Zurücksetzen</button>
       <div id="cost-result" style="margin-top:18px"></div>
     </div>
   </div>
@@ -500,6 +562,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:-apple-
     <div class="tabs" id="korpus-tabs">
       <button class="tab active" data-tab="input">Eingabe</button>
       <button class="tab" data-tab="projects">Projekte</button>
+      <button class="tab" id="kp-tab-guide" data-tab="guide" style="display:none">Anleitung</button>
     </div>
 
     <div class="pane active" id="kpane-input">
@@ -522,7 +585,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:-apple-
       </div>
 
       <div class="section">
-        <div class="slabel-row"><div class="slabel">🔩 Konstruktion</div><button class="info-btn" onclick="openConstrInfo()" aria-label="Erklärung zur Konstruktionsart">ⓘ</button></div>
+        <div class="slabel-row"><div class="slabel">Konstruktion</div><button class="info-btn" onclick="openConstrInfo()" aria-label="Erklärung zur Konstruktionsart">ⓘ</button></div>
         <div class="kp-seg-label">Verbindung Seiten / Boden &amp; Deckel</div>
         <div class="cost-seg kp-seg">
           <button id="kp-c-sides" class="on" onclick="korpusSetConstr('sides')">Seiten durchgehend</button>
@@ -531,7 +594,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:-apple-
       </div>
 
       <div class="section">
-        <div class="slabel-row"><div class="slabel">🚪 Rückwand</div><button class="info-btn" onclick="openBackInfo()" aria-label="Erklärung zu den Rückwand-Varianten">ⓘ</button></div>
+        <div class="slabel-row"><div class="slabel">Rückwand</div><button class="info-btn" onclick="openBackInfo()" aria-label="Erklärung zu den Rückwand-Varianten">ⓘ</button></div>
         <div class="kp-seg-label">Befestigung &amp; Einbauart der Rückwand</div>
         <div class="cost-seg kp-seg kp-seg-4">
           <button id="kp-bk-inset" class="on" onclick="korpusSetBack('inset')">eingenutet</button>
@@ -556,12 +619,14 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:-apple-
       </div>
 
       <div id="kp-result" style="margin-top:6px"></div>
-      <button class="action-btn" style="margin-top:14px" onclick="korpusReset()">↺ Zurücksetzen</button>
+      <button class="action-btn" style="margin-top:14px" onclick="korpusReset()"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M12,4C14.1,4 16.1,4.8 17.6,6.3C20.7,9.4 20.7,14.5 17.6,17.6C15.8,19.5 13.3,20.2 10.9,19.9L11.4,17.9C13.1,18.1 14.9,17.5 16.2,16.2C18.5,13.9 18.5,10.1 16.2,7.7C15.1,6.6 13.5,6 12,6V10.6L7,5.6L12,0.6V4M6.3,17.6C3.7,15 3.3,11 5.1,7.9L6.6,9.4C5.5,11.6 5.9,14.4 7.8,16.2C8.3,16.7 8.9,17.1 9.6,17.4L9,19.4C8,19 7.1,18.4 6.3,17.6Z"/></svg> Zurücksetzen</button>
     </div>
+
+    <div class="pane" id="kpane-guide"><div id="kp-guide-content"></div></div>
 
     <div class="pane" id="kpane-projects">
       <div class="slabel">Projekt speichern</div>
-      <div class="save-row"><input id="kp-proj-name" placeholder="Projektname eingeben…" autocomplete="off" autocorrect="off"><button class="save-btn" onclick="korpusSaveProject()">💾 Speichern</button></div>
+      <div class="save-row"><input id="kp-proj-name" placeholder="Projektname eingeben…" autocomplete="off" autocorrect="off"><button class="save-btn" onclick="korpusSaveProject()">Speichern</button></div>
       <div class="slabel" style="margin-top:18px">Gespeicherte Projekte</div>
       <div id="kp-proj-list"></div>
       <div class="info-note">Projekte werden lokal auf diesem Gerät gespeichert und bleiben auch offline verfügbar.</div>
@@ -585,7 +650,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:-apple-
   <div class="sheet-backdrop" onclick="closeBackInfo()"></div>
   <div class="sheet">
     <div class="sheet-handle"></div>
-    <div class="sheet-head"><span>🚪 Rückwand-Varianten</span><button class="zoom-close" onclick="closeBackInfo()" aria-label="Schließen">×</button></div>
+    <div class="sheet-head"><span>Rückwand-Varianten</span><button class="zoom-close" onclick="closeBackInfo()" aria-label="Schließen">×</button></div>
     <div class="sheet-body">
       <div class="info-item">
         <div class="info-item-title">Eingenutet</div>
@@ -612,7 +677,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:-apple-
   <div class="sheet-backdrop" onclick="closeConstrInfo()"></div>
   <div class="sheet">
     <div class="sheet-handle"></div>
-    <div class="sheet-head"><span>🔩 Konstruktionsarten</span><button class="zoom-close" onclick="closeConstrInfo()" aria-label="Schließen">×</button></div>
+    <div class="sheet-head"><span>Konstruktionsarten</span><button class="zoom-close" onclick="closeConstrInfo()" aria-label="Schließen">×</button></div>
     <div class="sheet-body">
       <div class="info-item">
         <div class="info-item-title">Seiten durchgehend</div>
@@ -629,6 +694,49 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:-apple-
 <script>
 // ═══════════════════════════════════════════════════════════════════════
 //  betterKerf — modular shell
+
+// ── Dialog helpers ──
+let _dlgResolve = null;
+function showConfirm(title, msg, {confirmLabel='Bestätigen', danger=false, icon='alert_circle'} = {}) {
+  return new Promise(resolve => {
+    _dlgResolve = resolve;
+    const iconEl = document.getElementById('dlg-icon');
+    iconEl.innerHTML = msIcon(icon, 32);
+    iconEl.style.color = danger ? 'var(--danger)' : 'var(--text3)';
+    document.getElementById('dlg-title').textContent = title;
+    document.getElementById('dlg-msg').textContent = msg;
+    document.getElementById('dlg-btns').innerHTML =
+      `<button class="dlg-btn ${danger?'dlg-btn-danger':'dlg-btn-confirm'}" onclick="_dlgDone(true)">${confirmLabel}</button>` +
+      `<button class="dlg-btn dlg-btn-cancel" onclick="_dlgDone(false)">Abbrechen</button>`;
+    document.getElementById('dlg-overlay').classList.add('show');
+  });
+}
+function showAlert(msg, {title='Hinweis', icon='information', danger=false} = {}) {
+  return new Promise(resolve => {
+    _dlgResolve = resolve;
+    const iconEl = document.getElementById('dlg-icon');
+    iconEl.innerHTML = msIcon(icon, 32);
+    iconEl.style.color = danger ? 'var(--danger)' : 'var(--text3)';
+    document.getElementById('dlg-title').textContent = title;
+    document.getElementById('dlg-msg').textContent = msg;
+    document.getElementById('dlg-btns').innerHTML =
+      `<button class="dlg-btn dlg-btn-ok" onclick="_dlgDone(true)">OK</button>`;
+    document.getElementById('dlg-overlay').classList.add('show');
+  });
+}
+function _dlgDone(val) {
+  document.getElementById('dlg-overlay').classList.remove('show');
+  if (_dlgResolve) { _dlgResolve(val); _dlgResolve = null; }
+}
+let _toastTimer = null;
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.innerHTML = msIcon('check_circle',16) + ' ' + msg;
+  t.classList.add('show');
+  clearTimeout(_toastTimer);
+  _toastTimer = setTimeout(() => t.classList.remove('show'), 2200);
+}
+
 //  Add a new tool by registering it in MODULES and providing a screen +
 //  an optional init() hook. The router shows/hides screens and swaps the
 //  header. Each module owns its own state and DOM under its screen id.
@@ -637,7 +745,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:-apple-
 // ── Einheiten (global) ──────────────────────────────────────────────────
 // Intern wird IMMER in mm gerechnet. Nur Ein-/Ausgabe wird konvertiert.
 const UNITS={mm:{f:1,dec:0,label:'mm'},cm:{f:10,dec:1,label:'cm'},m:{f:1000,dec:3,label:'m'}};
-let currentUnit=(()=>{try{return localStorage.getItem('betterkerf_unit')||'mm';}catch{return 'mm';}})();
+let currentUnit=(()=>{try{return localStorage.getItem('betterkerf_unit')||'cm';}catch{return 'cm';}})();
 function unitLabel(){return UNITS[currentUnit].label;}
 // mm -> Anzeigewert (Zahl in aktueller Einheit)
 function dispNum(mm){return mm/UNITS[currentUnit].f;}
@@ -725,25 +833,25 @@ function renderUnitChips(){
 }
 
 const MS={
-  carpenter:'M605-131q-9 9-20.5 13.5T562-113q-11 0-22-4.5T520-131l-48-47q-9-9-13-20t-4-22q0-11 4.5-22t12.5-20l12-13-326-466 122-122 486 486q9 9 13.5 20.5T784-334q0 11-4.5 22T766-292L605-131ZM503-295l154-152-377-377-86 86 309 443Zm38 144q10 9 23 9t22-9l160-160q9-9 9-22t-9-23l-70-72-184 184q-10 10-10 23.5t10 22.5l49 47Zm-38-144 154-152-154 152Z',
-  adjust:'M528.5-431.5Q548-451 548-480t-19.5-48.5Q509-548 480-548t-48.5 19.5Q412-509 412-480t19.5 48.5Q451-412 480-412t48.5-19.5ZM480.17-132q-72.17 0-135.73-27.39-63.56-27.39-110.57-74.35-47.02-46.96-74.44-110.43Q132-407.65 132-479.83q0-72.17 27.39-135.73 27.39-63.56 74.35-110.57 46.96-47.02 110.43-74.44Q407.65-828 479.83-828q72.17 0 135.73 27.39 63.56 27.39 110.57 74.35 47.02 46.96 74.44 110.43Q828-552.35 828-480.17q0 72.17-27.39 135.73-27.39 63.56-74.35 110.57-46.96 47.02-110.43 74.44Q552.35-132 480.17-132Zm-.17-28q134 0 227-93t93-227q0-134-93-227t-227-93q-134 0-227 93t-93 227q0 134 93 227t227 93Zm0-320Z',
-  recycling:'m390-566 72-117-48-79q-9-16-27.5-16t-27.99 16.07L281-631l109 65Zm309.86 218L629-466l111-64 51 85q8 14 9.5 31t-6.5 31q-8 17-24 26t-34.31 9h-35.83ZM608-124 480-252l128-128v64h152l-46.4 92.8q-8.8 16-24 25.6-15.2 9.6-33.6 9.6h-48v64Zm-309.95-64Q282-188 269-196t-19-21.91Q244-231 244-245t7.2-26.04L278.4-316H416v128H298.05ZM219-279l-52-104q-8-15-7-31.5t9.56-30.5L182-466l-54-33 175-44 44 176-55-34-73 122Zm432-274-175.2-43.96 55.2-32.78L431-796h112.8q16.8 0 31.6 8.35 14.8 8.34 23.6 22.65l42 70 54-34-44 176Z',
-  calculate:'M336-256h28v-80h80v-28h-80v-80h-28v80h-80v28h80v80Zm200-30h168v-28H536v28Zm0-100h168v-28H536v28Zm28-160 56-56 56 56 20-20-56-56 56-56-20-20-56 56-56-56-20 20 56 56-56 56 20 20Zm-298-62h168v-28H266v28Zm-34 436q-26 0-43-17t-17-43v-496q0-26 17-43t43-17h496q26 0 43 17t17 43v496q0 26-17 43t-43 17H232Zm0-28h496q12 0 22-10t10-22v-496q0-12-10-22t-22-10H232q-12 0-22 10t-10 22v496q0 12 10 22t22 10Zm-32-560v560-560Z',
-  shelves:'M172-87v-785h28v85h560v-85h28v785h-28v-85H200v85h-28Zm28-433h112v-148h176v148h272v-239H200v239Zm0 320h272v-148h176v148h112v-292H200v292Zm140-320h120v-120H340v120Zm160 320h120v-120H500v120ZM340-520h120-120Zm160 320h120-120Z',
-  settings:'m416-132-14-112q-21-6-46.5-20T313-294l-103 44-64-112 89-67q-2-12-3.5-25t-1.5-25q0-11 1.5-23.5T235-531l-89-67 64-110 102 43q20-17 43.5-30.5T401-716l15-112h128l14 113q26 9 45.5 20.5T644-665l106-43 64 110-93 70q4 14 4.5 25.5t.5 22.5q0 10-1 21.5t-4 28.5l91 68-64 112-104-45q-21 18-42 30.5T558-245l-14 113H416Zm24-28h78l15-109q30-8 53.5-21.5T636-329l100 43 40-68-88-66q5-18 6.5-32t1.5-28q0-15-1.5-28t-6.5-30l90-68-40-68-103 43q-17-19-47.5-37T532-691l-12-109h-80l-12 108q-30 6-55 20t-51 40l-100-42-40 68 87 65q-5 13-7 29t-2 33q0 15 2 30t6 29l-86 66 40 68 99-42q24 24 49 38t57 22l13 108Zm38-232q37 0 62.5-25.5T566-480q0-37-25.5-62.5T478-568q-37 0-62.5 25.5T390-480q0 37 25.5 62.5T478-392Zm2-88Z',
-  checklist:'M237-257 132-362l19-19 85 85 170-170 19 20-188 189Zm0-280L132-642l19-19 85 85 170-170 19 20-188 189Zm284 211v-28h308v28H521Zm0-280v-28h308v28H521Z',
-  straighten:'M192-292q-26 0-43-17t-17-43v-256q0-26 17-43t43-17h576q26 0 43 17t17 43v256q0 26-17 43t-43 17H192Zm0-28h576q12 0 22-10t10-22v-256q0-12-10-22t-22-10H654v120h-28v-120H494v120h-28v-120H334v120h-28v-120H192q-12 0-22 10t-10 22v256q0 12 10 22t22 10Zm114-200h28-28Zm160 0h28-28Zm160 0h28-28Zm-146 40Z',
-  build:'M720-142 452-410q-23 11-47.02 17.5Q380.95-386 354-386q-89.17 0-151.58-62.42Q140-510.83 140-600q0-23 4.5-44.5T158-686l140 138 108-108-136-138q20-9 40.59-14.5 20.6-5.5 43.41-5.5 89.17 0 151.58 62.42Q568-689.17 568-600q0 29-6 53t-18 45l268 268q8 8.35 8 20.17 0 11.83-7.78 19.61l-54.44 54.44Q750-132 739-133t-19-9Zm20-20 52-52-283-283q15-22 23-48.5t8-54.5q0-77-62-139t-160-45l107 107q9 9 9 21t-9 21L319-529q-9 9-21 9t-21-9L170-636q-14 109 49 165.5T354-414q26.67 0 53.33-7.5Q434-429 457-445l283 283ZM472-484Z',
-  forest:'M332-132v-160H98l160-240h-78l180-258 120 172 120-172 180 258h-78l160 240H628v160h-56v-160H388v160h-56Zm271-188h207L650-560h76L600-740 498-594l42 62h-78l141 212Zm-453 0h420L410-560h76L360-740 234-560h76L150-320Zm0 0h160-76 252-76 160-420Zm453 0H462h78-42 228-76 160-207Zm-31 28h56-56Zm50 0Z',
-  download:'M480-342 356-466l20-20 90 90v-352h28v352l90-90 20 20-124 124ZM272-212q-26 0-43-17t-17-43v-90h28v90q0 12 10 22t22 10h416q12 0 22-10t10-22v-90h28v90q0 26-17 43t-43 17H272Z',
-  content_copy:'M366-292q-26 0-43-17t-17-43v-416q0-26 17-43t43-17h296q26 0 43 17t17 43v416q0 26-17 43t-43 17H366Zm0-28h296q12 0 22-10t10-22v-416q0-12-10-22t-22-10H366q-12 0-22 10t-10 22v416q0 12 10 22t22 10ZM258-184q-26 0-43-17t-17-43v-444h28v444q0 12 10 22t22 10h324v28H258Zm76-136v-480 480Z',
-  restart_alt:'M440-176q-99-14-163.5-89T212-440q0-53 21-101.5t57-86.5l20 20q-35 33-52.5 76.5T240-440q0 88 56.5 154.5T440-204v28Zm80 2v-28q86-20 143-85.5T720-440q0-100-70-170t-170-70h-32l70 70-20 20-104-104 104-104 20 20-70 70h32q112 0 190 78t78 190q0 100-65 174t-163 92Z',
-  edit:'M200-200h40l439-439-40-40-439 439v40Zm-28 28v-80l527-528q4.39-3.83 9.7-5.91Q714-788 719.68-788q5.67 0 11 1.5Q736-785 741-780l39 39q5 5 6.5 10.41t1.5 10.82q0 5.77-1.91 11.07-1.92 5.31-6.09 9.7L252-172h-80Zm589-548-41-41 41 41Zm-102.35 61.35L639-679l40 40-20.35-19.65Z',
-  folder:'M192-212q-26 0-43-17t-17-43v-416q0-26 17-43t43-17h187l80 80h309q26 0 43 17t17 43v336q0 26-17 43t-43 17H192Zm0-28h576q14 0 23-9t9-23v-336q0-14-9-23t-23-9H448l-80-80H192q-14 0-23 9t-9 23v416q0 14 9 23t23 9Zm-32 0v-480 480Z',
-  grid_on:'M232-172q-26 0-43-17t-17-43v-496q0-26 17-43t43-17h496q26 0 43 17t17 43v496q0 26-17 43t-43 17H232Zm0-28h136v-168H200v136q0 14 9 23t23 9Zm164 0h168v-168H396v168Zm196 0h136q14 0 23-9t9-23v-136H592v168ZM200-396h168v-168H200v168Zm196 0h168v-168H396v168Zm196 0h168v-168H592v168ZM200-592h168v-168H232q-14 0-23 9t-9 23v136Zm196 0h168v-168H396v168Zm196 0h168v-136q0-14-9-23t-23-9H592v168Z',
-  menu_book:'M554-580v-28q32-17 69.5-25.5T700-642q21 0 40 2.5t40 7.5v28q-20-6-38.5-8t-41.5-2q-39 0-76.5 8.5T554-580Zm0 218v-30q30-17 69-25.5t77-8.5q21 0 40 2.5t40 7.5v28q-20-6-38.5-8t-41.5-2q-39 0-76.5 9.5T554-362Zm0-108v-30q32-17 69.5-25.5T700-534q21 0 40 2.5t40 7.5v28q-20-6-38.5-8t-41.5-2q-39 0-76.5 9.5T554-470ZM260-318q54 0 105 12.5T466-264v-392q-44-33-98-49.5T260-722q-36 0-60.5 3.5T142-704q-12 4-17 11.5t-5 16.5v350q0 14 10 20.5t22 1.5q18-6 45-10t63-4Zm234 54q50-29 101-41.5T700-318q36 0 63 4t45 10q12 5 22-1.5t10-20.5v-350q0-9-5-16t-17-12q-33-11-57.5-14.5T700-722q-54 0-108 16.5T494-656v392Zm-14 40q-49-32-105-49t-115-17q-28 0-55 3.5T152-274q-22 8-41-6.5T92-320v-358q0-16 8.5-29.5T124-726q32-13 66.5-18.5T260-750q59 0 115 17.5T480-682q49-33 105-50.5T700-750q35 0 69.5 5.5T836-726q15 5 23.5 18.5T868-678v358q0 25-21 38.5t-45 5.5q-25-8-50.5-11t-51.5-3q-59 0-115 17t-105 49ZM293-501Z'
+  carpenter:'M20,15C20,15 18.6,16.3 21.1,17L18.3,19.8H15.5C15.5,19.8 13.6,19.7 15,22H11L9,20C9,20 7.7,18.6 7,21.1L4.2,18.3V15.5C4.2,15.5 4.3,13.6 2,15V11L4,9C4,9 5.4,7.7 2.8,7.1L5.6,4.2H8.5C8.5,4.2 10.4,4.3 9,2H13L15,4C15,4 16.3,5.4 17,2.8L19.8,5.6V8.5C19.8,8.5 19.7,10.4 22,9V13L20,15M14,12A2,2 0 0,0 12,10A2,2 0 0,0 10,12A2,2 0 0,0 12,14A2,2 0 0,0 14,12Z',
+  adjust:'M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M12,4A8,8 0 0,1 20,12A8,8 0 0,1 12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4M12,6A6,6 0 0,0 6,12A6,6 0 0,0 12,18A6,6 0 0,0 18,12A6,6 0 0,0 12,6M12,8A4,4 0 0,1 16,12A4,4 0 0,1 12,16A4,4 0 0,1 8,12A4,4 0 0,1 12,8M12,10A2,2 0 0,0 10,12A2,2 0 0,0 12,14A2,2 0 0,0 14,12A2,2 0 0,0 12,10Z',
+  recycling:'M21.82,15.42L19.32,19.75C18.83,20.61 17.92,21.06 17,21H15V23L12.5,18.5L15,14V16H17.82L15.6,12.15L19.93,9.65L21.73,12.77C22.25,13.54 22.32,14.57 21.82,15.42M9.21,3.06H14.21C15.19,3.06 16.04,3.63 16.45,4.45L17.45,6.19L19.18,5.19L16.54,9.6L11.39,9.69L13.12,8.69L11.71,6.24L9.5,10.09L5.16,7.59L6.96,4.47C7.37,3.64 8.22,3.06 9.21,3.06M5.05,19.76L2.55,15.43C2.06,14.58 2.13,13.56 2.64,12.79L3.64,11.06L1.91,10.06L7.05,10.14L9.7,14.56L7.97,13.56L6.56,16H11V21H7.4C6.47,21.07 5.55,20.61 5.05,19.76Z',
+  calculate:'M7,2H17A2,2 0 0,1 19,4V20A2,2 0 0,1 17,22H7A2,2 0 0,1 5,20V4A2,2 0 0,1 7,2M7,4V8H17V4H7M7,10V12H9V10H7M11,10V12H13V10H11M15,10V12H17V10H15M7,14V16H9V14H7M11,14V16H13V14H11M15,14V16H17V14H15M7,18V20H9V18H7M11,18V20H13V18H11M15,18V20H17V18H15Z',
+  shelves:'M14,8H10V6H14V8M20,4V20C20,21.11 19.11,22 18,22H6C4.89,22 4,21.11 4,20V4A2,2 0 0,1 6,2H18C19.11,2 20,2.9 20,4M18,13H6V20H18V13M18,4H6V11H18V4M14,15H10V17H14V15Z',
+  settings:'M12,15.5A3.5,3.5 0 0,1 8.5,12A3.5,3.5 0 0,1 12,8.5A3.5,3.5 0 0,1 15.5,12A3.5,3.5 0 0,1 12,15.5M19.43,12.97C19.47,12.65 19.5,12.33 19.5,12C19.5,11.67 19.47,11.34 19.43,11L21.54,9.37C21.73,9.22 21.78,8.95 21.66,8.73L19.66,5.27C19.54,5.05 19.27,4.96 19.05,5.05L16.56,6.05C16.04,5.66 15.5,5.32 14.87,5.07L14.5,2.42C14.46,2.18 14.25,2 14,2H10C9.75,2 9.54,2.18 9.5,2.42L9.13,5.07C8.5,5.32 7.96,5.66 7.44,6.05L4.95,5.05C4.73,4.96 4.46,5.05 4.34,5.27L2.34,8.73C2.21,8.95 2.27,9.22 2.46,9.37L4.57,11C4.53,11.34 4.5,11.67 4.5,12C4.5,12.33 4.53,12.65 4.57,12.97L2.46,14.63C2.27,14.78 2.21,15.05 2.34,15.27L4.34,18.73C4.46,18.95 4.73,19.03 4.95,18.95L7.44,17.94C7.96,18.34 8.5,18.68 9.13,18.93L9.5,21.58C9.54,21.82 9.75,22 10,22H14C14.25,22 14.46,21.82 14.5,21.58L14.87,18.93C15.5,18.67 16.04,18.34 16.56,17.94L19.05,18.95C19.27,19.03 19.54,18.95 19.66,18.73L21.66,15.27C21.78,15.05 21.73,14.78 21.54,14.63L19.43,12.97Z',
+  checklist:'M4 5V18H21V5H4M6 16V7H9V16H6M11 16V12.5H14V16H11M19 16H16V12.5H19V16M11 10.5V7H19V10.5H11Z',
+  straighten:'M1.39,18.36L3.16,16.6L4.58,18L5.64,16.95L4.22,15.54L5.64,14.12L8.11,16.6L9.17,15.54L6.7,13.06L8.11,11.65L9.53,13.06L10.59,12L9.17,10.59L10.59,9.17L13.06,11.65L14.12,10.59L11.65,8.11L13.06,6.7L14.47,8.11L15.54,7.05L14.12,5.64L15.54,4.22L18,6.7L19.07,5.64L16.6,3.16L18.36,1.39L22.61,5.64L5.64,22.61L1.39,18.36Z',
+  download:'M5,20H19V18H5M19,9H15V3H9V9H5L12,16L19,9Z',
+  content_copy:'M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z',
+  restart_alt:'M12,4C14.1,4 16.1,4.8 17.6,6.3C20.7,9.4 20.7,14.5 17.6,17.6C15.8,19.5 13.3,20.2 10.9,19.9L11.4,17.9C13.1,18.1 14.9,17.5 16.2,16.2C18.5,13.9 18.5,10.1 16.2,7.7C15.1,6.6 13.5,6 12,6V10.6L7,5.6L12,0.6V4M6.3,17.6C3.7,15 3.3,11 5.1,7.9L6.6,9.4C5.5,11.6 5.9,14.4 7.8,16.2C8.3,16.7 8.9,17.1 9.6,17.4L9,19.4C8,19 7.1,18.4 6.3,17.6Z',
+  alert_circle:'M13,13H11V7H13M13,17H11V15H13M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z',
+  information:'M13,9H11V7H13M13,17H11V11H13M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z',
+  delete:'M9,3V4H4V6H5V19A2,2 0 0,0 7,21H17A2,2 0 0,0 19,19V6H20V4H15V3H9M7,6H17V19H7V6M9,8V17H11V8H9M13,8V17H15V8H13Z',
+  content_save:'M15,9H5V5H15M12,19A3,3 0 0,1 9,16A3,3 0 0,1 12,13A3,3 0 0,1 15,16A3,3 0 0,1 12,19M17,3H5C3.89,3 3,3.9 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V7L17,3Z',
+  folder_open:'M19,20H4C2.89,20 2,19.1 2,18V6C2,4.89 2.89,4 4,4H10L12,6H19A2,2 0 0,1 21,8H21L4,8V18L6.14,10H23.21L20.93,18.5C20.7,19.37 19.92,20 19,20Z',
+  check_circle:'M12 2C6.5 2 2 6.5 2 12S6.5 22 12 22 22 17.5 22 12 17.5 2 12 2M10 17L5 12L6.41 10.59L10 14.17L17.59 6.58L19 8L10 17Z'
 };
-function msIcon(name,size){size=size||20;return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960" width="${size}" height="${size}" fill="currentColor"><path d="${MS[name]}"/></svg>`;}
+function msIcon(name,size){size=size||20;return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="${size}" height="${size}" fill="currentColor"><path d="${MS[name]}"/></svg>`;}
 
 const MODULES=[
   {
@@ -755,6 +863,16 @@ const MODULES=[
     status:'ready',
     screen:'screen-cutlist',
     init:()=>{ renderStock(); renderParts(); }
+  },
+  {
+    id:'korpus',
+    title:'Korpusplaner',
+    sub:'Schränke & Möbel planen',
+    icon:'shelves',
+    desc:'Aus Außenmaßen automatisch die Zuschnittliste für Korpusteile (Seiten, Boden, Deckel, Rückwand) berechnen.',
+    status:'ready',
+    screen:'screen-korpus',
+    init:()=>{ korpusInit(); }
   },
   // ── Geplante Module (Platzhalter, noch nicht aktiv) ──
   {
@@ -785,16 +903,6 @@ const MODULES=[
     screen:'screen-cost',
     init:()=>{ costInit(); }
   },
-  {
-    id:'korpus',
-    title:'Korpusplaner',
-    sub:'Schränke & Möbel planen',
-    icon:'shelves',
-    desc:'Aus Außenmaßen automatisch die Zuschnittliste für Korpusteile (Seiten, Boden, Deckel, Rückwand) berechnen.',
-    status:'ready',
-    screen:'screen-korpus',
-    init:()=>{ korpusInit(); }
-  }
 ];
 
 const HEADER_DEFAULT={icon:msIcon('checklist',20),title:'<span class="bk-better">better</span><span class="bk-kerf">Kerf</span>',sub:'Werkstatt-Rechner für die Holzbearbeitung'};
@@ -806,7 +914,7 @@ function renderHome(){
     return `<button class="module-card${ready?'':' disabled'}" ${ready?`onclick="openModule('${m.id}')"`:''}>
       <div class="mc-icon">${msIcon(m.icon,26)}</div>
       <div class="mc-body">
-        <div class="mc-title">${m.title}${ready?'':' '}<span class="${ready?'mc-badge':'mc-soon'}">${ready?'Bereit':'Bald'}</span></div>
+        <div class="mc-title">${m.title}${ready?'':' <span class="mc-soon">Bald</span>'}</div>
         <div class="mc-desc">${m.desc}</div>
       </div>
       ${ready?'<div class="mc-arrow">›</div>':''}
@@ -891,13 +999,12 @@ refreshUnitSpans();
 //  MODULE: Cutlist Optimizer
 // ═══════════════════════════════════════════════════════════════════════
 let stockData=[
-  {id:1,name:'Brett A',l:2400,w:200,qty:2},
-  {id:2,name:'Brett B',l:1800,w:150,qty:1}
+  {id:1,name:'Brett A',l:2000,w:620,qty:3}
 ];
 let partsData=[
-  {id:1,name:'Regal-Seite',l:800,w:150,qty:2,grain:false},
-  {id:2,name:'Regal-Boden',l:600,w:150,qty:3,grain:false},
-  {id:3,name:'Rücken',l:800,w:200,qty:1,grain:false}
+  {id:1,name:'Seite',l:900,w:600,qty:2,grain:false},
+  {id:2,name:'Boden / Deckel',l:564,w:600,qty:2,grain:false},
+  {id:3,name:'Rückwand',l:876,w:576,qty:1,grain:false}
 ];
 let nextSId=20,nextPId=20,lastResult=null;
 let cutOptMode='waste'; // 'waste' = wenigster Verschnitt (Standard), 'boards' = wenigste Bretter
@@ -1029,10 +1136,11 @@ function initDrag(listId,which){
   });
 }
 
-function resetToExample(){
-  if(!confirm('Zurücksetzen?\n\nAlle eingegebenen Bretter und Teile werden gelöscht. Nicht gespeicherte Änderungen gehen verloren.'))return;
+async function resetToExample(){
+  const ok=await showConfirm('Zurücksetzen?','Alle eingegebenen Bretter und Teile werden gelöscht. Nicht gespeicherte Änderungen gehen verloren.',{confirmLabel:'Zurücksetzen',danger:true,icon:'restart_alt'});if(!ok)return;
   stockData=[];
   partsData=[];
+  lastResult=null;
   nextSId=1;nextPId=1;
   document.getElementById('kerf').value=3;
   const m=document.querySelector('input[name=mode][value="guillotine"]');if(m)m.checked=true;
@@ -1054,9 +1162,9 @@ function calculate(){
   const allowRotate=document.getElementById('allow-rotate').checked;
   const optEl=document.querySelector('input[name=optmode]:checked');
   cutOptMode=optEl?optEl.value:'waste';
-  if(!stockData.length||!partsData.length){alert('Bitte Bretter und Teile eingeben.');return;}
-  for(const s of stockData){const n=norm(s);if(n.L<1||n.W<1){alert('Alle Bretter brauchen gültige Maße.');return;}}
-  for(const p of partsData){const n=norm(p);if(n.L<1||n.W<1){alert('Alle Teile brauchen gültige Maße.');return;}}
+  if(!stockData.length||!partsData.length){showAlert('Bitte Bretter und Teile eingeben.',{title:'Fehlende Eingaben',icon:'information'});return;}
+  for(const s of stockData){const n=norm(s);if(n.L<1||n.W<1){showAlert('Alle Bretter brauchen gültige Maße.',{title:'Ungültige Maße',icon:'information'});return;}}
+  for(const p of partsData){const n=norm(p);if(n.L<1||n.W<1){showAlert('Alle Teile brauchen gültige Maße.',{title:'Ungültige Maße',icon:'information'});return;}}
 
   // Falls schon eine Optimierung läuft: abbrechen
   if(optRun){optRun.cancel=true;if(optRun.timer)clearTimeout(optRun.timer);optRun=null;}
@@ -1547,7 +1655,7 @@ function renderResult(result){
     </div>`).join('')}</div>
     <div class="info-note">Kerf ${kerf} mm | Einheit: ${unitLabel()} | ↻ = 90° gedreht | L=Länge, B=Breite</div>
   </div>
-  <button class="action-btn" onclick="exportPDF()">⬇ Als PDF exportieren</button>`;
+  <button class="action-btn" onclick="exportPDF()">${msIcon('download',16)} Als PDF exportieren</button>`;
   document.getElementById('result-content').innerHTML=html;
 }
 
@@ -1571,7 +1679,7 @@ function renderSteps(result){
       else {steps.push({type:'part',text:`Teil entnehmen: ${rowItems.map(a=>`<b>${a.part.name}${a.part.qty>1?' #'+a.part.instance:''}${a.rotated?' ↻':''}</b>`).join(', ')}`,detail:`Maß: ${dispVal(rowItems[0].part.L)}×${dispUnit(rowItems[0].part.W)}${rowItems[0].rotated?' (90° gedreht einbauen)':''} — sofort beschriften!`});}
     });
   });
-  const icons={board:'📦',cut:'✂️',rip:'↔️',part:'✅'};
+  const icons={board:'',cut:'',rip:'',part:''};
   const colors={board:'#5B8DB8',cut:'#2E7D5E',rip:'#9B6B9B',part:'#6B8F5E'};
   document.getElementById('steps-content').innerHTML=`
     <div class="slabel" style="margin-bottom:14px">Schritt-für-Schritt Schnittanleitung</div>
@@ -1579,22 +1687,24 @@ function renderSteps(result){
       <div class="step-num" style="color:${colors[s.type]}">${icons[s.type]} Schritt ${i+1}</div>
       <div class="step-action">${s.text}</div><div class="step-detail">${s.detail}</div>
     </div>`).join('')}
-    <button class="action-btn" onclick="exportPDF()">⬇ Als PDF exportieren</button>`;
+    <button class="action-btn" onclick="exportPDF()">${msIcon('download',16)} Als PDF exportieren</button>`;
 }
 
 function getProjects(){try{const r=localStorage.getItem('betterkerf_cutlist');return r?JSON.parse(r):[];}catch{return[];}}
-function persist(p){try{localStorage.setItem('betterkerf_cutlist',JSON.stringify(p));return true;}catch{alert('Speichern nicht möglich.');return false;}}
+function persist(p){try{localStorage.setItem('betterkerf_cutlist',JSON.stringify(p));return true;}catch{showAlert('Speichern nicht möglich.',{title:'Fehler',icon:'alert_circle',danger:true});return false;}}
 function saveProject(){
   const name=document.getElementById('proj-name-input').value.trim();
-  if(!name){alert('Bitte Projektnamen eingeben.');return;}
+  if(!name){showAlert('Bitte Projektnamen eingeben.',{title:'Kein Name',icon:'information'});return;}
   const projects=getProjects();const idx=projects.findIndex(p=>p.name===name);
   const proj={name,saved:new Date().toLocaleDateString('de-DE'),stocks:JSON.parse(JSON.stringify(stockData)),parts:JSON.parse(JSON.stringify(partsData)),settings:{kerf:document.getElementById('kerf').value,mode:document.querySelector('input[name=mode]:checked').value,allowRotate:document.getElementById('allow-rotate').checked,optmode:(document.querySelector('input[name=optmode]:checked')||{}).value||'waste'}};
-  if(idx>=0){if(!confirm(`"${name}" überschreiben?`))return;projects[idx]=proj;}else projects.unshift(proj);
-  if(persist(projects)){document.getElementById('proj-name-input').value='';renderProjects();}
+  async function doSave(){
+    if(idx>=0){const ok=await showConfirm('„'+name+'“ überschreiben?','Das gespeicherte Projekt wird mit den aktuellen Eingaben überschrieben.',{confirmLabel:'Überschreiben',icon:'content_save'});if(!ok)return;projects[idx]=proj;}else projects.unshift(proj);
+    if(persist(projects)){document.getElementById('proj-name-input').value='';renderProjects();}
+  }doSave();
 }
-function loadProject(name){
+async function loadProject(name){
   const p=getProjects().find(x=>x.name===name);if(!p)return;
-  if(!confirm(`Projekt "${name}" laden?\n\nDie aktuelle Eingabe (Bretter, Teile und Einstellungen) wird dabei überschrieben. Nicht gespeicherte Änderungen gehen verloren.`))return;
+  const _ok=await showConfirm('Projekt „'+name+'“ laden?','Die aktuelle Eingabe (Bretter, Teile und Einstellungen) wird dabei überschrieben.',{confirmLabel:'Laden',icon:'folder_open'});if(!_ok)return;
   stockData=JSON.parse(JSON.stringify(p.stocks));partsData=JSON.parse(JSON.stringify(p.parts));
   partsData.forEach(x=>{if(x.grain===undefined)x.grain=false;});
   nextSId=Math.max(19,...stockData.map(x=>x.id))+1;nextPId=Math.max(19,...partsData.map(x=>x.id))+1;
@@ -1603,11 +1713,11 @@ function loadProject(name){
   document.getElementById('grain-enabled').checked=grainEnabled;
   renderStock();renderParts();showTab('input');
 }
-function deleteProject(name){if(!confirm(`"${name}" löschen?`))return;persist(getProjects().filter(p=>p.name!==name));renderProjects();}
+async function deleteProject(name){const ok=await showConfirm('„'+name+'“ löschen?','Das Projekt wird unwiderruflich gelöscht.',{confirmLabel:'Löschen',danger:true,icon:'delete'});if(!ok)return;persist(getProjects().filter(p=>p.name!==name));renderProjects();}
 function renderProjects(){
   const projects=getProjects(),el=document.getElementById('proj-list');
-  if(!projects.length){el.innerHTML=`<div class="empty-proj">📂 Noch keine Projekte gespeichert.<br>Daten bleiben lokal auf diesem Gerät.</div>`;return;}
-  el.innerHTML=projects.map(p=>`<div class="proj-item"><div><div class="proj-name">${p.name}</div><div class="proj-meta">${p.saved} · ${p.stocks.length} Brett-Typ(en) · ${p.parts.length} Teil(e)</div></div><div class="proj-btns"><button class="btn-load" onclick="loadProject('${p.name.replace(/'/g,"\\'")}')">📥 Laden</button><button class="btn-del" onclick="deleteProject('${p.name.replace(/'/g,"\\'")}')">🗑</button></div></div>`).join('');
+  if(!projects.length){el.innerHTML=`<div class="empty-proj">Noch keine Projekte gespeichert.<br>Daten bleiben lokal auf diesem Gerät.</div>`;return;}
+  el.innerHTML=projects.map(p=>`<div class="proj-item"><div><div class="proj-name">${p.name}</div><div class="proj-meta">${p.saved} · ${p.stocks.length} Brett-Typ(en) · ${p.parts.length} Teil(e)</div></div><div class="proj-btns"><button class="btn-load" onclick="loadProject('${p.name.replace(/'/g,"\\'")}')">Laden</button><button class="btn-del" onclick="deleteProject('${p.name.replace(/'/g,"\\'")}')">×</button></div></div>`).join('');
 }
 
 // Rasterize an inline <svg> element to a PNG data URL at a higher resolution for crisp PDF output.
@@ -1637,8 +1747,8 @@ function svgToPng(svgEl,scaleFactor){
   });
 }
 
-function exportPDF(){if(!lastResult){alert('Bitte zuerst berechnen.');return;}loadJsPDF(()=>{doExport().catch(err=>{console.error(err);alert('PDF konnte nicht erstellt werden.');});});}
-function loadJsPDF(cb){if(window.jspdf&&window.jspdf.jsPDF){cb();return;}const s=document.createElement('script');s.src='https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';s.onload=cb;s.onerror=()=>alert('PDF-Export benötigt beim ersten Mal eine Internetverbindung.');document.body.appendChild(s);}
+function exportPDF(){if(!lastResult){showAlert('Bitte zuerst berechnen.',{title:'Kein Ergebnis',icon:'information'});return;}loadJsPDF(()=>{doExport().catch(err=>{console.error(err);showAlert('PDF konnte nicht erstellt werden.',{title:'Fehler',icon:'alert_circle',danger:true});});});}
+function loadJsPDF(cb){if(window.jspdf&&window.jspdf.jsPDF){cb();return;}const s=document.createElement('script');s.src='./jspdf.umd.min.js';s.onload=cb;s.onerror=()=>showAlert('PDF-Export fehlgeschlagen.',{title:'Fehler',icon:'alert_circle',danger:true});document.body.appendChild(s);}
 async function doExport(){
   const {jsPDF}=window.jspdf;const doc=new jsPDF({unit:'mm',format:'a4'});
   const {expandedBoards,assignment,unplaced,kerf}=lastResult;
@@ -1863,9 +1973,9 @@ function renderHoles(L,n,centers,gaps,width,dia){
   }
 
   html+=`<div class="info-note">Alle Maße als Lochmitte, gemessen von der linken Kante. ${centers.length?`Erstes Loch: ${dispUnit(centers[0])} · Letztes Loch: ${dispUnit(centers[centers.length-1])} (${dispUnit(L-centers[centers.length-1])} von rechter Kante).`:''}</div>
-  <button class="action-btn" onclick="holesCopy()">📋 Positionen kopieren</button>
-  <button class="action-btn" onclick="holesPDF()">⬇ Als PDF exportieren</button>
-  <button class="action-btn" onclick="holesTemplate()">📐 1:1-Bohrschablone (PDF)</button>`;
+  <button class="action-btn" onclick="holesCopy()">${msIcon('content_copy',16)} Positionen kopieren</button>
+  <button class="action-btn" onclick="holesPDF()">${msIcon('download',16)} Als PDF exportieren</button>
+  <button class="action-btn" onclick="holesTemplate()">${msIcon('straighten',16)} 1:1-Bohrschablone (PDF)</button>`;
 
   res.innerHTML=html;
 }
@@ -1902,12 +2012,12 @@ function holesCopy(){
   const txt=lastHoles.centers.map((c,i)=>`Loch ${i+1}: ${dispVal(c)} ${u}`).join('\n');
   const full=`Bohrlochplaner — ${lastHoles.n} Löcher auf ${dispVal(lastHoles.L)} ${u}\n\n${txt}`;
   if(navigator.clipboard&&navigator.clipboard.writeText){
-    navigator.clipboard.writeText(full).then(()=>alert('Positionen in die Zwischenablage kopiert.')).catch(()=>holesCopyFallback(full));
+    navigator.clipboard.writeText(full).then(()=>showToast('Positionen kopiert ✓')).catch(()=>holesCopyFallback(full));
   } else holesCopyFallback(full);
 }
 function holesCopyFallback(text){
   const ta=document.createElement('textarea');ta.value=text;ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.select();
-  try{document.execCommand('copy');alert('Positionen kopiert.');}catch{alert('Kopieren nicht möglich.');}
+  try{document.execCommand('copy');showToast('Positionen kopiert ✓');}catch{showAlert('Kopieren nicht möglich.',{title:'Fehler',icon:'alert_circle',danger:true});}
   document.body.removeChild(ta);
 }
 
@@ -1944,8 +2054,8 @@ function holesMode(m){
   if(m==='row')holesCalc(); else gridCalc();
 }
 
-function holesReset(){
-  if(!confirm('Zurücksetzen?\n\nDie Eingaben werden auf die Standardwerte zurückgesetzt.'))return;
+async function holesReset(){
+  const ok=await showConfirm('Zurücksetzen?','Die Eingaben werden auf die Standardwerte zurückgesetzt.',{confirmLabel:'Zurücksetzen',danger:true,icon:'restart_alt'});if(!ok)return;
   holesMM={length:1000,start:50,end:50,width:0,dia:0};
   document.getElementById('h-length').value=inputVal(1000);
   document.getElementById('h-count').value=5;
@@ -2035,9 +2145,9 @@ function renderGrid(g){
   </div>`;
 
   html+=`<div class="info-note">X = ab linker Kante, Y = ab oberer Kante. ${xGap?`Abstand X: ${dispUnit(xGap)}`:''}${xGap&&yGap?' · ':''}${yGap?`Abstand Y: ${dispUnit(yGap)}`:''}</div>
-  <button class="action-btn" onclick="gridCopy()">📋 Koordinaten kopieren</button>
-  <button class="action-btn" onclick="gridPDF()">⬇ Als PDF exportieren</button>
-  <button class="action-btn" onclick="gridTemplate()">📐 1:1-Bohrschablone (PDF)</button>`;
+  <button class="action-btn" onclick="gridCopy()">${msIcon('content_copy',16)} Koordinaten kopieren</button>
+  <button class="action-btn" onclick="gridPDF()">${msIcon('download',16)} Als PDF exportieren</button>
+  <button class="action-btn" onclick="gridTemplate()">${msIcon('straighten',16)} 1:1-Bohrschablone (PDF)</button>`;
   res.innerHTML=html;
 }
 
@@ -2079,12 +2189,12 @@ function gridCopy(){
   const txt=lastGrid.pts.map((p,i)=>`${i+1}. R${p.row} S${p.col}: X=${dispVal(p.x)} Y=${dispVal(p.y)} ${u}`).join('\n');
   const full=`Lochraster — ${lastGrid.cols}×${lastGrid.rows} auf ${dispVal(lastGrid.W)}×${dispVal(lastGrid.H)} ${u}\n\n${txt}`;
   if(navigator.clipboard&&navigator.clipboard.writeText){
-    navigator.clipboard.writeText(full).then(()=>alert('Koordinaten in die Zwischenablage kopiert.')).catch(()=>holesCopyFallback(full));
+    navigator.clipboard.writeText(full).then(()=>showToast('Koordinaten kopiert ✓')).catch(()=>holesCopyFallback(full));
   } else holesCopyFallback(full);
 }
 
-function gridReset(){
-  if(!confirm('Zurücksetzen?\n\nDie Eingaben werden auf die Standardwerte zurückgesetzt.'))return;
+async function gridReset(){
+  const ok=await showConfirm('Zurücksetzen?','Die Eingaben werden auf die Standardwerte zurückgesetzt.',{confirmLabel:'Zurücksetzen',danger:true,icon:'restart_alt'});if(!ok)return;
   gridMM={width:800,height:400,mx:50,my:50,dia:0};
   document.getElementById('g-width').value=inputVal(800);
   document.getElementById('g-height').value=inputVal(400);
@@ -2099,7 +2209,7 @@ function gridReset(){
 }
 
 // ── PDF: Bohrliste (Reihe) ──────────────────────────────────────────────
-function holesPDF(){if(!lastHoles){alert('Bitte zuerst berechnen.');return;}loadJsPDF(()=>{holesDoExport().catch(e=>{console.error(e);alert('PDF konnte nicht erstellt werden.');});});}
+function holesPDF(){if(!lastHoles){showAlert('Bitte zuerst berechnen.',{title:'Kein Ergebnis',icon:'information'});return;}loadJsPDF(()=>{holesDoExport().catch(e=>{console.error(e);alert('PDF konnte nicht erstellt werden.');});});}
 async function holesDoExport(){
   const {jsPDF}=window.jspdf;const doc=new jsPDF({unit:'mm',format:'a4'});
   const {L,n,centers,gaps}=lastHoles;const u=unitLabel();
@@ -2123,7 +2233,7 @@ async function holesDoExport(){
 }
 
 // ── PDF: Bohrliste (Raster) ─────────────────────────────────────────────
-function gridPDF(){if(!lastGrid){alert('Bitte zuerst berechnen.');return;}loadJsPDF(()=>{gridDoExport().catch(e=>{console.error(e);alert('PDF konnte nicht erstellt werden.');});});}
+function gridPDF(){if(!lastGrid){showAlert('Bitte zuerst berechnen.',{title:'Kein Ergebnis',icon:'information'});return;}loadJsPDF(()=>{gridDoExport().catch(e=>{console.error(e);alert('PDF konnte nicht erstellt werden.');});});}
 async function gridDoExport(){
   const {jsPDF}=window.jspdf;const doc=new jsPDF({unit:'mm',format:'a4'});
   const {W,H,cols,rows,xs,ys,pts}=lastGrid;const u=unitLabel();
@@ -2329,7 +2439,7 @@ function buildTemplate(points,sheetW,sheetH,titleText,holeDiameterMM){
 function eps2(v){return Math.max(0.01,v*0.0005);} // kleine Toleranz für Fließkomma-Kantenvergleiche
 
 function holesTemplate(){
-  if(!lastHoles){alert('Bitte zuerst berechnen.');return;}
+  if(!lastHoles){showAlert('Bitte zuerst berechnen.',{title:'Kein Ergebnis',icon:'information'});return;}
   loadJsPDF(()=>{
     try{
       const {L,centers,width,dia}=lastHoles;
@@ -2339,18 +2449,18 @@ function holesTemplate(){
       const pts=centers.map(c=>({x:c,y:stripH/2}));
       const doc=buildTemplate(pts,L,stripH,'Bohrschablone Reihe',dia>0?dia:undefined);
       doc.save('betterkerf-schablone-reihe.pdf');
-    }catch(e){console.error(e);alert('Schablone konnte nicht erstellt werden.');}
+    }catch(e){console.error(e);showAlert('Schablone konnte nicht erstellt werden.',{title:'Fehler',icon:'alert_circle',danger:true});}
   });
 }
 
 function gridTemplate(){
-  if(!lastGrid){alert('Bitte zuerst berechnen.');return;}
+  if(!lastGrid){showAlert('Bitte zuerst berechnen.',{title:'Kein Ergebnis',icon:'information'});return;}
   loadJsPDF(()=>{
     try{
       const {W,H,pts,dia}=lastGrid;
       const doc=buildTemplate(pts.map(p=>({x:p.x,y:p.y})),W,H,'Bohrschablone Raster',dia>0?dia:undefined);
       doc.save('betterkerf-schablone-raster.pdf');
-    }catch(e){console.error(e);alert('Schablone konnte nicht erstellt werden.');}
+    }catch(e){console.error(e);showAlert('Schablone konnte nicht erstellt werden.',{title:'Fehler',icon:'alert_circle',danger:true});}
   });
 }
 
@@ -2383,7 +2493,7 @@ function renderPriceList(){
   if(!el)return;
   const m=loadCostPrices();
   const names=Object.keys(m).sort((a,b)=>a.localeCompare(b,'de'));
-  if(!names.length){el.innerHTML=`<div class="empty-proj" style="margin-top:0">🏷️ Noch keine Preise gemerkt.<br>Eingetragene Brett-Preise werden hier automatisch gespeichert.</div>`;return;}
+  if(!names.length){el.innerHTML=`<div class="empty-proj" style="margin-top:0">Noch keine Preise gemerkt.<br>Eingetragene Brett-Preise werden hier automatisch gespeichert.</div>`;return;}
   el.innerHTML=names.map(n=>{
     const e=m[n];
     const label=e.priceMode==='area'?`${fmtEur(e.price)} / m²`:`${fmtEur(e.price)} / Brett`;
@@ -2391,18 +2501,18 @@ function renderPriceList(){
       <div class="price-info"><div class="price-name">${n}</div><div class="price-val">${label}</div></div>
       <div class="price-btns">
         <button class="price-use" onclick="usePriceEntry('${n.replace(/'/g,"\\'")}')">Übernehmen</button>
-        <button class="price-del" onclick="delPriceEntry('${n.replace(/'/g,"\\'")}')">🗑</button>
+        <button class="price-del" onclick="delPriceEntry('${n.replace(/'/g,"\\'")}')">×</button>
       </div>
     </div>`;
-  }).join('')+`<button class="action-btn danger" onclick="clearAllPrices()">🗑 Alle gemerkten Preise löschen</button>`;
+  }).join('')+`<button class="action-btn danger" onclick="clearAllPrices()">Alle gemerkten Preise löschen</button>`;
 }
-function clearAllPrices(){
-  if(!confirm('Alle gemerkten Brett-Preise löschen?\n\nDie aktuell eingegebenen Bretter bleiben erhalten — nur die für die Zukunft gespeicherten Preise werden entfernt.'))return;
+async function clearAllPrices(){
+  const ok=await showConfirm('Alle gemerkten Preise löschen?','Die aktuell eingegebenen Bretter bleiben erhalten — nur die gespeicherten Preise werden entfernt.',{confirmLabel:'Alle löschen',danger:true,icon:'delete'});if(!ok)return;
   try{localStorage.removeItem('betterkerf_prices');}catch{}
   renderPriceList();
 }
-function delPriceEntry(name){
-  if(!confirm(`Gemerkten Preis für „${name}" löschen?`))return;
+async function delPriceEntry(name){
+  const ok=await showConfirm('Preis für „'+name+'“ löschen?','Dieser gemerkte Preis wird unwiderruflich entfernt.',{confirmLabel:'Löschen',danger:true,icon:'delete'});if(!ok)return;
   deleteCostPrice(name);renderPriceList();
 }
 function usePriceEntry(name){
@@ -2446,7 +2556,7 @@ function renderCostSource(){
     const nBoards=new Set(lastResult.expandedBoards.filter(b=>b.placed.length).map(b=>b.boardIdx)).size;
     const stale = costLinkedResult && costLinkedResult!==lastResult;
     el.innerHTML=`<div class="cost-state cost-state-info">
-      <div class="cost-state-icon">📐</div>
+      <div class="cost-state-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M13,11A1,1 0 0,1 14,12A1,1 0 0,1 13,13A1,1 0 0,1 12,12A1,1 0 0,1 13,11M7.86,6.25C9.14,4.87 10.97,4 13,4C16.5,4 19.44,6.61 19.93,10H22V12H16A3,3 0 0,0 13,9A3,3 0 0,0 10,12H2V10H2.05C2.25,7.73 3.14,5.66 4.5,4L7.86,6.25M6.73,7.89L5.06,6.77C4.53,7.75 4.18,8.84 4.06,10H6.07C6.18,9.25 6.4,8.54 6.73,7.89M7.4,15.4L6,14H11.79C12.03,14.42 12.5,14.7 13,14.7C13.5,14.7 13.97,14.42 14.21,14H20V15.4C18.39,14.42 18.46,15.75 18.46,15.75V17.71L16.5,19.67C16,17.92 15.1,18.9 15.1,18.9L13.7,20.3H10.9C11.88,18.69 10.55,18.76 10.55,18.76H8.59L6.63,16.8C8.38,16.31 7.4,15.4 7.4,15.4Z"/></svg></div>
       <div class="cost-state-body">
         <div class="cost-state-title">${stale?'Neues Zuschnitt-Ergebnis verfügbar':'Zuschnitt-Ergebnis verfügbar'}</div>
         <div class="cost-state-sub">${nBoards} Brett(er) · ${lastResult.assignment.length} Teile${stale?' — übernommene Daten sind veraltet':''}</div>
@@ -2456,7 +2566,7 @@ function renderCostSource(){
   } else {
     // Zustand 1: noch kein Zuschnitt vorhanden
     el.innerHTML=`<div class="cost-state cost-state-hint">
-      <div class="cost-state-icon">💡</div>
+      <div class="cost-state-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M20,11H23V13H20V11M1,11H4V13H1V11M13,1V4H11V1H13M4.92,3.5L7.05,5.64L5.63,7.05L3.5,4.93L4.92,3.5M16.95,5.63L19.07,3.5L20.5,4.93L18.37,7.05L16.95,5.63M12,6A6,6 0 0,1 18,12C18,14.22 16.79,16.16 15,17.2V19A1,1 0 0,1 14,20H10A1,1 0 0,1 9,19V17.2C7.21,16.16 6,14.22 6,12A6,6 0 0,1 12,6M14,21V22A1,1 0 0,1 13,23H11A1,1 0 0,1 10,22V21H14M11,18H13V15.87C14.73,15.43 16,13.86 16,12A4,4 0 0,0 12,8A4,4 0 0,0 8,12C8,13.86 9.27,15.43 11,15.87V18Z"/></svg></div>
       <div class="cost-state-body">
         <div class="cost-state-title">Tipp: Zuschnitt zuerst berechnen</div>
         <div class="cost-state-sub">Erstelle im Modul „Zuschnitt-Optimierer" einen Plan — dann kannst du ihn hier mit einem Tippen übernehmen und bekommst automatisch Brettmengen, Kosten pro Teil und den Verschnittwert. Ohne Zuschnitt kannst du Bretter auch manuell eintragen.</div>
@@ -2476,7 +2586,7 @@ function costAddBoard(silent){
 
 function costFromCutlist(){
   if(!lastResult || !lastResult.expandedBoards || !lastResult.assignment.length){
-    alert('Es liegt noch kein Zuschnitt-Ergebnis vor.\n\nBerechne zuerst im Modul „Zuschnitt-Optimierer" einen Plan, dann kannst du ihn hier übernehmen.');
+    showAlert('Berechne zuerst im Modul „Zuschnitt-Optimierer“ einen Plan, dann kannst du ihn hier übernehmen.',{title:'Kein Zuschnitt-Ergebnis',icon:'information'});
     return;
   }
   // genutzte Bretter nach Typ (stockId bzw. Name+Maß) gruppieren und zählen
@@ -2602,7 +2712,7 @@ function costCompute(){
 
 let lastCost=null;
 function costCalc(){
-  if(!costBoards.length){alert('Bitte mindestens ein Brett eingeben.');return;}
+  if(!costBoards.length){showAlert('Bitte mindestens ein Brett eingeben.',{title:'Fehlende Eingaben',icon:'information'});return;}
   const c=costCompute();
   lastCost=c;
 
@@ -2637,15 +2747,15 @@ function costCalc(){
   } else {
     html+=`<div class="info-note">Für „Kosten pro Teil", die Verschnitt-Aufteilung und den Verschnittwert übernimm zuerst ein Ergebnis aus dem Zuschnitt-Optimierer (Button „Aus Zuschnitt").</div>`;
   }
-  html+=`<button class="action-btn" onclick="costPDF()">⬇ Kosten als PDF exportieren</button>`;
+  html+=`<button class="action-btn" onclick="costPDF()">${msIcon('download',16)} Kosten als PDF exportieren</button>`;
 
   document.getElementById('cost-result').innerHTML=html;
 }
 
 // Eigenständiges Kosten-PDF
 function costPDF(){
-  if(!lastCost){alert('Bitte zuerst die Kosten berechnen.');return;}
-  loadJsPDF(()=>{try{costDoPDF();}catch(e){console.error(e);alert('PDF konnte nicht erstellt werden.');}});
+  if(!lastCost){showAlert('Bitte zuerst die Kosten berechnen.',{title:'Kein Ergebnis',icon:'information'});return;}
+  loadJsPDF(()=>{try{costDoPDF();}catch(e){console.error(e);showAlert('PDF konnte nicht erstellt werden.',{title:'Fehler',icon:'alert_circle',danger:true});}}); 
 }
 function costDoPDF(){
   const {jsPDF}=window.jspdf;const doc=new jsPDF({unit:'mm',format:'a4'});
@@ -2701,8 +2811,8 @@ function costDoPDF(){
   doc.save('betterkerf-materialkosten.pdf');
 }
 
-function costReset(){
-  if(!confirm('Kostenkalkulator zurücksetzen?\n\nAlle eingegebenen Bretter und Preise werden gelöscht.'))return;
+async function costReset(){
+  const ok=await showConfirm('Kostenkalkulator zurücksetzen?','Alle eingegebenen Bretter und Preise werden gelöscht.',{confirmLabel:'Zurücksetzen',danger:true,icon:'restart_alt'});if(!ok)return;
   costBoards=[];
   costLinkedResult=null;
   lastCost=null;
@@ -2737,6 +2847,9 @@ function korpusInit(){
   // Standard-Stärken (18 mm Platte, 5 mm Rückwand, 6 mm Nut) einheitenkorrekt setzen,
   // aber bestehende Eingaben des Nutzers nicht überschreiben.
   const setDefault=(id,mm)=>{const el=document.getElementById(id);if(el&&el.value.trim()==='')el.value=inputVal(mm);};
+  setDefault('kp-h',900);
+  setDefault('kp-b',600);
+  setDefault('kp-t',600);
   setDefault('kp-s',18);
   setDefault('kp-sr',5);
   korpusSetConstr(kpConstr);
@@ -2919,7 +3032,7 @@ function renderKpShelfPositions(count,innerH){
     const isTop=i===lastIdx;
     const label=isTop?`Fach ${i+1} (oben)`:`Fach ${i+1}`;
     const fixedHint=isTop?'Oberstes Fach · Fachhöhe individuell':'Fachhöhe individuell · lichtes Maß';
-    const lockBtn=`<button class="grain-btn${isFixed?' locked':''}" onclick="kpToggleShelfFixed(${i})" title="${isFixed?'Zurück zu Auto':'Individuell festlegen'}" style="font-size:17px;flex-shrink:0">${isFixed?'🔒':'🔓'}</button>`;
+    const lockBtn=`<button class="grain-btn${isFixed?' locked':''}" onclick="kpToggleShelfFixed(${i})" title="${isFixed?'Zurück zu Auto':'Individuell festlegen'}" style="font-size:17px;flex-shrink:0">${isFixed?'●':'○'}</button>`;
     if(isFixed){
       return `<div class="srow"><div><div class="srow-label">${label}</div><div class="srow-hint">${fixedHint}</div></div><div style="display:flex;align-items:center;gap:6px">${lockBtn}<div class="nm"><input id="kp-shelf-inp-${i}" type="number" inputmode="decimal" value="${st.posMM?inputVal(st.posMM):''}" min="1" oninput="kpSetShelfPos(${i},this.value)"><span data-unit-span>${u}</span></div></div></div>`;
     } else {
@@ -3001,7 +3114,7 @@ function renderKpDivPositions(count,innerW){
     const isRight=i===lastIdx;
     const label=isRight?`Fach ${i+1} (rechts)`:`Fach ${i+1}`;
     const fixedHint=isRight?'Rechtestes Fach · Fachbreite individuell':'Fachbreite individuell · lichtes Maß';
-    const lockBtn=`<button class="grain-btn${isFixed?' locked':''}" onclick="kpToggleDivFixed(${i})" title="${isFixed?'Zurück zu Auto':'Individuell festlegen'}" style="font-size:17px;flex-shrink:0">${isFixed?'🔒':'🔓'}</button>`;
+    const lockBtn=`<button class="grain-btn${isFixed?' locked':''}" onclick="kpToggleDivFixed(${i})" title="${isFixed?'Zurück zu Auto':'Individuell festlegen'}" style="font-size:17px;flex-shrink:0">${isFixed?'●':'○'}</button>`;
     if(isFixed){
       return `<div class="srow"><div><div class="srow-label">${label}</div><div class="srow-hint">${fixedHint}</div></div><div style="display:flex;align-items:center;gap:6px">${lockBtn}<div class="nm"><input id="kp-div-inp-${i}" type="number" inputmode="decimal" value="${st.posMM?inputVal(st.posMM):''}" min="1" oninput="kpSetDivPos(${i},this.value)"><span data-unit-span>${u}</span></div></div></div>`;
     } else {
@@ -3090,7 +3203,7 @@ function korpusCalc(){
     renderKpDivPositions(dividers+1,innerW_mm);
   }
 
-  if(H<=0||B<=0||T<=0){kpParts=[];res.innerHTML='';return;}
+  if(H<=0||B<=0||T<=0){kpParts=[];res.innerHTML='';const gt=document.getElementById('kp-tab-guide');if(gt)gt.style.display='none';const gc=document.getElementById('kp-guide-content');if(gc)gc.innerHTML='';return;}
   // Plausibilität: Plattenstärke darf Korpus nicht „auffressen"
   if(2*s>=B||2*s>=H){
     kpParts=[];
@@ -3130,15 +3243,17 @@ function korpusCalc(){
     <div class="stat"><div class="stat-val">${totalArea.toLocaleString('de-DE',{minimumFractionDigits:2,maximumFractionDigits:2})} m²</div><div class="stat-lbl">Plattenfläche</div></div>
   </div>`;
 
-  // Bau-Anleitung (kontextabhängig)
+  // Bau-Anleitung (kontextabhängig) — eigener Tab
   const guide=korpusGuide(kpConstr,kpBack,nut,shelves,dividers,shelfPos);
-  html+=`<div class="section" style="margin-top:18px"><div class="slabel">🔨 Bau-Anleitung</div>
+  const guideTab=document.getElementById('kp-tab-guide');
+  if(guideTab)guideTab.style.display='';
+  const guideContent=document.getElementById('kp-guide-content');
+  if(guideContent)guideContent.innerHTML=`<div class="section"><div class="slabel">Bau-Anleitung</div>
     <div class="kp-guide">${guide.map((g,i)=>`<div class="kp-step"><span class="kp-step-num">${i+1}</span><span class="kp-step-txt">${g}</span></div>`).join('')}</div>
   </div>`;
 
   html+=`<button class="calc-btn" style="margin-top:14px" onclick="korpusToCutlist()">→ An Zuschnitt-Optimierer übergeben</button>`;
-  html+=`<button class="action-btn" onclick="korpusPDF()">⬇ Als PDF exportieren</button>`;
-  html+=`<div class="hint-box" style="margin-top:10px">Die berechneten Teile werden in den Zuschnitt-Optimierer geladen. Plattenmaße und Verschnitt planst du dort.</div>`;
+  html+=`<button class="action-btn" onclick="korpusPDF()">${msIcon('download',16)} Als PDF exportieren</button>`;
 
   res.innerHTML=html;
 }
@@ -3161,7 +3276,7 @@ function korpusSketch(H,B,T,s,sr,constr,back,nut,shelves,dividers,shelfPosMM,div
   const ox=pad, oy=pad;             // Ursprung Vorderansicht (oben-links)
   const sx=pad+fW+gap;              // Ursprung Seitenansicht x
 
-  const col={body:'#5B8DB8', bodyFill:'rgba(91,141,184,.18)', back:'#9B6B9B', backFill:'rgba(155,107,155,.28)', shelf:'#2E7D5E', line:'#7A7268', txt:'#B8AF9E'};
+  const col={body:'#5B8DB8', bodyFill:'rgba(91,141,184,.18)', back:'#9B6B9B', backFill:'rgba(155,107,155,.28)', shelf:'#2E7D5E', div:'#C07A2E', line:'#7A7268', txt:'#B8AF9E'};
   let p='';
   // --- Vorderansicht: äußerer Rahmen ---
   p+=`<rect x="${ox}" y="${oy}" width="${fW}" height="${fH}" fill="${col.bodyFill}" stroke="${col.body}" stroke-width="1.2"/>`;
@@ -3193,7 +3308,7 @@ function korpusSketch(H,B,T,s,sr,constr,back,nut,shelves,dividers,shelfPosMM,div
     for(let i=0;i<=n;i++){
       const cW=divPosMM[i]*scW;
       compEdges.push(cx);compWidths.push(cW);compWidths_mm.push(divPosMM[i]);
-      if(i<n)p+=`<rect x="${(cx+cW).toFixed(1)}" y="${innerTop}" width="${t}" height="${innerH}" fill="${col.body}" opacity=".55"/>`;
+      if(i<n)p+=`<rect x="${(cx+cW).toFixed(1)}" y="${innerTop}" width="${t}" height="${innerH}" fill="${col.div}" opacity=".7"/>`;
       cx+=cW+t;
     }
   } else {
@@ -3201,7 +3316,7 @@ function korpusSketch(H,B,T,s,sr,constr,back,nut,shelves,dividers,shelfPosMM,div
     const cW_mm=(B-2*s-n*s)/(n+1);
     for(let i=0;i<=n;i++){
       compEdges.push(cx);compWidths.push(cW);compWidths_mm.push(cW_mm);
-      if(i<n)p+=`<rect x="${(cx+cW).toFixed(1)}" y="${innerTop}" width="${t}" height="${innerH}" fill="${col.body}" opacity=".55"/>`;
+      if(i<n)p+=`<rect x="${(cx+cW).toFixed(1)}" y="${innerTop}" width="${t}" height="${innerH}" fill="${col.div}" opacity=".7"/>`;
       cx+=cW+t;
     }
   }
@@ -3302,6 +3417,7 @@ function korpusSketch(H,B,T,s,sr,constr,back,nut,shelves,dividers,shelfPosMM,div
 
   // Legende
   let legend=`<div class="kp-legend"><span class="kp-leg"><i style="background:${col.body}"></i>Korpus</span>`;
+  if(n>0)legend+=`<span class="kp-leg"><i style="background:${col.div}"></i>Trennwand</span>`;
   if(shelves>0)legend+=`<span class="kp-leg"><i style="background:${col.shelf}"></i>Einlegeboden</span>`;
   if(back!=='none')legend+=`<span class="kp-leg"><i style="background:${col.back}"></i>Rückwand</span>`;
   legend+=`</div>`;
@@ -3309,11 +3425,11 @@ function korpusSketch(H,B,T,s,sr,constr,back,nut,shelves,dividers,shelfPosMM,div
   return `<div class="kp-sketch"><svg viewBox="0 0 ${svgW.toFixed(0)} ${svgH.toFixed(0)}" width="100%" preserveAspectRatio="xMidYMid meet">${p}</svg></div>${legend}`;
 }
 
-function korpusReset(){
-  if(!confirm('Korpusplaner zurücksetzen?\n\nAlle eingegebenen Maße werden auf die Standardwerte zurückgesetzt.'))return;
-  document.getElementById('kp-h').value='';
-  document.getElementById('kp-b').value='';
-  document.getElementById('kp-t').value='';
+async function korpusReset(){
+  const ok=await showConfirm('Korpusplaner zurücksetzen?','Alle eingegebenen Maße werden auf die Standardwerte zurückgesetzt.',{confirmLabel:'Zurücksetzen',danger:true,icon:'restart_alt'});if(!ok)return;
+  document.getElementById('kp-h').value=inputVal(900);
+  document.getElementById('kp-b').value=inputVal(600);
+  document.getElementById('kp-t').value=inputVal(600);
   document.getElementById('kp-s').value=inputVal(18);  // 18 mm Standard-Plattenstärke
   document.getElementById('kp-sr').value=inputVal(5);  // 5 mm Rückwand
   document.getElementById('kp-shelves').value='0';
@@ -3327,16 +3443,19 @@ function korpusReset(){
   const rPos=document.getElementById('kp-shelf-pos-list');if(rPos)rPos.style.display='none';
   const rDivChk=document.getElementById('kp-div-custom');if(rDivChk)rDivChk.checked=false;
   const rDivPos=document.getElementById('kp-div-pos-list');if(rDivPos)rDivPos.style.display='none';
-  document.getElementById('kp-result').innerHTML='';
+  const guideTab=document.getElementById('kp-tab-guide');if(guideTab)guideTab.style.display='none';
+  const guideContent=document.getElementById('kp-guide-content');if(guideContent)guideContent.innerHTML='';
+  korpusShowTab('input');
+  korpusCalc();
 }
 
 // — Korpus-Projekte (localStorage) —
 function kpGetProjects(){try{const r=localStorage.getItem('betterkerf_korpus');return r?JSON.parse(r):[];}catch{return[];}}
-function kpPersist(p){try{localStorage.setItem('betterkerf_korpus',JSON.stringify(p));return true;}catch{alert('Speichern nicht möglich.');return false;}}
+function kpPersist(p){try{localStorage.setItem('betterkerf_korpus',JSON.stringify(p));return true;}catch{showAlert('Speichern nicht möglich.',{title:'Fehler',icon:'alert_circle',danger:true});return false;}}
 function korpusSaveProject(){
   const inp=document.getElementById('kp-proj-name');
   const name=inp.value.trim();
-  if(!name){alert('Bitte Projektnamen eingeben.');return;}
+  if(!name){showAlert('Bitte Projektnamen eingeben.',{title:'Kein Name',icon:'information'});return;}
   const gv=id=>document.getElementById(id).value;
   const proj={
     name, saved:new Date().toLocaleDateString('de-DE'),
@@ -3350,14 +3469,16 @@ function korpusSaveProject(){
     divCustom:kpDivCustom,
     divStates:kpDivCustom?kpDivStates.map(s=>({...s})):[]
   };
-  if(!proj.dims.H||!proj.dims.B||!proj.dims.T){alert('Bitte zuerst gültige Außenmaße eingeben.');return;}
+  if(!proj.dims.H||!proj.dims.B||!proj.dims.T){showAlert('Bitte zuerst gültige Außenmaße eingeben.',{title:'Fehlende Maße',icon:'information'});return;}
   const projects=kpGetProjects();const idx=projects.findIndex(p=>p.name===name);
-  if(idx>=0){if(!confirm(`"${name}" überschreiben?`))return;projects[idx]=proj;}else projects.unshift(proj);
-  if(kpPersist(projects)){inp.value='';renderKpProjects();}
+  async function doKpSave(){
+    if(idx>=0){const ok=await showConfirm('„'+name+'“ überschreiben?','Das gespeicherte Projekt wird mit den aktuellen Eingaben überschrieben.',{confirmLabel:'Überschreiben',icon:'content_save'});if(!ok)return;projects[idx]=proj;}else projects.unshift(proj);
+    if(kpPersist(projects)){inp.value='';renderKpProjects();}
+  }doKpSave();
 }
-function korpusLoadProject(name){
+async function korpusLoadProject(name){
   const p=kpGetProjects().find(x=>x.name===name);if(!p)return;
-  if(!confirm(`Projekt "${name}" laden?\n\nDie aktuelle Eingabe wird dabei überschrieben.`))return;
+  const _ok=await showConfirm('Projekt „'+name+'“ laden?','Die aktuelle Eingabe wird dabei überschrieben.',{confirmLabel:'Laden',icon:'folder_open'});if(!_ok)return;
   const setMM=(id,mm)=>{const el=document.getElementById(id);if(el)el.value=mm?inputVal(mm):'';};
   setMM('kp-h',p.dims.H);setMM('kp-b',p.dims.B);setMM('kp-t',p.dims.T);
   setMM('kp-s',p.dims.s);setMM('kp-sr',p.dims.sr);
@@ -3376,23 +3497,23 @@ function korpusLoadProject(name){
   korpusCalc();
   document.getElementById('screen-korpus').scrollTop=0;
 }
-function korpusDeleteProject(name){
-  if(!confirm(`"${name}" löschen?`))return;
+async function korpusDeleteProject(name){
+  const ok=await showConfirm('„'+name+'“ löschen?','Das Projekt wird unwiderruflich gelöscht.',{confirmLabel:'Löschen',danger:true,icon:'delete'});if(!ok)return;
   kpPersist(kpGetProjects().filter(p=>p.name!==name));renderKpProjects();
 }
 function renderKpProjects(){
   const el=document.getElementById('kp-proj-list');if(!el)return;
   const projects=kpGetProjects();
-  if(!projects.length){el.innerHTML=`<div class="empty-proj">📂 Noch keine Korpus-Projekte gespeichert.<br>Daten bleiben lokal auf diesem Gerät.</div>`;return;}
+  if(!projects.length){el.innerHTML=`<div class="empty-proj">Noch keine Korpus-Projekte gespeichert.<br>Daten bleiben lokal auf diesem Gerät.</div>`;return;}
   el.innerHTML=projects.map(p=>{
     const desc=`${dispVal(p.dims.H)}×${dispVal(p.dims.B)}×${dispVal(p.dims.T)} ${unitLabel()}`+(p.dividers?` · ${p.dividers} Trennw.`:'')+(p.shelves?` · ${p.shelves} Böden`:'');
     const nm=p.name.replace(/'/g,"\\'");
-    return `<div class="proj-item"><div><div class="proj-name">${p.name}</div><div class="proj-meta">${p.saved} · ${desc}</div></div><div class="proj-btns"><button class="btn-load" onclick="korpusLoadProject('${nm}')">📥 Laden</button><button class="btn-del" onclick="korpusDeleteProject('${nm}')">🗑</button></div></div>`;
+    return `<div class="proj-item"><div><div class="proj-name">${p.name}</div><div class="proj-meta">${p.saved} · ${desc}</div></div><div class="proj-btns"><button class="btn-load" onclick="korpusLoadProject('${nm}')">Laden</button><button class="btn-del" onclick="korpusDeleteProject('${nm}')">×</button></div></div>`;
   }).join('');
 }
 
 function korpusToCutlist(){
-  if(!kpParts.length){alert('Bitte zuerst gültige Außenmaße eingeben.');return;}
+  if(!kpParts.length){showAlert('Bitte zuerst gültige Außenmaße eingeben.',{title:'Fehlende Maße',icon:'information'});return;}
   // Teile ins Zuschnitt-Datenmodell übertragen (l/w gerundet auf 0,1 mm)
   let id=1;
   partsData=kpParts.map(p=>({id:id++,name:p.name,l:Math.round(p.l*10)/10,w:Math.round(p.w*10)/10,qty:p.qty,grain:false}));
@@ -3408,8 +3529,8 @@ function korpusToCutlist(){
 
 // — Korpus-PDF —
 function korpusPDF(){
-  if(!kpParts.length){alert('Bitte zuerst gültige Außenmaße eingeben.');return;}
-  loadJsPDF(()=>{korpusDoPDF().catch(e=>{console.error(e);alert('PDF konnte nicht erstellt werden.');});});
+  if(!kpParts.length){showAlert('Bitte zuerst gültige Außenmaße eingeben.',{title:'Fehlende Maße',icon:'information'});return;}
+  loadJsPDF(()=>{korpusDoPDF().catch(e=>{console.error(e);showAlert('PDF konnte nicht erstellt werden.',{title:'Fehler',icon:'alert_circle',danger:true});});});
 }
 async function korpusDoPDF(){
   const {jsPDF}=window.jspdf;const doc=new jsPDF({unit:'mm',format:'a4'});
@@ -3504,5 +3625,54 @@ if('serviceWorker' in navigator){
   navigator.serviceWorker.register(URL.createObjectURL(b)).catch(()=>{});
 }
 </script>
+
+<!-- HAFTUNGSAUSSCHLUSS MODAL -->
+<div class="legal-overlay" id="disclaimer-overlay" onclick="if(event.target===this)this.classList.remove('open')">
+  <div class="legal-sheet">
+    <div class="legal-header">
+      <h2>Haftungsausschluss</h2>
+      <button class="legal-close" onclick="document.getElementById('disclaimer-overlay').classList.remove('open')">×</button>
+    </div>
+    <div class="legal-body">
+      <p>Die Berechnungen dieser App — einschließlich Schnittoptimierung, Maße, Materialmengen und Kostenabschätzungen — dienen ausschließlich als Planungshilfe.</p>
+      <p>Ergebnisse können je nach Material, Maschine, Sägeblatt und handwerklicher Ausführung abweichen. Die tatsächliche Effizienz eines Schnitts hängt von zahlreichen Faktoren ab, die die App nicht kennt.</p>
+      <p>Alle Angaben sind vor der Umsetzung eigenverantwortlich zu prüfen. Eine Haftung für Schäden materieller oder anderer Art, die aus der Nutzung oder Nichtnutzung der bereitgestellten Informationen entstehen, wird ausgeschlossen, soweit gesetzlich zulässig.</p>
+    </div>
+  </div>
+</div>
+
+<!-- DATENSCHUTZ MODAL -->
+<div class="legal-overlay" id="legal-overlay" onclick="if(event.target===this)this.classList.remove('open')">
+  <div class="legal-sheet">
+    <div class="legal-header">
+      <h2>Datenschutzerklärung</h2>
+      <button class="legal-close" onclick="document.getElementById('legal-overlay').classList.remove('open')">×</button>
+    </div>
+    <div class="legal-body">
+      <h3>1. Allgemeines</h3>
+      <p>betterKerf ist eine Progressive Web App (PWA) für Berechnungen in der Holzbearbeitung. Die App verarbeitet keine personenbezogenen Daten und sendet keine Nutzerdaten an externe Server.</p>
+
+      <h3>3. Lokale Datenspeicherung</h3>
+      <p>Die App speichert Projektdaten (Schnittlisten, Korpusprojekte, Materialpreise) sowie Einstellungen ausschließlich im <strong>localStorage</strong> deines Browsers auf deinem Gerät. Diese Daten verlassen dein Gerät nicht und sind nur für dich zugänglich. Du kannst sie jederzeit über die Browsereinstellungen löschen.</p>
+
+      <h3>4. Hosting & Server-Logs</h3>
+      <p>betterKerf wird über <strong>GitHub Pages</strong> (GitHub, Inc., 88 Colin P Kelly Jr St, San Francisco, CA 94107, USA) bereitgestellt. Beim Aufruf der App protokolliert GitHub automatisch technische Zugriffsdaten (u.&nbsp;a. IP-Adresse, Zeitstempel, aufgerufene Seite). Darauf haben wir keinen Einfluss. Weitere Informationen: <a href="https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement" target="_blank" rel="noopener">GitHub Privacy Statement</a>.</p>
+
+      <h3>5. Service Worker & Offline-Cache</h3>
+      <p>Die App nutzt einen Service Worker, um Dateien lokal zu cachen und offline nutzbar zu sein. Dabei werden keine personenbezogenen Daten verarbeitet.</p>
+
+      <h3>6. PDF-Export</h3>
+      <p>Der PDF-Export wird vollständig lokal im Browser durchgeführt. Die dafür verwendete Bibliothek (jsPDF) ist Bestandteil der App und wird von keinem externen Server geladen.</p>
+
+      <h3>7. Cookies</h3>
+      <p>Die App setzt keine Cookies.</p>
+
+      <h3>8. Rechte</h3>
+      <p>Du hast das Recht auf Auskunft, Berichtigung und Löschung deiner Daten sowie das Recht auf Beschwerde bei der zuständigen Datenschutzaufsichtsbehörde. Da keine personenbezogenen Daten auf unseren Servern gespeichert werden, liegen alle Daten ausschließlich bei dir.</p>
+
+      <p style="margin-top:16px;color:var(--text3);font-size:11px">Stand: Juni 2026</p>
+    </div>
+  </div>
+</div>
 </body>
 </html>
