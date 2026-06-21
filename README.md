@@ -12,6 +12,7 @@
 - [Module](#module)
   - [📐 Zuschnitt-Optimierer](#-zuschnitt-optimierer)
   - [🗄️ Korpusplaner](#️-korpusplaner)
+  - [🧰 Schubladenplaner](#-schubladenplaner)
   - [🎯 Bohrlochplaner](#-bohrlochplaner)
   - [💰 Kostenkalkulator](#-kostenkalkulator)
 - [Wie die Module zusammenarbeiten](#wie-die-module-zusammenarbeiten)
@@ -60,6 +61,17 @@ Berechnet aus den Außenmaßen eines Korpus automatisch alle Zuschnittmaße für
 - Ausgabe: vollständige Zuschnittliste aller Teile mit Maßen und Stückzahl
 - Projekte lokal speichern und wieder laden
 
+### 🧰 Schubladenplaner
+Berechnet aus den lichten Maßen einer Korpusöffnung und dem gewählten Auszugssystem automatisch die Zuschnittmaße eines kompletten Schubkastens.
+
+- Eingabe: lichte Breite, Höhe und Korpustiefe der Öffnung
+- Auszugssystem wählbar: **Kugel-/Teleskopauszug** (Seitenmontage), **Unterflur-/Vollauszug**, **Holzläufer** oder **ohne Schiene** — mit passenden Luftmaßen je System (editierbar) und Erklärungen
+- Normierte Auszugslängen per Schnellwahl, automatische Warnung wenn die Schiene nicht in die Korpustiefe passt (inkl. Vorschlag der größten passenden Nennlänge)
+- Schubkasten-Bauart (Seiten durchgehend / Front+Rückwand durchgehend) und Bodenmontage (eingenutet / untergeschraubt) konfigurierbar
+- Optionale sichtbare Frontblende (überfälzt oder eingelassen) inklusive Griffbohrung
+- Ausgabe: maßstäbliche Skizze (Vorder- und Draufsicht), vollständige Zuschnittliste, Schienen-Einkaufsliste und kontextabhängige Bau-Anleitung
+- Übernahme in den Zuschnitt-Optimierer, Übergabe der Griffbohrung an den Bohrlochplaner, PDF-Export und lokale Projekte
+
 ### 🎯 Bohrlochplaner
 Berechnet gleichmäßige Bohrungsabstände für eine Lochreihe oder ein Lochraster.
 
@@ -87,9 +99,13 @@ Die Module sind bewusst miteinander verknüpft:
 
 1. **Korpusplaner → Zuschnitt-Optimierer:** Die Zuschnittliste aus dem Korpusplaner kann direkt in den Zuschnitt-Optimierer übernommen werden — mit einem Klick werden alle Teile als Eingabe übertragen.
 
-2. **Zuschnitt-Optimierer → Kostenkalkulator:** Nach einer Berechnung im Zuschnitt-Optimierer können die verwendeten Bretter automatisch in den Kostenkalkulator übernommen werden, um den Materialpreis sofort zu kalkulieren.
+2. **Schubladenplaner → Zuschnitt-Optimierer:** Auch die Schubkasten-Teile (Seiten, Front, Rückwand, Boden und optionale Frontblende) lassen sich mit einem Klick als Zuschnittliste übernehmen.
 
-3. **Globale Einheit:** Die gewählte Maßeinheit (mm, cm, m) gilt für alle Module gleichzeitig. Intern wird immer in Millimetern gerechnet; die Umrechnung erfolgt nur in der Anzeige. Die Sägeblattbreite (Kerf) bleibt immer in mm.
+3. **Schubladenplaner → Bohrlochplaner:** Die Griffbohrung der Frontblende kann direkt an den Bohrlochplaner übergeben werden — Lochabstand und Position werden vorbelegt und als 1:1-Schablone ausgegeben.
+
+4. **Zuschnitt-Optimierer → Kostenkalkulator:** Nach einer Berechnung im Zuschnitt-Optimierer können die verwendeten Bretter automatisch in den Kostenkalkulator übernommen werden, um den Materialpreis sofort zu kalkulieren.
+
+5. **Globale Einheit:** Die gewählte Maßeinheit (mm, cm, m) gilt für alle Module gleichzeitig. Intern wird immer in Millimetern gerechnet; die Umrechnung erfolgt nur in der Anzeige. Die Sägeblattbreite (Kerf) bleibt immer in mm.
 
 ---
 

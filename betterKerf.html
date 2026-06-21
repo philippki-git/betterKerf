@@ -635,6 +635,107 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
     </div>
   </div>
 
+  <!-- MODULE: SCHUBLADENPLANER -->
+  <div class="screen" id="screen-drawer">
+    <div class="tabs" id="drawer-tabs">
+      <button class="tab active" data-tab="input">Eingabe</button>
+      <button class="tab" data-tab="projects">Projekte</button>
+      <button class="tab" id="dr-tab-guide" data-tab="guide" style="display:none">Anleitung</button>
+    </div>
+
+    <div class="pane active" id="dpane-input">
+      <div class="section">
+        <div class="slabel">Korpusöffnung (lichte Maße)</div>
+        <div class="hint-box">Die lichten Innenmaße der Öffnung, in die der Schubkasten eingebaut wird. Daraus werden Schubkastenbreite, -tiefe und die Zuschnittmaße berechnet.</div>
+        <div class="kp-dims">
+          <div class="kp-field"><label>Lichte Breite <span class="ku">mm</span></label><input type="number" inputmode="decimal" id="dr-ow" placeholder="0" oninput="drawerCalc()"></div>
+          <div class="kp-field"><label>Lichte Höhe <span class="ku">mm</span></label><input type="number" inputmode="decimal" id="dr-oh" placeholder="0" oninput="drawerCalc()"></div>
+          <div class="kp-field"><label>Korpustiefe <span class="ku">mm</span></label><input type="number" inputmode="decimal" id="dr-cd" placeholder="0" oninput="drawerCalc()"></div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="slabel-row"><div class="slabel">Auszugssystem</div><button class="info-btn" onclick="openSlideInfo()" aria-label="Erklärung der Auszugssysteme">ⓘ</button></div>
+        <div class="kp-seg-label">Führung des Schubkastens</div>
+        <div class="cost-seg kp-seg kp-seg-4">
+          <button id="dr-sys-ball" class="on" onclick="drawerSetSys('ball')">Kugelauszug</button>
+          <button id="dr-sys-under" onclick="drawerSetSys('under')">Unterflur</button>
+          <button id="dr-sys-wood" onclick="drawerSetSys('wood')">Holzläufer</button>
+          <button id="dr-sys-none" onclick="drawerSetSys('none')">ohne</button>
+        </div>
+        <div class="srow"><div><div class="srow-label" id="dr-clear-label">Luft je Seite</div><div class="srow-hint" id="dr-clear-hint">Abzug je Seite für die Schiene — immer in mm</div></div><div class="nm"><input type="number" inputmode="decimal" id="dr-clear" value="12.5" min="0" step="0.5" oninput="drawerCalc()"><span>mm</span></div></div>
+        <div class="srow" style="margin-top:4px"><div><div class="srow-label" id="dr-slidelen-label">Auszugslänge (Nennlänge)</div><div class="srow-hint" id="dr-slidelen-hint">Nennlänge der Schiene — passend zur Korpustiefe</div></div><div class="nm"><input type="number" inputmode="decimal" id="dr-slidelen" placeholder="0" oninput="drawerCalc()"><span class="ku">mm</span></div></div>
+        <div class="unit-chips" id="dr-len-chips" style="flex-wrap:wrap;margin-top:8px"></div>
+        <div id="dr-slidelen-warn" class="srow-hint" style="margin-top:6px"></div>
+      </div>
+
+      <div class="section">
+        <div class="slabel">Schubkasten-Material</div>
+        <div class="kp-dims">
+          <div class="kp-field"><label>Zargenstärke <span class="ku">mm</span></label><input type="number" inputmode="decimal" id="dr-zt" placeholder="13" oninput="drawerCalc()"></div>
+          <div class="kp-field"><label>Bodenstärke <span class="ku">mm</span></label><input type="number" inputmode="decimal" id="dr-bt" placeholder="5" oninput="drawerCalc()"></div>
+          <div class="kp-field"><label>Zargenhöhe <span class="ku">mm</span></label><input type="number" inputmode="decimal" id="dr-boxh" placeholder="0" oninput="drawerCalc()"></div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="slabel-row"><div class="slabel">Bauart</div><button class="info-btn" onclick="openBoxInfo()" aria-label="Erklärung zu Bauart & Front">ⓘ</button></div>
+        <div class="kp-seg-label">Eckverbindung des Schubkastens</div>
+        <div class="cost-seg kp-seg">
+          <button id="dr-c-sides" class="on" onclick="drawerSetConstr('sides')">Seiten durchgehend</button>
+          <button id="dr-c-frontback" onclick="drawerSetConstr('frontback')">Front/Rück durchgehend</button>
+        </div>
+        <div class="kp-seg-label">Bodenmontage</div>
+        <div class="cost-seg kp-seg">
+          <button id="dr-b-groove" class="on" onclick="drawerSetBottom('groove')">eingenutet</button>
+          <button id="dr-b-under" onclick="drawerSetBottom('under')">untergeschraubt</button>
+        </div>
+        <div id="dr-groove-wrap" class="kp-dims kp-dims-2">
+          <div class="kp-field"><label>Nutabstand v. unten</label><input type="number" inputmode="decimal" id="dr-goff" value="10" min="0" step="0.5" oninput="drawerCalc()"></div>
+          <div class="kp-field"><label>Nuttiefe</label><input type="number" inputmode="decimal" id="dr-gdepth" value="6" min="0" step="0.5" oninput="drawerCalc()"></div>
+        </div>
+        <div class="srow-hint" style="margin-top:6px">Nutmaße immer in mm. Der Boden wird um die Nuttiefe je Seite größer berechnet.</div>
+      </div>
+
+      <div class="section">
+        <div class="srow"><div><div class="srow-label">Sichtbare Frontblende</div><div class="srow-hint">Separate Front auf den Schubkasten — mit Maßen und Griffbohrung</div></div><input type="checkbox" id="dr-hasfront" class="toggle" onchange="drawerToggleFront()"></div>
+        <div id="dr-front-wrap" style="display:none">
+          <div class="kp-seg-label" style="margin-top:8px">Frontart</div>
+          <div class="cost-seg kp-seg">
+            <button id="dr-f-overlay" class="on" onclick="drawerSetFront('overlay')">überfälzt (aufliegend)</button>
+            <button id="dr-f-inset" onclick="drawerSetFront('inset')">eingelassen</button>
+          </div>
+          <div class="srow"><div><div class="srow-label" id="dr-fgap-label">Überstand je Seite</div><div class="srow-hint" id="dr-fgap-hint">Wie weit die Front je Seite über die Öffnung steht</div></div><div class="nm"><input type="number" inputmode="decimal" id="dr-fgap" value="0" min="0" oninput="drawerCalc()"><span class="ku">mm</span></div></div>
+          <div class="srow"><div><div class="srow-label">Griffbohrung</div><div class="srow-hint">Bohrungen für Griff/Knopf in der Front vorsehen</div></div><input type="checkbox" id="dr-handle" class="toggle" onchange="drawerToggleHandle()"></div>
+          <div id="dr-handle-wrap" style="display:none">
+            <div class="kp-seg-label" style="margin-top:6px">Anzahl Bohrungen</div>
+            <div class="cost-seg kp-seg">
+              <button id="dr-h-1" class="on" onclick="drawerSetHandleN(1)">1 (Knopf)</button>
+              <button id="dr-h-2" onclick="drawerSetHandleN(2)">2 (Bügelgriff)</button>
+            </div>
+            <div class="kp-dims kp-dims-2">
+              <div class="kp-field" id="dr-handle-bc-field"><label>Lochabstand <span class="ku">mm</span></label><input type="number" inputmode="decimal" id="dr-handle-bc" placeholder="0" min="0" oninput="drawerCalc()"></div>
+              <div class="kp-field"><label>Bohrer-Ø <span class="ku">mm</span></label><input type="number" inputmode="decimal" id="dr-handle-dia" placeholder="0" min="0" oninput="drawerCalc()"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="dr-result" style="margin-top:6px"></div>
+      <button class="action-btn" style="margin-top:14px" onclick="drawerReset()"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M12,4C14.1,4 16.1,4.8 17.6,6.3C20.7,9.4 20.7,14.5 17.6,17.6C15.8,19.5 13.3,20.2 10.9,19.9L11.4,17.9C13.1,18.1 14.9,17.5 16.2,16.2C18.5,13.9 18.5,10.1 16.2,7.7C15.1,6.6 13.5,6 12,6V10.6L7,5.6L12,0.6V4M6.3,17.6C3.7,15 3.3,11 5.1,7.9L6.6,9.4C5.5,11.6 5.9,14.4 7.8,16.2C8.3,16.7 8.9,17.1 9.6,17.4L9,19.4C8,19 7.1,18.4 6.3,17.6Z"/></svg> Zurücksetzen</button>
+    </div>
+
+    <div class="pane" id="dpane-guide"><div id="dr-guide-content"></div></div>
+
+    <div class="pane" id="dpane-projects">
+      <div class="slabel">Projekt speichern</div>
+      <div class="save-row"><input id="dr-proj-name" placeholder="Projektname eingeben…" autocomplete="off" autocorrect="off"><button class="save-btn" onclick="drawerSaveProject()">Speichern</button></div>
+      <div class="slabel" style="margin-top:18px">Gespeicherte Projekte</div>
+      <div id="dr-proj-list"></div>
+      <div class="info-note">Projekte werden lokal auf diesem Gerät gespeichert und bleiben auch offline verfügbar.</div>
+    </div>
+  </div>
+
   <!-- Future modules mount here -->
 </div>
 
@@ -688,6 +789,60 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
       <div class="info-item">
         <div class="info-item-title">Boden/Deckel durchgehend</div>
         <div class="info-item-txt">Boden und Deckel laufen über die volle Korpusbreite, die Seitenteile sitzen dazwischen und werden entsprechend kürzer zugeschnitten. Von vorne sind Boden- und Deckelkante sichtbar, dafür wirkt der Korpus oben und unten durchgängig — praktisch z. B. bei Sideboards mit sichtbarer Deckplatte.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Info-Sheet: Auszugssysteme -->
+<div class="sheet-overlay" id="slideinfo-overlay">
+  <div class="sheet-backdrop" onclick="closeSlideInfo()"></div>
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-head"><span>Auszugssysteme</span><button class="zoom-close" onclick="closeSlideInfo()" aria-label="Schließen">×</button></div>
+    <div class="sheet-body">
+      <div class="info-item">
+        <div class="info-item-title">Kugel-/Teleskopauszug (Seitenmontage)</div>
+        <div class="info-item-txt">Die häufigste Schiene: wird seitlich zwischen Korpuswand und Schubkasten montiert. Sie braucht pro Seite Luft — üblich sind <strong>12,5 mm</strong>, sodass der Schubkasten 25 mm schmaler als die lichte Öffnung wird. Es gibt sie als Teil- und Vollauszug in genormten Nennlängen (250–600 mm in 50er-Schritten). Die Nennlänge sollte zur Korpustiefe passen.</div>
+      </div>
+      <div class="info-item">
+        <div class="info-item-title">Unterflur-/Vollauszug</div>
+        <div class="info-item-txt">Unsichtbar unter dem Schubkasten montierte Schiene (z. B. Blum Tandem/Movento). Sie liefert eine sehr hohe Tragkraft und eine schlanke Optik. Der Schubkasten wird gegenüber der lichten Breite stärker abgezogen (häufig rund 42 mm gesamt). <strong>Wichtig:</strong> Boden meist zurückgesetzt und die Rückwand niedriger/ausgeklinkt — Herstellerangaben beachten.</div>
+      </div>
+      <div class="info-item">
+        <div class="info-item-title">Holzläufer / klassisch</div>
+        <div class="info-item-txt">Traditionelle Holzführung: Der Schubkasten läuft direkt auf Leisten im Korpus. Es genügt minimale Luft je Seite (ca. 1–2 mm). Die Tiefe ist frei wählbar (begrenzt durch die Korpustiefe). Schöne, beschlagfreie Lösung, erfordert aber sauberes Arbeiten.</div>
+      </div>
+      <div class="info-item">
+        <div class="info-item-title">Ohne Schiene</div>
+        <div class="info-item-txt">Reine Maßberechnung ohne Führung — z. B. für Einsätze, Boxen oder Schübe, die lose eingelegt werden. Standardmäßig kein Abzug; bei Bedarf kannst du die Luft je Seite selbst eintragen.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Info-Sheet: Bauart & Front -->
+<div class="sheet-overlay" id="boxinfo-overlay">
+  <div class="sheet-backdrop" onclick="closeBoxInfo()"></div>
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-head"><span>Bauart &amp; Front</span><button class="zoom-close" onclick="closeBoxInfo()" aria-label="Schließen">×</button></div>
+    <div class="sheet-body">
+      <div class="info-item">
+        <div class="info-item-title">Seiten durchgehend</div>
+        <div class="info-item-txt">Die beiden Seiten des Schubkastens laufen über die volle Tiefe; Front und Rückwand sitzen dazwischen und werden entsprechend schmaler zugeschnitten. Bei Seitenmontage die übliche Bauweise, weil die Seite die Schiene trägt.</div>
+      </div>
+      <div class="info-item">
+        <div class="info-item-title">Front/Rück durchgehend</div>
+        <div class="info-item-txt">Front und Rückwand laufen über die volle Breite, die Seiten sitzen dazwischen und werden entsprechend kürzer zugeschnitten. Von der Seite sind die Stirnkanten von Front und Rückwand sichtbar.</div>
+      </div>
+      <div class="info-item">
+        <div class="info-item-title">Front überfälzt (aufliegend)</div>
+        <div class="info-item-txt">Die sichtbare Frontblende liegt vor dem Korpus und deckt die Öffnung ab. Sie wird größer als die Öffnung — der eingestellte Überstand gilt je Seite. Typisch für moderne, grifflose oder flächenbündige Möbelfronten.</div>
+      </div>
+      <div class="info-item">
+        <div class="info-item-title">Front eingelassen</div>
+        <div class="info-item-txt">Die Front sitzt bündig in der Öffnung. Sie wird kleiner als die Öffnung — das eingestellte Fugenmaß (Luftspalt) gilt rundum je Seite, damit die Front sauber läuft.</div>
       </div>
     </div>
   </div>
@@ -802,6 +957,13 @@ function setUnit(u){
       sr:(parseFloat(document.getElementById('kp-sr').value)||0)*oldF,
     };
   }
+  // Schubladenplaner-Felder in mm puffern (Luft/Nutmaße bleiben immer in mm und werden nicht umgerechnet)
+  const drOw=document.getElementById('dr-ow');
+  let drMM=null;
+  if(drOw){
+    const gd=id=>(parseFloat(document.getElementById(id).value)||0)*oldF;
+    drMM={ow:gd('dr-ow'),oh:gd('dr-oh'),cd:gd('dr-cd'),zt:gd('dr-zt'),bt:gd('dr-bt'),boxh:gd('dr-boxh'),sl:gd('dr-slidelen'),fgap:gd('dr-fgap'),hbc:gd('dr-handle-bc'),hdia:gd('dr-handle-dia')};
+  }
   currentUnit=u;
   try{localStorage.setItem('betterkerf_unit',u);}catch{}
   renderUnitChips();
@@ -816,6 +978,16 @@ function setUnit(u){
     setIf('kp-s',kpMM.s);setIf('kp-sr',kpMM.sr);
     refreshKpUnits();
     if(typeof korpusCalc==='function')korpusCalc();
+  }
+  // Schubladenplaner-Felder zurückschreiben (in neuer Einheit) und neu berechnen
+  if(drMM){
+    const setIf=(id,mm)=>{const el=document.getElementById(id);if(el)el.value=mm?inputVal(mm):'';};
+    setIf('dr-ow',drMM.ow);setIf('dr-oh',drMM.oh);setIf('dr-cd',drMM.cd);
+    setIf('dr-zt',drMM.zt);setIf('dr-bt',drMM.bt);setIf('dr-boxh',drMM.boxh);
+    setIf('dr-slidelen',drMM.sl);setIf('dr-fgap',drMM.fgap);
+    setIf('dr-handle-bc',drMM.hbc);setIf('dr-handle-dia',drMM.hdia);
+    refreshDrUnits();
+    if(typeof drawerCalc==='function')drawerCalc();
   }
 }
 
@@ -851,7 +1023,8 @@ const MS={
   delete:'M9,3V4H4V6H5V19A2,2 0 0,0 7,21H17A2,2 0 0,0 19,19V6H20V4H15V3H9M7,6H17V19H7V6M9,8V17H11V8H9M13,8V17H15V8H13Z',
   content_save:'M15,9H5V5H15M12,19A3,3 0 0,1 9,16A3,3 0 0,1 12,13A3,3 0 0,1 15,16A3,3 0 0,1 12,19M17,3H5C3.89,3 3,3.9 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V7L17,3Z',
   folder_open:'M19,20H4C2.89,20 2,19.1 2,18V6C2,4.89 2.89,4 4,4H10L12,6H19A2,2 0 0,1 21,8H21L4,8V18L6.14,10H23.21L20.93,18.5C20.7,19.37 19.92,20 19,20Z',
-  check_circle:'M12 2C6.5 2 2 6.5 2 12S6.5 22 12 22 22 17.5 22 12 17.5 2 12 2M10 17L5 12L6.41 10.59L10 14.17L17.59 6.58L19 8L10 17Z'
+  check_circle:'M12 2C6.5 2 2 6.5 2 12S6.5 22 12 22 22 17.5 22 12 17.5 2 12 2M10 17L5 12L6.41 10.59L10 14.17L17.59 6.58L19 8L10 17Z',
+  drawer:'M3,5H21V19H3V5M5,7V11H19V7H5M5,13V17H19V13H5M10,8H14V10H10V8M10,14H14V16H10V14Z'
 };
 function msIcon(name,size){size=size||20;return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="${size}" height="${size}" fill="currentColor"><path d="${MS[name]}"/></svg>`;}
 
@@ -876,6 +1049,16 @@ const MODULES=[
     screen:'screen-korpus',
     init:()=>{ korpusInit(); }
   },
+  {
+    id:'drawer',
+    title:'Schubladenplaner',
+    sub:'Schubkästen & Auszüge planen',
+    icon:'drawer',
+    desc:'Aus Korpusöffnung und Auszugssystem automatisch die Zuschnittmaße eines Schubkastens (Seiten, Front, Rückwand, Boden) berechnen.',
+    status:'ready',
+    screen:'screen-drawer',
+    init:()=>{ drawerInit(); }
+  },
   // ── Geplante Module (Platzhalter, noch nicht aktiv) ──
   {
     id:'holes',
@@ -885,7 +1068,7 @@ const MODULES=[
     desc:'Abstände für eine Reihe von Bohrungen nach Anzahl und Materialbreite berechnen.',
     status:'ready',
     screen:'screen-holes',
-    init:()=>{ }
+    init:()=>{ refreshHolesUnits(); }
   },
   {
     id:'rest',
@@ -3660,6 +3843,435 @@ async function korpusDoPDF(){
   doc.setFontSize(8);doc.setTextColor(150,140,130);
   doc.text('Maße als Zuschnittmaße der Einzelteile. Verbindungsmittel (Dübel, Lamello o.ä.) nach eigener Konstruktion.',lm,289);
   doc.save('betterkerf-korpus.pdf');
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+//  MODULE: Schubladenplaner — Schubkasten aus Öffnung + Auszugssystem
+// ═══════════════════════════════════════════════════════════════════════
+const DR_PRESETS={
+  ball: {label:'Kugel-/Teleskopauszug', clr:12.5, hasSlide:true,  std:[250,300,350,400,450,500,550,600], lenLabel:'Auszugslänge (Nennlänge)', lenHint:'Nennlänge der Schiene — passend zur Korpustiefe'},
+  under:{label:'Unterflur-/Vollauszug', clr:21,   hasSlide:true,  std:[250,300,350,400,450,500,550],     lenLabel:'Auszugslänge (Nennlänge)', lenHint:'Nennlänge der Unterflurschiene — Herstellerangabe beachten'},
+  wood: {label:'Holzläufer',            clr:1.5,  hasSlide:false, lenLabel:'Schubkasten-Tiefe',         lenHint:'Tiefe des Schubkastens (max. Korpustiefe)'},
+  none: {label:'Ohne Schiene',          clr:0,    hasSlide:false, lenLabel:'Schubkasten-Tiefe',         lenHint:'Tiefe des Schubkastens (max. Korpustiefe)'}
+};
+let drStype='ball';     // ball | under | wood | none
+let drBoxConstr='sides';// sides | frontback
+let drBottom='groove';  // groove | under
+let drFrontType='overlay'; // overlay | inset
+let drHandleN=1;        // 1 | 2
+let drParts=[];         // zuletzt berechnete Teile (mm) für Übergabe
+let drGeo=null;         // zuletzt berechnete Geometrie
+
+document.getElementById('drawer-tabs').addEventListener('click',e=>{const b=e.target.closest('.tab');if(b)drawerShowTab(b.dataset.tab);});
+function drawerShowTab(t){
+  document.querySelectorAll('#drawer-tabs .tab').forEach(b=>b.classList.toggle('active',b.dataset.tab===t));
+  document.querySelectorAll('#screen-drawer .pane').forEach(p=>p.classList.toggle('active',p.id==='dpane-'+t));
+  if(t==='projects')renderDrawerProjects();
+}
+initSwipeTabs('screen-drawer',()=>
+  Array.from(document.querySelectorAll('#drawer-tabs .tab'))
+    .filter(b=>b.offsetParent!==null)
+    .map(b=>({id:b.dataset.tab,active:b.classList.contains('active')}))
+,drawerShowTab);
+
+function drawerInit(){
+  refreshDrUnits();
+  drawerShowTab('input');
+  const setDefault=(id,mm)=>{const el=document.getElementById(id);if(el&&el.value.trim()==='')el.value=inputVal(mm);};
+  setDefault('dr-ow',500);
+  setDefault('dr-oh',150);
+  setDefault('dr-cd',500);
+  setDefault('dr-zt',13);
+  setDefault('dr-bt',5);
+  setDefault('dr-boxh',100);
+  setDefault('dr-slidelen',450);
+  setDefault('dr-handle-bc',128);
+  setDefault('dr-handle-dia',5);
+  drawerSetSys(drStype);
+  drawerSetConstr(drBoxConstr);
+  drawerSetBottom(drBottom);
+  drawerSetFront(drFrontType);
+  drawerSetHandleN(drHandleN);
+  drawerToggleFront();
+  drawerToggleHandle();
+  drawerCalc();
+  renderDrawerProjects();
+}
+function refreshDrUnits(){
+  document.querySelectorAll('#screen-drawer .ku').forEach(s=>s.textContent=unitLabel());
+}
+
+// Info-Sheets
+function openSlideInfo(){document.getElementById('slideinfo-overlay').classList.add('show');}
+function closeSlideInfo(){document.getElementById('slideinfo-overlay').classList.remove('show');}
+function openBoxInfo(){document.getElementById('boxinfo-overlay').classList.add('show');}
+function closeBoxInfo(){document.getElementById('boxinfo-overlay').classList.remove('show');}
+
+// Segment-Setter
+function drawerSetSys(sys){
+  if(!DR_PRESETS[sys])return;
+  drStype=sys;
+  ['ball','under','wood','none'].forEach(k=>{const el=document.getElementById('dr-sys-'+k);if(el)el.classList.toggle('on',k===sys);});
+  const p=DR_PRESETS[sys];
+  const clrEl=document.getElementById('dr-clear');if(clrEl)clrEl.value=p.clr;
+  const ll=document.getElementById('dr-slidelen-label');if(ll)ll.textContent=p.lenLabel;
+  const lh=document.getElementById('dr-slidelen-hint');if(lh)lh.textContent=p.lenHint;
+  drawerRenderLenChips();
+  drawerCalc();
+}
+function drawerSetConstr(c){drBoxConstr=c;document.getElementById('dr-c-sides').classList.toggle('on',c==='sides');document.getElementById('dr-c-frontback').classList.toggle('on',c==='frontback');drawerCalc();}
+function drawerSetBottom(b){drBottom=b;document.getElementById('dr-b-groove').classList.toggle('on',b==='groove');document.getElementById('dr-b-under').classList.toggle('on',b==='under');const gw=document.getElementById('dr-groove-wrap');if(gw)gw.style.display=b==='groove'?'':'none';drawerCalc();}
+function drawerSetFront(f){
+  drFrontType=f;
+  document.getElementById('dr-f-overlay').classList.toggle('on',f==='overlay');
+  document.getElementById('dr-f-inset').classList.toggle('on',f==='inset');
+  const lbl=document.getElementById('dr-fgap-label'),hint=document.getElementById('dr-fgap-hint');
+  if(f==='overlay'){lbl.textContent='Überstand je Seite';hint.textContent='Wie weit die Front je Seite über die Öffnung steht';}
+  else{lbl.textContent='Fugenmaß je Seite';hint.textContent='Luftspalt rundum zwischen Front und Öffnung';}
+  drawerCalc();
+}
+function drawerSetHandleN(n){drHandleN=n;document.getElementById('dr-h-1').classList.toggle('on',n===1);document.getElementById('dr-h-2').classList.toggle('on',n===2);const bcf=document.getElementById('dr-handle-bc-field');if(bcf)bcf.style.display=n===2?'':'none';drawerCalc();}
+function drawerToggleFront(){const on=document.getElementById('dr-hasfront').checked;document.getElementById('dr-front-wrap').style.display=on?'':'none';drawerCalc();}
+function drawerToggleHandle(){const on=document.getElementById('dr-handle').checked;document.getElementById('dr-handle-wrap').style.display=on?'':'none';drawerCalc();}
+
+function drawerRenderLenChips(){
+  const wrap=document.getElementById('dr-len-chips');if(!wrap)return;
+  const p=DR_PRESETS[drStype];
+  if(!p.hasSlide||!p.std){wrap.style.display='none';wrap.innerHTML='';return;}
+  wrap.style.display='';
+  const cur=toMM(document.getElementById('dr-slidelen').value);
+  wrap.innerHTML=p.std.map(L=>`<button class="unit-chip${Math.abs(cur-L)<0.5?' active':''}" onclick="drawerPickLen(${L})">${dispVal(L)}</button>`).join('');
+}
+function drawerPickLen(mm){document.getElementById('dr-slidelen').value=inputVal(mm);drawerCalc();}
+
+function drawerInputs(){
+  const g=id=>toMM(document.getElementById(id).value);
+  const gmm=id=>parseFloat(document.getElementById(id).value)||0; // Felder, die immer in mm gepflegt werden
+  return {
+    p:DR_PRESETS[drStype],
+    OW:g('dr-ow'),OH:g('dr-oh'),CD:g('dr-cd'),
+    clr:gmm('dr-clear'),slideLen:g('dr-slidelen'),
+    zt:g('dr-zt'),bt:g('dr-bt'),boxH:g('dr-boxh'),
+    goff:gmm('dr-goff'),gdepth:gmm('dr-gdepth'),
+    boxConstr:drBoxConstr,bottomMount:drBottom,
+    hasFront:document.getElementById('dr-hasfront').checked,
+    frontType:drFrontType,frontGap:g('dr-fgap'),
+    hasHandle:document.getElementById('dr-hasfront').checked&&document.getElementById('dr-handle').checked,
+    handleN:drHandleN,handleBc:g('dr-handle-bc'),handleDia:g('dr-handle-dia')
+  };
+}
+
+// Kernberechnung: liefert Teile {name,l,w,qty} in mm + abgeleitete Maße.
+function drawerGeometry(o){
+  const parts=[];
+  const add=(name,l,w,qty)=>{if(qty>0&&l>0.1&&w>0.1)parts.push({name,l,w,qty});};
+  const BW=o.OW-2*o.clr;   // Schubkasten-Außenbreite
+  const BD=o.slideLen;     // Schubkasten-Tiefe (= Nennlänge bzw. freie Tiefe)
+  if(o.boxConstr==='sides'){
+    add('Schubkasten-Seite', BD, o.boxH, 2);
+    add('Schubkasten-Front', BW-2*o.zt, o.boxH, 1);
+    add('Schubkasten-Rückwand', BW-2*o.zt, o.boxH, 1);
+  } else {
+    add('Schubkasten-Front', BW, o.boxH, 1);
+    add('Schubkasten-Rückwand', BW, o.boxH, 1);
+    add('Schubkasten-Seite', BD-2*o.zt, o.boxH, 2);
+  }
+  const innerW=BW-2*o.zt, innerD=BD-2*o.zt;
+  if(o.bottomMount==='groove') add('Schubkasten-Boden', innerW+2*o.gdepth, innerD+2*o.gdepth, 1);
+  else add('Schubkasten-Boden', BW, BD, 1);
+  let frontW=0,frontH=0;
+  if(o.hasFront){
+    if(o.frontType==='overlay'){frontW=o.OW+2*o.frontGap;frontH=o.OH+2*o.frontGap;}
+    else{frontW=o.OW-2*o.frontGap;frontH=o.OH-2*o.frontGap;}
+    add('Frontblende', frontW, frontH, 1);
+  }
+  return {parts,BW,BD,innerW,innerD,frontW,frontH};
+}
+
+// größte Norm-Nennlänge, die noch in die Korpustiefe passt (≈10 mm Luft)
+function drBestStd(cdMM){const std=DR_PRESETS[drStype].std;if(!std)return 0;let best=0;std.forEach(L=>{if(L<=cdMM-10&&L>best)best=L;});return best;}
+
+function drawerCalc(){
+  const o=drawerInputs();
+  drawerRenderLenChips();
+  const res=document.getElementById('dr-result');
+  const clearGuide=()=>{const gt=document.getElementById('dr-tab-guide');if(gt)gt.style.display='none';const gc=document.getElementById('dr-guide-content');if(gc)gc.innerHTML='';};
+  if(o.OW<=0||o.OH<=0||o.CD<=0||o.boxH<=0||o.zt<=0||o.slideLen<=0){drParts=[];drGeo=null;res.innerHTML='';clearGuide();return;}
+  const BWchk=o.OW-2*o.clr;
+  if(BWchk<=2*o.zt){drParts=[];drGeo=null;res.innerHTML=`<div class="warn-box"><div class="warn-head">⚠️ Maße prüfen</div><div class="warn-hint">Die Öffnung ist für diese Luft und Zargenstärke zu schmal — es bleibt keine sinnvolle Schubkastenbreite übrig.</div></div>`;clearGuide();return;}
+
+  const geo=drawerGeometry(o);
+  drGeo=geo;drParts=geo.parts;
+  const u=unitLabel();
+
+  // Hinweise / Warnungen
+  const warns=[];
+  if(o.slideLen>o.CD){const best=drBestStd(o.CD);warns.push(`${o.p.hasSlide?'Nennlänge':'Schubkastentiefe'} (${dispVal(o.slideLen)} ${u}) ist größer als die Korpustiefe (${dispVal(o.CD)} ${u}).${o.p.hasSlide&&best?` Größte passende Nennlänge: ${dispVal(best)} ${u}.`:''}`);}
+  else if(o.p.hasSlide&&(o.CD-o.slideLen)<10){warns.push(`Zwischen Schiene und Rückwand bleiben nur ${dispVal(o.CD-o.slideLen)} ${u}. Etwa 10 mm Luft einplanen.`);}
+  if(o.p.hasSlide&&geo.BW<150){warns.push(`Schubkastenbreite (${dispVal(geo.BW)} ${u}) ist sehr gering — viele Schienen brauchen mind. ~150 mm Korpus-Innenbreite.`);}
+  if(o.bottomMount==='groove'&&o.gdepth>=o.zt){warns.push(`Nuttiefe (${o.gdepth} mm) ist ≥ Zargenstärke (${dispVal(o.zt)} ${u}) — die Nut schwächt die Wand zu stark.`);}
+  if(o.boxH>=o.OH){warns.push(`Zargenhöhe (${dispVal(o.boxH)} ${u}) ist ≥ lichte Höhe (${dispVal(o.OH)} ${u}). Plane oben/unten etwas Luft ein.`);}
+  if(drStype==='under'){warns.push('Unterflur: Boden meist zurückgesetzt und Rückwand niedriger/ausgeklinkt — Herstellerangaben des Beschlags beachten.');}
+
+  let html='';
+  html+=`<div class="section"><div class="bvis-top"><b>Schubkasten-Skizze</b></div>${drawerSketch(o,geo)}<div class="srow-hint" style="text-align:center;margin-top:6px">Antippen zum Vergrößern</div></div>`;
+
+  html+=`<div class="section"><div class="slabel">Zuschnittliste</div>
+    <div class="kp-cut-head"><span>Bauteil</span><span>Maß (${u})</span><span>Anz.</span></div>`;
+  geo.parts.forEach(p=>{html+=`<div class="kp-cut-row"><span class="kp-cut-name">${p.name}</span><span class="kp-cut-dim">${dispVal(p.l)} × ${dispVal(p.w)}</span><span class="kp-cut-qty">${p.qty}×</span></div>`;});
+  html+=`</div>`;
+
+  const totalPieces=geo.parts.reduce((a,p)=>a+p.qty,0);
+  const totalArea=geo.parts.reduce((a,p)=>a+p.l*p.w*p.qty,0)/1e6;
+  html+=`<div class="stat-row">
+    <div class="stat"><div class="stat-val">${dispVal(geo.BW)}×${dispVal(geo.BD)}</div><div class="stat-lbl">Kasten B×T ${u}</div></div>
+    <div class="stat"><div class="stat-val">${totalPieces}</div><div class="stat-lbl">Teile</div></div>
+    <div class="stat"><div class="stat-val">${totalArea.toLocaleString('de-DE',{minimumFractionDigits:2,maximumFractionDigits:2})} m²</div><div class="stat-lbl">Plattenfläche</div></div>
+  </div>`;
+
+  if(o.p.hasSlide)html+=`<div class="info-note" style="margin-top:8px">🔩 Beschläge: 1 Paar ${o.p.label}, Nennlänge ${dispVal(o.slideLen)} ${u}.</div>`;
+  if(warns.length)html+=`<div class="warn-box" style="margin-top:12px"><div class="warn-head">⚠️ Hinweise</div><div class="warn-hint">${warns.map(w=>'• '+w).join('<br>')}</div></div>`;
+
+  html+=`<button class="calc-btn" style="margin-top:14px" onclick="drawerToCutlist()">→ An Zuschnitt-Optimierer übergeben</button>`;
+  if(o.hasHandle)html+=`<button class="action-btn" onclick="drawerToHoles()">${msIcon('adjust',16)} Griffbohrung an Bohrlochplaner</button>`;
+  html+=`<button class="action-btn" onclick="drawerPDF()">${msIcon('download',16)} Als PDF exportieren</button>`;
+  res.innerHTML=html;
+
+  // Anleitung-Tab
+  const guide=drawerGuide(o,geo);
+  const gt=document.getElementById('dr-tab-guide');if(gt)gt.style.display='';
+  const gc=document.getElementById('dr-guide-content');
+  if(gc)gc.innerHTML=`<div class="section"><div class="slabel">Bau-Anleitung</div><div class="kp-guide">${guide.map((g,i)=>`<div class="kp-step"><span class="kp-step-num">${i+1}</span><span class="kp-step-txt">${g}</span></div>`).join('')}</div></div>`;
+}
+
+// Maßstäbliche Skizze: Vorderansicht (B×H) + Draufsicht (B×T).
+function drawerSketch(o,geo){
+  const BW=geo.BW, boxH=o.boxH, BD=geo.BD, zt=o.zt;
+  const frontW=o.hasFront?geo.frontW:0, frontH=o.hasFront?geo.frontH:0;
+  const pad=24, gap=44, topLabel=16;
+  const refW=Math.max(BW, frontW, 1), refH=Math.max(boxH, BD, frontH, 1);
+  const scale=Math.min(190/refW, 150/refH);
+  const t=Math.max(2, zt*scale);
+  const fW=BW*scale, fH=boxH*scale, dH=BD*scale;
+  const frW=frontW*scale, frH=frontH*scale;
+  const colW=Math.max(fW, frW);
+  const oy=pad+topLabel;
+  const ox=pad+(colW-fW)/2;
+  const cx=pad+colW/2;
+  const sx=pad+colW+gap;
+  const blockH=Math.max(fH, frH, dH);
+  const svgW=pad*2+colW+gap+fW;
+  const svgH=oy+blockH+26;
+  const col={body:'#5B8DB8',bodyFill:'rgba(91,141,184,.16)',bottom:'#2E7D5E',front:'#C07A2E',line:'#7A7268',txt:'#B8AF9E'};
+  let p='';
+  // Vorderansicht — Frontblende (gestrichelt) zuerst
+  if(o.hasFront){
+    const frx=cx-frW/2, fry=oy+(blockH-frH)/2;
+    p+=`<rect x="${frx.toFixed(1)}" y="${fry.toFixed(1)}" width="${frW.toFixed(1)}" height="${frH.toFixed(1)}" fill="rgba(192,122,46,.10)" stroke="${col.front}" stroke-width="1" stroke-dasharray="4 3"/>`;
+  }
+  const boxY=oy+(blockH-fH)/2;
+  p+=`<rect x="${ox.toFixed(1)}" y="${boxY.toFixed(1)}" width="${fW.toFixed(1)}" height="${fH.toFixed(1)}" fill="${col.bodyFill}" stroke="${col.body}" stroke-width="1.2"/>`;
+  if(o.bottomMount==='groove'&&o.goff>0&&boxH>0){
+    const gy=boxY+fH-(o.goff*scale);
+    if(gy>boxY+2&&gy<boxY+fH-1)p+=`<line x1="${ox.toFixed(1)}" y1="${gy.toFixed(1)}" x2="${(ox+fW).toFixed(1)}" y2="${gy.toFixed(1)}" stroke="${col.bottom}" stroke-width="1" stroke-dasharray="3 2"/>`;
+  }
+  if(o.hasHandle&&frH>0){
+    const hy=oy+(blockH-frH)/2+frH*0.3;
+    const r=Math.max(1.6,(o.handleDia*scale)/2);
+    if(o.handleN===2){const half=(o.handleBc*scale)/2;p+=`<circle cx="${(cx-half).toFixed(1)}" cy="${hy.toFixed(1)}" r="${r.toFixed(1)}" fill="${col.front}"/><circle cx="${(cx+half).toFixed(1)}" cy="${hy.toFixed(1)}" r="${r.toFixed(1)}" fill="${col.front}"/>`;}
+    else p+=`<circle cx="${cx.toFixed(1)}" cy="${hy.toFixed(1)}" r="${r.toFixed(1)}" fill="${col.front}"/>`;
+  }
+  p+=`<text x="${cx.toFixed(1)}" y="${(oy+blockH+16).toFixed(1)}" text-anchor="middle" font-size="10" fill="${col.txt}">Vorderansicht</text>`;
+  p+=`<text x="${cx.toFixed(1)}" y="${(oy-5).toFixed(1)}" text-anchor="middle" font-size="9.5" fill="${col.txt}">B ${dispVal(BW)}</text>`;
+  p+=`<text x="${(ox-7).toFixed(1)}" y="${(boxY+fH/2).toFixed(1)}" text-anchor="middle" font-size="9.5" fill="${col.txt}" transform="rotate(-90 ${(ox-7).toFixed(1)} ${(boxY+fH/2).toFixed(1)})">H ${dispVal(boxH)}</text>`;
+  // Draufsicht
+  const ty=oy+(blockH-dH)/2;
+  p+=`<rect x="${sx.toFixed(1)}" y="${ty.toFixed(1)}" width="${fW.toFixed(1)}" height="${dH.toFixed(1)}" fill="${col.bodyFill}" stroke="${col.body}" stroke-width="1.2"/>`;
+  p+=`<rect x="${(sx+t).toFixed(1)}" y="${(ty+t).toFixed(1)}" width="${(fW-2*t).toFixed(1)}" height="${(dH-2*t).toFixed(1)}" fill="rgba(46,125,94,.14)"/>`;
+  if(o.boxConstr==='sides'){
+    p+=`<rect x="${sx.toFixed(1)}" y="${ty.toFixed(1)}" width="${t.toFixed(1)}" height="${dH.toFixed(1)}" fill="${col.body}" opacity=".55"/>`;
+    p+=`<rect x="${(sx+fW-t).toFixed(1)}" y="${ty.toFixed(1)}" width="${t.toFixed(1)}" height="${dH.toFixed(1)}" fill="${col.body}" opacity=".55"/>`;
+    p+=`<rect x="${(sx+t).toFixed(1)}" y="${ty.toFixed(1)}" width="${(fW-2*t).toFixed(1)}" height="${t.toFixed(1)}" fill="${col.body}" opacity=".55"/>`;
+    p+=`<rect x="${(sx+t).toFixed(1)}" y="${(ty+dH-t).toFixed(1)}" width="${(fW-2*t).toFixed(1)}" height="${t.toFixed(1)}" fill="${col.body}" opacity=".55"/>`;
+  } else {
+    p+=`<rect x="${sx.toFixed(1)}" y="${ty.toFixed(1)}" width="${fW.toFixed(1)}" height="${t.toFixed(1)}" fill="${col.body}" opacity=".55"/>`;
+    p+=`<rect x="${sx.toFixed(1)}" y="${(ty+dH-t).toFixed(1)}" width="${fW.toFixed(1)}" height="${t.toFixed(1)}" fill="${col.body}" opacity=".55"/>`;
+    p+=`<rect x="${sx.toFixed(1)}" y="${(ty+t).toFixed(1)}" width="${t.toFixed(1)}" height="${(dH-2*t).toFixed(1)}" fill="${col.body}" opacity=".55"/>`;
+    p+=`<rect x="${(sx+fW-t).toFixed(1)}" y="${(ty+t).toFixed(1)}" width="${t.toFixed(1)}" height="${(dH-2*t).toFixed(1)}" fill="${col.body}" opacity=".55"/>`;
+  }
+  p+=`<text x="${(sx+fW/2).toFixed(1)}" y="${(oy+blockH+16).toFixed(1)}" text-anchor="middle" font-size="10" fill="${col.txt}">Draufsicht (vorne unten)</text>`;
+  p+=`<text x="${(sx+fW+7).toFixed(1)}" y="${(ty+dH/2).toFixed(1)}" text-anchor="middle" font-size="9.5" fill="${col.txt}" transform="rotate(-90 ${(sx+fW+7).toFixed(1)} ${(ty+dH/2).toFixed(1)})">T ${dispVal(BD)}</text>`;
+  let legend=`<div class="kp-legend"><span class="kp-leg"><i style="background:${col.body}"></i>Schubkasten</span><span class="kp-leg"><i style="background:${col.bottom}"></i>Boden</span>`;
+  if(o.hasFront)legend+=`<span class="kp-leg"><i style="background:${col.front}"></i>Frontblende</span>`;
+  legend+=`</div>`;
+  return `<div class="kp-sketch" onclick="openZoom(this)" style="cursor:zoom-in"><svg viewBox="0 0 ${Math.ceil(svgW)} ${Math.ceil(svgH)}" width="100%" preserveAspectRatio="xMidYMid meet">${p}</svg></div>${legend}`;
+}
+
+// Kontextabhängige Bau-Anleitung
+function drawerGuide(o,geo){
+  const u=unitLabel();const steps=[];
+  steps.push('Alle Teile gemäß Zuschnittliste sauber und rechtwinklig zuschneiden. Maße noch einmal gegen Öffnung und Schiene prüfen.');
+  if(o.bottomMount==='groove')steps.push(`Für den Boden eine umlaufende Nut in Seiten, Front und Rückwand fräsen: ${o.gdepth} mm tief, Breite passend zur Bodenstärke (${dispVal(o.bt)} ${u}), Unterkante ca. ${o.goff} mm über der Zargen-Unterkante.`);
+  if(o.boxConstr==='sides')steps.push('Schubkasten verleimen: Front und Rückwand zwischen die durchgehenden Seiten setzen. Eckverbindung nach Wahl (Zinken, Dübel, Domino oder Schrauben).');
+  else steps.push('Schubkasten verleimen: Die Seiten zwischen die durchgehende Front und Rückwand setzen. Eckverbindung nach Wahl (Zinken, Dübel, Domino oder Schrauben).');
+  if(o.bottomMount==='groove')steps.push('Boden vor dem letzten Verleimen in die Nut einschieben — er hält den Kasten rechtwinklig. Nicht verleimen, damit das Holz arbeiten kann.');
+  else steps.push('Boden von unten bündig auf den verleimten Rahmen schrauben (ggf. mit Leim). Der Boden steift den Kasten aus — auf Rechtwinkligkeit achten.');
+  steps.push('Rechtwinkligkeit prüfen (Diagonalen messen — beide gleich = rechtwinklig) und Leim abbinden lassen.');
+  if(o.p.hasSlide){
+    if(drStype==='under')steps.push(`Unterflur-Auszüge (Nennlänge ${dispVal(o.slideLen)} ${u}) am Korpusboden montieren und den Schubkasten einhängen. Boden-Rücksprung und Rückwand-Ausklinkung gemäß Beschlaganleitung beachten.`);
+    else steps.push(`Auszüge (Nennlänge ${dispVal(o.slideLen)} ${u}) montieren: Korpusteil an die Korpuswand, Laufteil an die Schubkasten-Seite — beidseitig ${o.clr} mm Luft, auf gleicher Höhe und parallel ausrichten.`);
+  } else if(drStype==='wood'){
+    steps.push('Holzläufer/Leisten im Korpus montieren und den Schubkasten einpassen. Laufflächen leicht wachsen, damit er gut gleitet.');
+  }
+  steps.push('Probelauf: Schubkasten einsetzen, Leichtgängigkeit und Spaltmaße prüfen, bei Bedarf nachjustieren.');
+  if(o.hasFront){
+    if(o.frontType==='overlay')steps.push(`Frontblende (${dispVal(geo.frontW)} × ${dispVal(geo.frontH)} ${u}) aufsetzen — sie liegt mit ${dispVal(o.frontGap)} ${u} Überstand je Seite vor dem Korpus. Mit Verstellbeschlägen ausrichten und gleichmäßige Fugen einstellen.`);
+    else steps.push(`Frontblende (${dispVal(geo.frontW)} × ${dispVal(geo.frontH)} ${u}) bündig in die Öffnung einpassen — ${dispVal(o.frontGap)} ${u} Fuge rundum für sauberen Lauf.`);
+    if(o.hasHandle){const sp=o.handleN===2?`2 Löcher, Lochabstand ${dispVal(o.handleBc)} ${u}`:'1 Loch mittig';steps.push(`Griffbohrung anzeichnen und bohren (${sp}, Ø ${dispVal(o.handleDia)} ${u}). Tipp: Im Bohrlochplaner als maßstäbliche 1:1-Schablone ausgeben.`);}
+  }
+  steps.push('Oberfläche endbehandeln und Beschläge final justieren.');
+  return steps;
+}
+
+// — Übergabe an Zuschnitt-Optimierer —
+function drawerToCutlist(){
+  if(!drParts.length){showAlert('Bitte zuerst gültige Maße eingeben.',{title:'Fehlende Maße',icon:'information'});return;}
+  let id=1;
+  partsData=drParts.map(p=>({id:id++,name:p.name,l:Math.round(p.l*10)/10,w:Math.round(p.w*10)/10,qty:p.qty,grain:p.name==='Frontblende'}));
+  nextPId=id+10;
+  grainEnabled=partsData.some(x=>x.grain);
+  lastResult=null;
+  openModule('cutlist');
+  showTab('input');
+  renderStock();renderParts();
+  const ge=document.getElementById('grain-enabled');if(ge)ge.checked=grainEnabled;
+}
+
+// — Übergabe der Griffbohrung an den Bohrlochplaner —
+function drawerToHoles(){
+  if(!drGeo||!document.getElementById('dr-hasfront').checked||!document.getElementById('dr-handle').checked){showAlert('Aktiviere zuerst Frontblende und Griffbohrung.',{title:'Keine Griffbohrung',icon:'information'});return;}
+  const o=drawerInputs();
+  const W=drGeo.frontW, n=o.handleN;
+  let start,end;
+  if(n===2){start=(W-o.handleBc)/2;end=start;}else{start=W/2;end=W/2;}
+  holesMM={length:W,start,end,width:drGeo.frontH,dia:o.handleDia};
+  openModule('holes');
+  if(typeof holesMode==='function')holesMode('row');
+  document.getElementById('h-count').value=n;
+  document.getElementById('h-usemargin').checked=true;
+  if(typeof toggleMarginInputs==='function')toggleMarginInputs();
+  const symEl=document.getElementById('h-sym');if(symEl){symEl.checked=true;if(typeof toggleSym==='function')toggleSym();}
+  document.getElementById('h-length').value=inputVal(W);
+  document.getElementById('h-start').value=inputVal(start);
+  document.getElementById('h-end').value=inputVal(end);
+  document.getElementById('h-width').value=drGeo.frontH>0?inputVal(drGeo.frontH):'';
+  document.getElementById('h-dia').value=o.handleDia>0?inputVal(o.handleDia):'';
+  if(typeof holesCalc==='function')holesCalc();
+}
+
+// — Schubladenplaner-PDF —
+function drawerPDF(){
+  if(!drParts.length){showAlert('Bitte zuerst gültige Maße eingeben.',{title:'Fehlende Maße',icon:'information'});return;}
+  loadJsPDF(()=>{drawerDoPDF().catch(e=>{console.error(e);showAlert('PDF konnte nicht erstellt werden.',{title:'Fehler',icon:'alert_circle',danger:true});});});
+}
+async function drawerDoPDF(){
+  const {jsPDF}=window.jspdf;const doc=new jsPDF({unit:'mm',format:'a4'});
+  const u=unitLabel();let y=15;const lm=15,pw=180;const checkY=k=>{if(y+k>278){doc.addPage();y=15;}};
+  const o=drawerInputs();const geo=drGeo||drawerGeometry(o);
+  doc.setFont('helvetica','bold');doc.setFontSize(18);doc.text('betterKerf — Schubkasten',lm,y);y+=9;
+  doc.setFont('helvetica','normal');doc.setFontSize(9);doc.setTextColor(120,110,100);
+  doc.text(`Erstellt: ${new Date().toLocaleDateString('de-DE')}  |  Einheit: ${u}`,lm,y);y+=11;doc.setTextColor(0);
+  doc.setFillColor(245,237,214);doc.rect(lm,y-5,pw,12,'F');
+  doc.setFont('helvetica','bold');doc.setFontSize(11);
+  doc.text(`Öffnung: ${dispVal(o.OW)} × ${dispVal(o.OH)} × ${dispVal(o.CD)} ${u}   ·   Kasten: ${dispVal(geo.BW)} × ${dispVal(geo.BD)} ${u}`,lm+3,y+3);
+  y+=15;doc.setTextColor(0);
+  doc.setFont('helvetica','normal');doc.setFontSize(9.5);
+  const constrTxt=o.boxConstr==='sides'?'Seiten durchgehend':'Front/Rück durchgehend';
+  const bottomTxt=o.bottomMount==='groove'?`Boden eingenutet (Nut ${o.gdepth} mm, ${o.goff} mm v. unten)`:'Boden untergeschraubt';
+  const cfg=`Auszug: ${o.p.label}${o.p.hasSlide?` (Nennlänge ${dispVal(o.slideLen)} ${u})`:''}  ·  Luft je Seite ${o.clr} mm  ·  Zarge ${dispVal(o.zt)} ${u}  ·  ${constrTxt}  ·  ${bottomTxt}`;
+  const cfgLines=doc.splitTextToSize(cfg,pw);doc.text(cfgLines,lm,y);y+=cfgLines.length*5+1;
+  if(o.hasFront){const ft=o.frontType==='overlay'?'überfälzt':'eingelassen';let frTxt=`Frontblende: ${dispVal(geo.frontW)} × ${dispVal(geo.frontH)} ${u} (${ft}, ${dispVal(o.frontGap)} ${u} je Seite)`;if(o.hasHandle)frTxt+=`  ·  Griff: ${o.handleN===2?dispVal(o.handleBc)+' '+u+' Lochabstand':'1 Loch mittig'}, Ø ${dispVal(o.handleDia)} ${u}`;const frLines=doc.splitTextToSize(frTxt,pw);doc.text(frLines,lm,y);y+=frLines.length*5;}
+  if(o.p.hasSlide){doc.setFont('helvetica','bold');doc.text(`Beschläge: 1 Paar ${o.p.label}, Nennlänge ${dispVal(o.slideLen)} ${u}.`,lm,y);y+=6;doc.setFont('helvetica','normal');}
+  y+=4;
+  const svgEl=document.querySelector('#dr-result svg');
+  if(svgEl){try{const png=await svgToPng(svgEl,3);const maxW=pw,maxH=72;let iw=png.w,ih=png.h;const r=Math.min(maxW/iw,maxH/ih);iw*=r;ih*=r;checkY(ih+8);doc.addImage(png.data,'PNG',lm+(pw-iw)/2,y,iw,ih);y+=ih+8;}catch(e){}}
+  checkY(16);doc.setFont('helvetica','bold');doc.setFontSize(12);doc.text('Zuschnittliste',lm,y);y+=6;
+  const cols=[96,54,30];const heads=['Bauteil',`Maß (${u})`,'Anzahl'];
+  doc.setFillColor(245,237,214);doc.rect(lm,y-5,pw,7,'F');doc.setFontSize(9);doc.setFont('helvetica','bold');
+  let hx=lm;heads.forEach((h,i)=>{doc.text(h,hx+1,y-1);hx+=cols[i];});y+=4;doc.setFont('helvetica','normal');
+  geo.parts.forEach((pp,i)=>{checkY(6);if(i%2===0){doc.setFillColor(252,250,246);doc.rect(lm,y-3.5,pw,5.5,'F');}let x=lm;[pp.name,`${dispVal(pp.l)} × ${dispVal(pp.w)}`,`${pp.qty}×`].forEach((v,ci)=>{doc.text(String(v),x+1,y);x+=cols[ci];});y+=5.5;});
+  const totalPieces=geo.parts.reduce((a,pp)=>a+pp.qty,0);
+  const totalArea=geo.parts.reduce((a,pp)=>a+pp.l*pp.w*pp.qty,0)/1e6;
+  y+=2;doc.setFont('helvetica','bold');doc.setFontSize(9);
+  doc.text(`Gesamt: ${totalPieces} Teile  ·  ${totalArea.toLocaleString('de-DE',{minimumFractionDigits:2,maximumFractionDigits:2})} m² Plattenfläche`,lm,y);y+=10;
+  doc.setFont('helvetica','normal');
+  const guide=drawerGuide(o,geo);
+  checkY(14);doc.setFont('helvetica','bold');doc.setFontSize(12);doc.text('Bau-Anleitung',lm,y);y+=7;doc.setFontSize(9.5);
+  guide.forEach((g,i)=>{const lines=doc.splitTextToSize(g,pw-9);checkY(lines.length*4.6+3);doc.setFont('helvetica','bold');doc.setTextColor(46,125,94);doc.text(`${i+1}.`,lm,y);doc.setFont('helvetica','normal');doc.setTextColor(40,40,40);doc.text(lines,lm+7,y);y+=lines.length*4.6+3;});
+  doc.setTextColor(0);
+  doc.setFontSize(8);doc.setTextColor(150,140,130);doc.text('Maße als Zuschnittmaße der Einzelteile. Schienen-/Beschlagabzüge nach Herstellerangabe prüfen.',lm,289);
+  doc.save('betterkerf-schubkasten.pdf');
+}
+
+// — Projekte —
+function drGetProjects(){try{const r=localStorage.getItem('betterkerf_drawer');return r?JSON.parse(r):[];}catch{return[];}}
+function drPersist(p){try{localStorage.setItem('betterkerf_drawer',JSON.stringify(p));return true;}catch{showAlert('Speichern nicht möglich.',{title:'Fehler',icon:'alert_circle',danger:true});return false;}}
+function drawerSaveProject(){
+  const inp=document.getElementById('dr-proj-name');const name=inp.value.trim();
+  if(!name){showAlert('Bitte Projektnamen eingeben.',{title:'Kein Name',icon:'information'});return;}
+  const o=drawerInputs();
+  if(!o.OW||!o.OH||!o.CD){showAlert('Bitte zuerst gültige Maße eingeben.',{title:'Fehlende Maße',icon:'information'});return;}
+  const proj={name,saved:new Date().toLocaleDateString('de-DE'),
+    dims:{OW:o.OW,OH:o.OH,CD:o.CD,zt:o.zt,bt:o.bt,boxH:o.boxH,slideLen:o.slideLen,frontGap:o.frontGap,handleBc:o.handleBc,handleDia:o.handleDia},
+    opts:{sys:drStype,clr:o.clr,goff:o.goff,gdepth:o.gdepth,boxConstr:drBoxConstr,bottomMount:drBottom,hasFront:o.hasFront,frontType:drFrontType,hasHandle:document.getElementById('dr-handle').checked,handleN:drHandleN}};
+  const projects=drGetProjects();const idx=projects.findIndex(p=>p.name===name);
+  async function doSave(){if(idx>=0){const ok=await showConfirm('„'+name+'“ überschreiben?','Das gespeicherte Projekt wird mit den aktuellen Eingaben überschrieben.',{confirmLabel:'Überschreiben',icon:'content_save'});if(!ok)return;projects[idx]=proj;}else projects.unshift(proj);if(drPersist(projects)){inp.value='';renderDrawerProjects();}}doSave();
+}
+async function drawerLoadProject(name){
+  const p=drGetProjects().find(x=>x.name===name);if(!p)return;
+  const ok=await showConfirm('Projekt „'+name+'“ laden?','Die aktuelle Eingabe wird dabei überschrieben.',{confirmLabel:'Laden',icon:'folder_open'});if(!ok)return;
+  const d=p.dims||{},opt=p.opts||{};
+  const setMM=(id,mm)=>{const el=document.getElementById(id);if(el)el.value=mm?inputVal(mm):'';};
+  setMM('dr-ow',d.OW);setMM('dr-oh',d.OH);setMM('dr-cd',d.CD);setMM('dr-zt',d.zt);setMM('dr-bt',d.bt);setMM('dr-boxh',d.boxH);setMM('dr-slidelen',d.slideLen);
+  setMM('dr-fgap',d.frontGap);setMM('dr-handle-bc',d.handleBc);setMM('dr-handle-dia',d.handleDia);
+  drawerSetSys(opt.sys||'ball');
+  document.getElementById('dr-clear').value=(opt.clr!=null?opt.clr:DR_PRESETS[opt.sys||'ball'].clr);
+  document.getElementById('dr-goff').value=(opt.goff!=null?opt.goff:10);
+  document.getElementById('dr-gdepth').value=(opt.gdepth!=null?opt.gdepth:6);
+  drawerSetConstr(opt.boxConstr||'sides');
+  drawerSetBottom(opt.bottomMount||'groove');
+  drawerSetFront(opt.frontType||'overlay');
+  drawerSetHandleN(opt.handleN||1);
+  document.getElementById('dr-hasfront').checked=!!opt.hasFront;
+  document.getElementById('dr-handle').checked=!!opt.hasHandle;
+  drawerToggleFront();drawerToggleHandle();
+  drawerCalc();
+  document.getElementById('screen-drawer').scrollTop=0;
+}
+async function drawerDeleteProject(name){const ok=await showConfirm('„'+name+'“ löschen?','Das Projekt wird unwiderruflich gelöscht.',{confirmLabel:'Löschen',danger:true,icon:'delete'});if(!ok)return;drPersist(drGetProjects().filter(p=>p.name!==name));renderDrawerProjects();}
+function renderDrawerProjects(){
+  const el=document.getElementById('dr-proj-list');if(!el)return;
+  const projects=drGetProjects();
+  if(!projects.length){el.innerHTML=`<div class="empty-proj">Noch keine Schubladen-Projekte gespeichert.<br>Daten bleiben lokal auf diesem Gerät.</div>`;return;}
+  el.innerHTML=projects.map(p=>{
+    const sysL=(DR_PRESETS[p.opts&&p.opts.sys]||{}).label||'';
+    const desc=`${dispVal(p.dims.OW)}×${dispVal(p.dims.OH)}×${dispVal(p.dims.CD)} ${unitLabel()}`+(sysL?` · ${sysL.split(' ')[0]}`:'');
+    const nm=p.name.replace(/'/g,"\\'");
+    return `<div class="proj-item"><div><div class="proj-name">${p.name}</div><div class="proj-meta">${p.saved} · ${desc}</div></div><div class="proj-btns"><button class="btn-load" onclick="drawerLoadProject('${nm}')">Laden</button><button class="btn-del" onclick="drawerDeleteProject('${nm}')">×</button></div></div>`;
+  }).join('');
+}
+
+async function drawerReset(){
+  const ok=await showConfirm('Schubladenplaner zurücksetzen?','Alle Eingaben werden auf die Standardwerte zurückgesetzt.',{confirmLabel:'Zurücksetzen',danger:true,icon:'restart_alt'});if(!ok)return;
+  const sv=(id,mm)=>{const el=document.getElementById(id);if(el)el.value=inputVal(mm);};
+  sv('dr-ow',500);sv('dr-oh',150);sv('dr-cd',500);sv('dr-zt',13);sv('dr-bt',5);sv('dr-boxh',100);sv('dr-slidelen',450);
+  document.getElementById('dr-goff').value=10;document.getElementById('dr-gdepth').value=6;
+  sv('dr-fgap',0);sv('dr-handle-bc',128);sv('dr-handle-dia',5);
+  document.getElementById('dr-hasfront').checked=false;
+  document.getElementById('dr-handle').checked=false;
+  drawerSetSys('ball');drawerSetConstr('sides');drawerSetBottom('groove');drawerSetFront('overlay');drawerSetHandleN(1);
+  drawerToggleFront();drawerToggleHandle();
+  drawerCalc();
 }
 
 // Service Worker
