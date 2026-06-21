@@ -2,7 +2,7 @@
 <html lang="de">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 
 <!-- Auto-Zoom beim Fokussieren von Eingabefeldern auf iOS zusätzlich unterbinden -->
 <script>
@@ -31,7 +31,7 @@ if ('serviceWorker' in navigator) {
   --safe-top:env(safe-area-inset-top,0px);--safe-bottom:env(safe-area-inset-bottom,0px);
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-html,body{height:100%;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;font-size:15px;overscroll-behavior:none;-webkit-text-size-adjust:100%;text-size-adjust:100%}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;font-size:15px;overscroll-behavior:none;-webkit-text-size-adjust:100%;text-size-adjust:100%;touch-action:manipulation}
 #app{display:flex;flex-direction:column;height:100%;padding-top:var(--safe-top)}
 
 /* Header (shared) */
@@ -315,8 +315,9 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:-apple-
 .action-btn:active{background:var(--bg3)}
 .info-note{font-size:11px;color:var(--text3);margin-top:10px;padding:8px 12px;background:var(--bg2);border-radius:8px;border:.5px solid var(--border)}
 /* ── Custom Dialog ── */
-.dlg-overlay{position:fixed;inset:0;z-index:2000;display:none;align-items:center;justify-content:center;padding:24px;background:rgba(10,8,5,.65);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px)}
+.dlg-overlay{position:fixed;inset:0;z-index:2000;display:none;align-items:center;justify-content:center;padding:24px;background:rgba(10,8,5,.65);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);touch-action:none}
 .dlg-overlay.show{display:flex}
+.dlg-overlay.show~#app{pointer-events:none}
 .dlg{background:var(--bg2);border:.5px solid var(--border2);border-radius:18px;width:100%;max-width:340px;padding:22px 20px 16px;box-shadow:0 12px 40px rgba(0,0,0,.55);animation:dlgIn .18s ease-out}
 @keyframes dlgIn{from{opacity:0;transform:scale(.94)}to{opacity:1;transform:scale(1)}}
 .dlg-icon{display:flex;align-items:center;justify-content:center;margin-bottom:10px;color:var(--text2)}
@@ -444,10 +445,10 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:-apple-
       </div>
       <div class="section">
         <div class="slabel-row"><div class="slabel">Benötigte Teile</div><button class="edit-toggle" id="edit-parts" onclick="toggleEdit('parts')">Sortieren</button></div>
-        <div class="srow" style="margin-bottom:8px"><div><div class="srow-label">Maserungsrichtung beachten</div><div class="srow-hint">Pro Teil festlegen, ob es gedreht werden darf</div></div><input type="checkbox" id="grain-enabled" class="toggle" onchange="toggleGrainMode()"></div>
         <div class="col-hd" id="parts-head"></div>
         <div id="parts-list"></div>
         <button class="add-btn" onclick="addPart()">+ Teil hinzufügen</button>
+        <div class="srow" style="margin-top:10px"><div><div class="srow-label">Maserungsrichtung beachten</div><div class="srow-hint">Pro Teil festlegen, ob es gedreht werden darf</div></div><input type="checkbox" id="grain-enabled" class="toggle" onchange="toggleGrainMode()"></div>
       </div>
       <button class="calc-btn" onclick="calculate()">▶ Zuschnitt berechnen</button>
       <button class="action-btn" onclick="resetToExample()"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M12,4C14.1,4 16.1,4.8 17.6,6.3C20.7,9.4 20.7,14.5 17.6,17.6C15.8,19.5 13.3,20.2 10.9,19.9L11.4,17.9C13.1,18.1 14.9,17.5 16.2,16.2C18.5,13.9 18.5,10.1 16.2,7.7C15.1,6.6 13.5,6 12,6V10.6L7,5.6L12,0.6V4M6.3,17.6C3.7,15 3.3,11 5.1,7.9L6.6,9.4C5.5,11.6 5.9,14.4 7.8,16.2C8.3,16.7 8.9,17.1 9.6,17.4L9,19.4C8,19 7.1,18.4 6.3,17.6Z"/></svg> Zurücksetzen</button>
@@ -530,7 +531,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:-apple-
         <button class="action-btn" onclick="gridReset()"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M12,4C14.1,4 16.1,4.8 17.6,6.3C20.7,9.4 20.7,14.5 17.6,17.6C15.8,19.5 13.3,20.2 10.9,19.9L11.4,17.9C13.1,18.1 14.9,17.5 16.2,16.2C18.5,13.9 18.5,10.1 16.2,7.7C15.1,6.6 13.5,6 12,6V10.6L7,5.6L12,0.6V4M6.3,17.6C3.7,15 3.3,11 5.1,7.9L6.6,9.4C5.5,11.6 5.9,14.4 7.8,16.2C8.3,16.7 8.9,17.1 9.6,17.4L9,19.4C8,19 7.1,18.4 6.3,17.6Z"/></svg> Zurücksetzen</button>
       </div>
 
-      <div id="h-result" style="margin-top:18px"></div>
+      <div id="h-result" style="margin-top:18px;display:none"></div>
     </div>
   </div>
 
@@ -883,7 +884,7 @@ const MODULES=[
     desc:'Abstände für eine Reihe von Bohrungen nach Anzahl und Materialbreite berechnen.',
     status:'ready',
     screen:'screen-holes',
-    init:()=>{ holesCalc(); }
+    init:()=>{ }
   },
   {
     id:'rest',
@@ -1020,6 +1021,36 @@ function showTab(t){
   document.querySelectorAll('#screen-cutlist .pane').forEach(p=>p.classList.toggle('active',p.id==='pane-'+t));
   if(t==='projects')renderProjects();
 }
+
+function initSwipeTabs(screenId,getTabsFn,switchFn){
+  const el=document.getElementById(screenId);
+  let sx,sy,armed=false;
+  el.addEventListener('touchstart',e=>{
+    const t=e.touches[0];
+    sx=t.clientX;sy=t.clientY;
+    armed=sx>30;
+  },{passive:true});
+  el.addEventListener('touchmove',e=>{
+    if(!armed)return;
+    const dx=e.touches[0].clientX-sx,dy=e.touches[0].clientY-sy;
+    if(Math.abs(dx)>Math.abs(dy)&&Math.abs(dx)>8)e.preventDefault();
+  },{passive:false});
+  el.addEventListener('touchend',e=>{
+    if(!armed)return;
+    armed=false;
+    const dx=e.changedTouches[0].clientX-sx,dy=e.changedTouches[0].clientY-sy;
+    if(Math.abs(dx)<50||Math.abs(dx)<Math.abs(dy)*1.5)return;
+    const tabs=getTabsFn();
+    const cur=tabs.findIndex(t=>t.active);
+    const next=dx<0?cur+1:cur-1;
+    if(next>=0&&next<tabs.length)switchFn(tabs[next].id);
+  },{passive:true});
+}
+initSwipeTabs('screen-cutlist',()=>
+  Array.from(document.querySelectorAll('#cutlist-tabs .tab'))
+    .filter(b=>b.offsetParent!==null)
+    .map(b=>({id:b.dataset.tab,active:b.classList.contains('active')}))
+,showTab);
 
 // UI-Zustände für Eingabe-Listen
 let editStock=false, editParts=false, grainEnabled=false;
@@ -1911,16 +1942,16 @@ function holesCalc(){
   const width=toMM(document.getElementById('h-width').value);
   const dia=toMM(document.getElementById('h-dia').value);
   const res=document.getElementById('h-result');
-  if(L<1){res.innerHTML='<div class="err">Bitte eine gültige Länge eingeben.</div>';return;}
-  if(n<1){res.innerHTML='<div class="err">Bitte mindestens 1 Loch angeben.</div>';return;}
+  if(L<1){res.style.display='';res.innerHTML='<div class="err">Bitte eine gültige Länge eingeben.</div>';return;}
+  if(n<1){res.style.display='';res.innerHTML='<div class="err">Bitte mindestens 1 Loch angeben.</div>';return;}
 
   let startM=null,endM=null;
   if(useMargin){
     startM=toMM(document.getElementById('h-start').value);
     const sym=document.getElementById('h-sym').checked;
     endM=sym?startM:toMM(document.getElementById('h-end').value);
-    if(startM+endM>=L && n>1){res.innerHTML='<div class="err">Die Randabstände sind größer als die Länge. Bitte anpassen.</div>';return;}
-    if(startM>L){res.innerHTML='<div class="err">Der Randabstand ist größer als die Länge.</div>';return;}
+    if(startM+endM>=L && n>1){res.style.display='';res.innerHTML='<div class="err">Die Randabstände sind größer als die Länge. Bitte anpassen.</div>';return;}
+    if(startM>L){res.style.display='';res.innerHTML='<div class="err">Der Randabstand ist größer als die Länge.</div>';return;}
   }
   const {centers,gaps}=computeHoles(L,n,startM,endM);
   holesMM={length:L,start:(startM!=null?startM:toMM(document.getElementById('h-start').value)),end:(endM!=null?endM:toMM(document.getElementById('h-end').value)),width,dia};
@@ -1930,6 +1961,7 @@ function holesCalc(){
 
 function renderHoles(L,n,centers,gaps,width,dia){
   const res=document.getElementById('h-result');
+  res.style.display='';
   const equalGap=gaps.length?gaps.every(g=>Math.abs(g-gaps[0])<0.05):false;
   const u=unitLabel();
 
@@ -2050,8 +2082,9 @@ function holesMode(m){
   document.querySelectorAll('.hsub-tab').forEach(b=>b.classList.toggle('active',b.dataset.hmode===m));
   document.getElementById('hmode-row').style.display=m==='row'?'':'none';
   document.getElementById('hmode-grid').style.display=m==='grid'?'':'none';
-  document.getElementById('h-result').innerHTML='';
-  if(m==='row')holesCalc(); else gridCalc();
+  const hres=document.getElementById('h-result');
+  hres.innerHTML='';
+  hres.style.display='none';
 }
 
 async function holesReset(){
@@ -2083,15 +2116,15 @@ function gridCalc(){
   const useMargin=document.getElementById('g-usemargin').checked;
   const dia=toMM(document.getElementById('g-dia').value);
   const res=document.getElementById('h-result');
-  if(W<1||H<1){res.innerHTML='<div class="err">Bitte gültige Plattenmaße eingeben.</div>';return;}
-  if(cols<1||rows<1){res.innerHTML='<div class="err">Bitte mindestens 1 Spalte und 1 Reihe angeben.</div>';return;}
+  if(W<1||H<1){res.style.display='';res.innerHTML='<div class="err">Bitte gültige Plattenmaße eingeben.</div>';return;}
+  if(cols<1||rows<1){res.style.display='';res.innerHTML='<div class="err">Bitte mindestens 1 Spalte und 1 Reihe angeben.</div>';return;}
 
   let mx=null,my=null;
   if(useMargin){
     mx=toMM(document.getElementById('g-mx').value);
     my=toMM(document.getElementById('g-my').value);
-    if(cols>1&&2*mx>=W){res.innerHTML='<div class="err">Horizontaler Rand ist größer als die Breite.</div>';return;}
-    if(rows>1&&2*my>=H){res.innerHTML='<div class="err">Vertikaler Rand ist größer als die Höhe.</div>';return;}
+    if(cols>1&&2*mx>=W){res.style.display='';res.innerHTML='<div class="err">Horizontaler Rand ist größer als die Breite.</div>';return;}
+    if(rows>1&&2*my>=H){res.style.display='';res.innerHTML='<div class="err">Vertikaler Rand ist größer als die Höhe.</div>';return;}
   }
   gridMM={width:W,height:H,mx:(mx!=null?mx:gridMM.mx),my:(my!=null?my:gridMM.my),dia};
 
@@ -2105,6 +2138,7 @@ function gridCalc(){
 
 function renderGrid(g){
   const res=document.getElementById('h-result');
+  res.style.display='';
   const u=unitLabel();
   const xGap=g.xs.length>1?g.xs[1]-g.xs[0]:0;
   const yGap=g.ys.length>1?g.ys[1]-g.ys[0]:0;
@@ -2840,6 +2874,11 @@ function korpusShowTab(t){
   document.querySelectorAll('#screen-korpus .pane').forEach(p=>p.classList.toggle('active',p.id==='kpane-'+t));
   if(t==='projects')renderKpProjects();
 }
+initSwipeTabs('screen-korpus',()=>
+  Array.from(document.querySelectorAll('#korpus-tabs .tab'))
+    .filter(b=>b.offsetParent!==null)
+    .map(b=>({id:b.dataset.tab,active:b.classList.contains('active')}))
+,korpusShowTab);
 
 function korpusInit(){
   refreshKpUnits();
