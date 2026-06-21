@@ -7,6 +7,7 @@
 <!-- Auto-Zoom beim Fokussieren von Eingabefeldern auf iOS zusätzlich unterbinden -->
 <script>
 document.addEventListener('gesturestart', e=>e.preventDefault());
+window.addEventListener('scroll', ()=>window.scrollTo(0,0), {passive:false});
 </script>
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -31,7 +32,7 @@ if ('serviceWorker' in navigator) {
   --safe-top:env(safe-area-inset-top,0px);--safe-bottom:env(safe-area-inset-bottom,0px);
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-html,body{height:100%;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;font-size:15px;overscroll-behavior:none;-webkit-text-size-adjust:100%;text-size-adjust:100%;touch-action:manipulation}
+html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;font-size:15px;overscroll-behavior:none;-webkit-text-size-adjust:100%;text-size-adjust:100%;touch-action:manipulation}
 #app{display:flex;flex-direction:column;height:100%;padding-top:var(--safe-top)}
 
 /* Header (shared) */
@@ -101,7 +102,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:-apple-
 .pane{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:16px 14px;padding-bottom:calc(16px + var(--safe-bottom));display:none}
 .pane.active{display:block}
 
-.slabel{font-size:13px;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);margin-bottom:8px;font-weight:600}
+.slabel{font-size:13px;text-transform:uppercase;letter-spacing:.08em;color:var(--accent2);margin-bottom:8px;font-weight:600}
 .slabel-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
 .slabel-row .slabel{margin-bottom:0}
 .info-btn{width:22px;height:22px;border-radius:50%;border:.5px solid var(--border2);background:var(--bg3);color:var(--text3);font-size:13px;line-height:1;display:flex;align-items:center;justify-content:center;cursor:pointer;font-family:inherit;padding:0;flex-shrink:0}
@@ -2099,7 +2100,9 @@ async function holesReset(){
   document.getElementById('h-width').value='';
   document.getElementById('h-dia').value='';
   toggleMarginInputs();toggleSym();
-  holesCalc();
+  const hres=document.getElementById('h-result');
+  hres.innerHTML='';
+  hres.style.display='none';
 }
 
 // ── Raster (2D-Grid) ────────────────────────────────────────────────────
@@ -2239,7 +2242,9 @@ async function gridReset(){
   document.getElementById('g-my').value=inputVal(50);
   document.getElementById('g-dia').value='';
   toggleGridMargin();
-  gridCalc();
+  const gres=document.getElementById('h-result');
+  gres.innerHTML='';
+  gres.style.display='none';
 }
 
 // ── PDF: Bohrliste (Reihe) ──────────────────────────────────────────────
