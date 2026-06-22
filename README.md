@@ -121,11 +121,10 @@ Die Module sind bewusst miteinander verknüpft:
 
 ## Technisch
 
-> ⚠️ **v0.9.0 — In aktiver Entwicklung.** Die App ist funktionsfähig, aber noch nicht feature-complete. Feedback und Issues sind willkommen.
+> ⚠️ **v0.10.0 — In aktiver Entwicklung.** Die App ist funktionsfähig, aber noch nicht feature-complete. Feedback und Issues sind willkommen.
 
-- Reines HTML/CSS/JavaScript — keine Frameworks, keine Build-Tools
-- PWA mit Service Worker (Offline-Nutzung)
+- [Svelte 5](https://svelte.dev/) + [Vite](https://vitejs.dev/) — kompiliert zu reinem HTML/CSS/JS, keine Laufzeit-Abhängigkeiten
+- PWA mit Service Worker (vollständig offline nutzbar)
 - Alle Daten lokal via `localStorage`
+- PDF-Export über [jsPDF](https://github.com/parallax/jsPDF) — lokal gebündelt, keine Internetverbindung nötig
 - Optimiert für iOS Safari (iPhone)
-
-> **Hinweis PDF-Export:** Beim allerersten PDF-Export wird die Bibliothek [jsPDF](https://github.com/parallax/jsPDF) einmalig aus dem Internet nachgeladen (~300 KB). Danach steht der Export vollständig offline zur Verfügung.
