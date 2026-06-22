@@ -33,22 +33,32 @@ web/
       Home.svelte         Startseite (Modul-Grid)
       Settings.svelte     Einstellungen + Rechtliches
       holes.js            Reine Bohrloch-Mathematik (DOM-frei)
+      cutlist.js          Reine Zuschnitt-Optimierung (Bin-Packing, DOM-frei)
+      cutlistProjects.svelte.js  Gespeicherte Projekte (localStorage, reaktiv)
+      pdf.js              jsPDF lazy laden + SVG→PNG (gemeinsam genutzt)
     modules/
       Holes.svelte        Modul „Bohrlochplaner" (migriert)
+      Cutlist.svelte      Modul „Zuschnitt-Optimierer" (migriert)
 ```
 
 ## Migrationsstand
 
 | Modul | Status |
 |-------|--------|
-| 🎯 Bohrlochplaner | ✅ migriert (Reihe + Raster, ohne PDF-Export) |
-| 📐 Zuschnitt-Optimierer | ⏳ offen |
+| 📐 Zuschnitt-Optimierer | ✅ migriert (Optimierung, Projekte, PDF) |
+| 🎯 Bohrlochplaner | ✅ migriert (Reihe + Raster, PDF & 1:1-Schablone) |
 | 🗄️ Korpusplaner | ⏳ offen |
 | 🧰 Schubladenplaner | ⏳ offen |
 | 💰 Kostenkalkulator | ⏳ offen |
 | ♻️ Reststück-Lager | 💡 geplant |
 
 ### Noch offen
-- PDF-Export & 1:1-Schablonen-PDF (jsPDF) für den Bohrlochplaner
+- Korpusplaner, Schubladenplaner und Kostenkalkulator portieren
 - PWA-Assets (`manifest.json`, `icons/`, Service Worker) in `web/public/` übernehmen
 - GitHub-Pages-Deploy auf den Build-Output umstellen (Cutover)
+
+### Hinweis: Optimierer-Einstellungen
+Kerf, Schnittmodus, Rotation und Optimierungsziel liegen in der Svelte-Version
+direkt im Modul (Tab „Eingabe") statt im globalen Einstellungs-Screen wie in der
+Legacy-App — so ist alles zum Zuschnitt an einem Ort und wird mit dem Projekt
+gespeichert.

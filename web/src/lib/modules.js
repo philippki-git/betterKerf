@@ -1,12 +1,13 @@
 // Modul-Registry. Migrierte Module besitzen eine `component`; noch nicht
 // portierte stehen auf status:'soon', bis sie an die Reihe kommen.
 import Holes from '../modules/Holes.svelte';
+import Cutlist from '../modules/Cutlist.svelte';
 
 export const MODULES = [
   {
     id: 'cutlist', title: 'Zuschnitt-Optimierer', sub: 'Plattenzuschnitt & Schnittplan', icon: 'carpenter',
     desc: 'Optimaler Zuschnitt aus Brettern mit minimalem Verschnitt, Schnittplan und Anleitung.',
-    status: 'soon'
+    status: 'ready', component: Cutlist
   },
   {
     id: 'korpus', title: 'Korpusplaner', sub: 'Schränke & Möbel planen', icon: 'shelves',
