@@ -7,6 +7,7 @@
   import { projects, saveProject, findProject, deleteProject } from '../lib/cutlistProjects.svelte.js';
   import { loadJsPDF, svgToPng } from '../lib/pdf.js';
   import { handoff } from '../lib/handoff.svelte.js';
+  import { cutlistResult } from '../lib/cutlistResult.svelte.js';
   import { onMount } from 'svelte';
 
   // ── Eingabedaten (Maße intern in mm). $state.raw: Tippen in den Feldern
@@ -173,6 +174,7 @@
   }
 
   $effect(() => () => stopTimers()); // Aufräumen beim Verlassen des Moduls
+  $effect(() => { cutlistResult.set(lastResult); });
 
   // Vom Korpusplaner übergebene Teile übernehmen (beim Mounten)
   onMount(() => {

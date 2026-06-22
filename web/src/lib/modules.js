@@ -4,6 +4,7 @@ import Holes from '../modules/Holes.svelte';
 import Cutlist from '../modules/Cutlist.svelte';
 import Korpus from '../modules/Korpus.svelte';
 import Drawer from '../modules/Drawer.svelte';
+import Cost from '../modules/Cost.svelte';
 
 export const MODULES = [
   {
@@ -27,13 +28,13 @@ export const MODULES = [
     status: 'ready', component: Holes
   },
   {
-    id: 'rest', title: 'Reststück-Lager', sub: 'Verschnitt wiederverwenden', icon: 'recycling',
-    desc: 'Nutzbare Reststücke speichern und in Folgeprojekten automatisch mit einplanen.',
-    status: 'soon'
-  },
-  {
     id: 'cost', title: 'Kostenkalkulator', sub: 'Preis & Verschnittwert', icon: 'calculate',
     desc: 'Kosten pro Teil und Geldwert des Verschnitts aus dem Plattenpreis berechnen.',
+    status: 'ready', component: Cost
+  },
+  {
+    id: 'rest', title: 'Reststück-Lager', sub: 'Verschnitt wiederverwenden', icon: 'recycling',
+    desc: 'Nutzbare Reststücke speichern und in Folgeprojekten automatisch mit einplanen.',
     status: 'soon'
   }
 ];
