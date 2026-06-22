@@ -27,7 +27,8 @@
   let gMy = $state(inputVal(50));
   let gDia = $state('');
 
-  let result = $state(null); // {kind, error?, top, svg, caption, bottom, copyText, list}
+  let result = $state(null); // {kind, error?, top, svg, caption, bottom, copyText, data}
+  let visWrap = $state(null);
 
   // Beim Einheitenwechsel die Eingabefelder umrechnen.
   let prevU = units.current;
@@ -108,7 +109,7 @@
 
     const copyText = `Bohrlochplaner — ${n} Löcher auf ${dispVal(L)} ${u}\n\n` + centers.map((c, i) => `Loch ${i + 1}: ${dispVal(c)} ${u}`).join('\n');
 
-    result = { kind: 'row', top, svg: holesSVG(L, centers), caption: 'Bohrschablone', bottom, copyText };
+    result = { kind: 'row', top, svg: holesSVG(L, centers), caption: 'Bohrschablone', bottom, copyText, data: { L, n, centers, gaps, width: toMM(hWidth), dia: toMM(hDia) } };
   }
 
   function holesSVG(L, centers) {
@@ -191,7 +192,7 @@
 
     const copyText = `Lochraster — ${cols}×${rows} auf ${dispVal(W)}×${dispVal(H)} ${u}\n\n` + pts.map((p, i) => `${i + 1}. R${p.row} S${p.col}: X=${dispVal(p.x)} Y=${dispVal(p.y)} ${u}`).join('\n');
 
-    result = { kind: 'grid', top, svg: gridSVG(g), caption: 'Lochraster', bottom, copyText };
+    result = { kind: 'grid', top, svg: gridSVG(g), caption: 'Lochraster', bottom, copyText, data: { W, H, cols, rows, xs, ys, pts, dia: toMM(gDia) } };
   }
 
   function gridSVG(g) {
@@ -240,8 +241,302 @@
     document.body.removeChild(ta);
   }
 
-  function pdfTodo() {
-    showAlert('Der PDF-Export wird gerade auf die neue App-Version migriert und ist in Kürze wieder verfügbar.', { title: 'PDF-Export folgt', icon: 'information' });
+  // ── PDF ──
+  function loadJsPDF(cb) {
+    if (window.jspdf && window.jspdf.jsPDF) { cb(); return; }
+    const s = document.createElement('script');
+    s.src = './jspdf.umd.min.js';
+    s.onload = cb;
+    s.onerror = () => showAlert('jsPDF konnte nicht geladen werden.', { title: 'Fehler', icon: 'alert_circle', danger: true });
+    document.body.appendChild(s);
+  }
+
+  function svgToPng(svgEl, sf = 3) {
+    return new Promise((resolve, reject) => {
+      try {
+        const clone = svgEl.cloneNode(true);
+        const vb = (svgEl.getAttribute('viewBox') || '').split(/\s+/).map(Number);
+        const w = vb[2] || svgEl.clientWidth || 300;
+        const h = vb[3] || svgEl.clientHeight || 150;
+        clone.setAttribute('width', w); clone.setAttribute('height', h);
+        const xml = new XMLSerializer().serializeToString(clone);
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          canvas.width = w * sf; canvas.height = h * sf;
+          const ctx = canvas.getContext('2d');
+          ctx.fillStyle = '#FFFFFF'; ctx.fillRect(0, 0, canvas.width, canvas.height);
+          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+          resolve({ data: canvas.toDataURL('image/png'), w, h });
+        };
+        img.onerror = reject;
+        img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(xml);
+      } catch (e) { reject(e); }
+    });
+  }
+
+  function holesPDF() {
+    if (!result || result.kind !== 'row') return;
+    loadJsPDF(() => { holesDoExport().catch(e => { console.error(e); showAlert('PDF konnte nicht erstellt werden.', { title: 'Fehler', icon: 'alert_circle', danger: true }); }); });
+  }
+
+  async function holesDoExport() {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF({ unit: 'mm', format: 'a4' });
+    const { L, n, centers, gaps } = result.data;
+    const u = unitLabel();
+    let y = 15; const lm = 15, pw = 180;
+    const checkY = k => { if (y + k > 272) { doc.addPage(); y = 15; } };
+    doc.setFont('helvetica', 'bold'); doc.setFontSize(18);
+    doc.text('betterKerf — Bohrlochplaner (Reihe)', lm, y); y += 9;
+    doc.setFont('helvetica', 'normal'); doc.setFontSize(9); doc.setTextColor(120, 110, 100);
+    doc.text(`Erstellt: ${new Date().toLocaleDateString('de-DE')} | Einheit: ${u}`, lm, y); y += 11; doc.setTextColor(0);
+    doc.setFont('helvetica', 'bold'); doc.setFontSize(12); doc.text('\xdcbersicht', lm, y); y += 6;
+    doc.setFont('helvetica', 'normal'); doc.setFontSize(9);
+    doc.text(`L\xe4nge: ${dispVal(L)} ${u}   L\xf6cher: ${n}   ${gaps.length ? 'Abstand: ' + dispVal(gaps[0]) + ' ' + u : ''}`, lm, y); y += 10;
+    const svgEl = visWrap && visWrap.querySelector('svg');
+    if (svgEl) { try { const png = await svgToPng(svgEl, 3); const iw = pw, ih = iw * (png.h / png.w); checkY(ih + 8); doc.addImage(png.data, 'PNG', lm, y, iw, ih, undefined, 'FAST'); y += ih + 8; } catch (e) { /* skip image on error */ } }
+    checkY(20); doc.setFont('helvetica', 'bold'); doc.setFontSize(12);
+    doc.text('Lochmittelpunkte', lm, y); y += 6;
+    const colW = [14, 70, 70];
+    const heads = ['#', `Position (${u})`, `Abstand zum vorigen (${u})`];
+    doc.setFillColor(245, 237, 214); doc.rect(lm, y - 5, pw, 7, 'F');
+    doc.setFontSize(9); doc.setFont('helvetica', 'bold');
+    let x = lm; heads.forEach((h, i) => { doc.text(h, x + 1, y - 1); x += colW[i]; }); y += 4;
+    doc.setFont('helvetica', 'normal');
+    centers.forEach((c, i) => {
+      checkY(6);
+      if (i % 2 === 0) { doc.setFillColor(252, 250, 246); doc.rect(lm, y - 3.5, pw, 5.5, 'F'); }
+      let xi = lm;
+      [String(i + 1), dispVal(c), i > 0 ? dispVal(gaps[i - 1]) : '–'].forEach((v, ci) => { doc.text(String(v), xi + 1, y); xi += colW[ci]; });
+      y += 5.5;
+    });
+    doc.save('betterkerf-lochabstaende.pdf');
+  }
+
+  function gridPDF() {
+    if (!result || result.kind !== 'grid') return;
+    loadJsPDF(() => { gridDoExport().catch(e => { console.error(e); showAlert('PDF konnte nicht erstellt werden.', { title: 'Fehler', icon: 'alert_circle', danger: true }); }); });
+  }
+
+  async function gridDoExport() {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF({ unit: 'mm', format: 'a4' });
+    const { W, H, cols, rows, xs, ys, pts } = result.data;
+    const u = unitLabel();
+    let y = 15; const lm = 15, pw = 180;
+    const checkY = k => { if (y + k > 272) { doc.addPage(); y = 15; } };
+    doc.setFont('helvetica', 'bold'); doc.setFontSize(18);
+    doc.text('betterKerf — Lochraster', lm, y); y += 9;
+    doc.setFont('helvetica', 'normal'); doc.setFontSize(9); doc.setTextColor(120, 110, 100);
+    doc.text(`Erstellt: ${new Date().toLocaleDateString('de-DE')} | Einheit: ${u}`, lm, y); y += 11; doc.setTextColor(0);
+    doc.setFont('helvetica', 'bold'); doc.setFontSize(12); doc.text('\xdcbersicht', lm, y); y += 6;
+    doc.setFont('helvetica', 'normal'); doc.setFontSize(9);
+    doc.text(`Platte: ${dispVal(W)} \xd7 ${dispVal(H)} ${u}   Raster: ${cols} \xd7 ${rows}   L\xf6cher: ${pts.length}`, lm, y); y += 10;
+    const svgEl = visWrap && visWrap.querySelector('svg');
+    if (svgEl) { try { const png = await svgToPng(svgEl, 3); const iw = pw, ih = iw * (png.h / png.w); checkY(ih + 8); doc.addImage(png.data, 'PNG', lm, y, iw, ih, undefined, 'FAST'); y += ih + 8; } catch (e) { /* skip image on error */ } }
+    checkY(16); doc.setFont('helvetica', 'bold'); doc.setFontSize(11);
+    doc.text('Spalten-Positionen (X)', lm, y); y += 5; doc.setFont('helvetica', 'normal'); doc.setFontSize(9);
+    doc.text(xs.map((v, i) => `S${i + 1}: ${dispVal(v)}`).join('   '), lm, y, { maxWidth: pw }); y += 8;
+    checkY(10); doc.setFont('helvetica', 'bold'); doc.setFontSize(11);
+    doc.text('Reihen-Positionen (Y)', lm, y); y += 5; doc.setFont('helvetica', 'normal'); doc.setFontSize(9);
+    doc.text(ys.map((v, i) => `R${i + 1}: ${dispVal(v)}`).join('   '), lm, y, { maxWidth: pw }); y += 10;
+    checkY(20); doc.setFont('helvetica', 'bold'); doc.setFontSize(12);
+    doc.text(`Alle Bohrpunkte (${u})`, lm, y); y += 6;
+    const tc = [14, 40, 55, 55]; const heads = ['#', 'Punkt', 'X', 'Y'];
+    doc.setFillColor(245, 237, 214); doc.rect(lm, y - 5, pw, 7, 'F');
+    doc.setFontSize(9); doc.setFont('helvetica', 'bold');
+    let x = lm; heads.forEach((h, i) => { doc.text(h, x + 1, y - 1); x += tc[i]; }); y += 4;
+    doc.setFont('helvetica', 'normal');
+    pts.forEach((p, i) => {
+      checkY(6);
+      if (i % 2 === 0) { doc.setFillColor(252, 250, 246); doc.rect(lm, y - 3.5, pw, 5.5, 'F'); }
+      let xi = lm;
+      [String(i + 1), `R${p.row} S${p.col}`, dispVal(p.x), dispVal(p.y)].forEach((v, ci) => { doc.text(String(v), xi + 1, y); xi += tc[ci]; });
+      y += 5.5;
+    });
+    doc.save('betterkerf-lochraster.pdf');
+  }
+
+  // ── 1:1-Bohrschablone ──
+  function eps2(v) { return Math.max(0.01, v * 0.0005); }
+
+  function planTemplateLayout(contentW, contentH, printW, printH) {
+    const eps = 0.01, bandGap = 7;
+    const tilesX = Math.max(1, Math.ceil((contentW - eps) / printW));
+    const tilesY = Math.max(1, Math.ceil((contentH - eps) / printH));
+    if (tilesX <= 1 && tilesY <= 1) {
+      return { mode: 'single', pages: [{ bands: [{ x0: 0, x1: contentW, y0: 0, y1: contentH, px: 0, py: 0, seg: 0 }] }], totalSegs: 1 };
+    }
+    if (tilesY <= 1) {
+      const bandH = contentH;
+      const bandsPerPage = Math.max(1, Math.floor((printH + bandGap) / (bandH + bandGap)));
+      const totalSegs = tilesX; const pages = [];
+      for (let p = 0; p * bandsPerPage < totalSegs; p++) {
+        const bands = [];
+        for (let b = 0; b < bandsPerPage; b++) {
+          const seg = p * bandsPerPage + b;
+          if (seg >= totalSegs) break;
+          const x0 = seg * printW, x1 = Math.min(contentW, x0 + printW);
+          bands.push({ x0, x1, y0: 0, y1: contentH, px: 0, py: b * (bandH + bandGap), seg });
+        }
+        pages.push({ bands });
+      }
+      return { mode: 'stackV', pages, totalSegs, bandGap, bandH, bandsPerPage };
+    }
+    if (tilesX <= 1) {
+      const bandW = contentW;
+      const bandsPerPage = Math.max(1, Math.floor((printW + bandGap) / (bandW + bandGap)));
+      const totalSegs = tilesY; const pages = [];
+      for (let p = 0; p * bandsPerPage < totalSegs; p++) {
+        const bands = [];
+        for (let b = 0; b < bandsPerPage; b++) {
+          const seg = p * bandsPerPage + b;
+          if (seg >= totalSegs) break;
+          const y0 = seg * printH, y1 = Math.min(contentH, y0 + printH);
+          bands.push({ x0: 0, x1: contentW, y0, y1, px: b * (bandW + bandGap), py: 0, seg });
+        }
+        pages.push({ bands });
+      }
+      return { mode: 'stackH', pages, totalSegs, bandGap, bandW, bandsPerPage };
+    }
+    const pages = []; let seg = 0;
+    for (let ty = 0; ty < tilesY; ty++) for (let tx = 0; tx < tilesX; tx++) {
+      const x0 = tx * printW, x1 = Math.min(contentW, x0 + printW);
+      const y0 = ty * printH, y1 = Math.min(contentH, y0 + printH);
+      pages.push({ bands: [{ x0, x1, y0, y1, px: 0, py: 0, seg, tx, ty }] }); seg++;
+    }
+    return { mode: 'grid', pages, totalSegs: seg, tilesX, tilesY };
+  }
+
+  function chooseTemplateOrientation(contentW, contentH, M, headerH) {
+    const variants = [{ name: 'portrait', PW: 210, PH: 297 }, { name: 'landscape', PW: 297, PH: 210 }].map(v => {
+      const printW = v.PW - 2 * M, printH = v.PH - headerH - M;
+      const layout = planTemplateLayout(contentW, contentH, printW, printH);
+      return { ...v, printW, printH, layout, pages: layout.pages.length };
+    });
+    variants.sort((a, b) => a.pages - b.pages);
+    if (variants[0].pages === variants[1].pages) {
+      return contentW >= contentH ? variants.find(v => v.name === 'landscape') : variants.find(v => v.name === 'portrait');
+    }
+    return variants[0];
+  }
+
+  function buildTemplate(points, sheetW, sheetH, titleText, holeDiameterMM) {
+    const { jsPDF } = window.jspdf;
+    const M = 8, headerH = 20;
+    const choice = chooseTemplateOrientation(sheetW, sheetH, M, headerH);
+    const { PW, PH, layout } = choice;
+    const doc = new jsPDF({ unit: 'mm', format: 'a4', orientation: choice.name });
+    const totalPages = layout.pages.length;
+    const hasDia = holeDiameterMM > 0;
+    const drawR = hasDia ? Math.max(1.2, holeDiameterMM / 2) : 3;
+    const chL = hasDia ? drawR + 4 : 5;
+
+    layout.pages.forEach((page, pageIdx) => {
+      if (pageIdx > 0) doc.addPage('a4', choice.name);
+      doc.setFont('helvetica', 'bold'); doc.setFontSize(11); doc.setTextColor(0);
+      doc.text(`${titleText} — Seite ${pageIdx + 1}/${totalPages}`, M, 7);
+      if (hasDia) { doc.setFontSize(9); doc.text(`Ø ${holeDiameterMM} mm`, PW - M, 7, { align: 'right' }); }
+      doc.setFont('helvetica', 'normal'); doc.setFontSize(7); doc.setTextColor(120);
+      doc.text('1:1 drucken: Skalierung 100 % / "Tats\xe4chliche Gr\xf6\xdfe" — NICHT "An Seite anpassen".', M, 10.6);
+      if (totalPages > 1) doc.text('Mehrere Seiten/Abschnitte? An den markierten Nahtstellen ausschneiden und zusammenf\xfcgen.', M, 13.6);
+      doc.setDrawColor(210); doc.setLineWidth(0.2); doc.line(M, headerH - 4, PW - M, headerH - 4);
+      doc.setTextColor(0);
+
+      page.bands.forEach((band, bandIdx) => {
+        const ox = M + band.px, oy = headerH + band.py;
+        const bw = band.x1 - band.x0, bh = band.y1 - band.y0;
+        doc.setDrawColor(180); doc.setLineWidth(0.15);
+        doc.rect(ox, oy, bw, bh);
+        doc.setDrawColor(120); doc.setLineWidth(0.3); const ml = 3.5;
+        [[ox, oy], [ox + bw, oy], [ox, oy + bh], [ox + bw, oy + bh]].forEach(([cx, cy]) => {
+          doc.line(cx - ml, cy, cx + ml, cy); doc.line(cx, cy - ml, cx, cy + ml);
+        });
+        doc.setDrawColor(150, 120, 60); doc.setLineWidth(0.45);
+        if (band.y0 <= eps2(sheetH)) doc.line(ox, oy, ox + bw, oy);
+        if (band.y1 >= sheetH - eps2(sheetH)) doc.line(ox, oy + bh, ox + bw, oy + bh);
+        if (band.x0 <= eps2(sheetW)) doc.line(ox, oy, ox, oy + bh);
+        if (band.x1 >= sheetW - eps2(sheetW)) doc.line(ox + bw, oy, ox + bw, oy + bh);
+        doc.setDrawColor(0); doc.setLineWidth(0.3);
+        points.forEach((p, i) => {
+          if (p.x < band.x0 - 0.5 || p.x > band.x1 + 0.5 || p.y < band.y0 - 0.5 || p.y > band.y1 + 0.5) return;
+          const px = ox + (p.x - band.x0), py = oy + (p.y - band.y0);
+          doc.setDrawColor(60, 110, 180); doc.setLineWidth(0.25);
+          doc.circle(px, py, drawR);
+          doc.line(px - chL, py, px + chL, py); doc.line(px, py - chL, px, py + chL);
+          doc.setFillColor(60, 110, 180); doc.circle(px, py, 0.5, 'F');
+          doc.setFontSize(6); doc.setTextColor(60, 110, 180);
+          doc.text(String(i + 1), px + drawR + 0.6, py - drawR - 0.6);
+          doc.setTextColor(0);
+        });
+
+        if (layout.totalSegs > 1) {
+          doc.setFont('helvetica', 'bold'); doc.setFontSize(6.5); doc.setTextColor(130);
+          doc.text(`Abschnitt ${band.seg + 1}/${layout.totalSegs}`, ox + 1.8, oy + 4.2);
+          if (bandIdx === 0 && pageIdx > 0 && band.seg > 0) {
+            doc.setFontSize(6); doc.setTextColor(46, 125, 94);
+            doc.text(`<- Anschluss von Abschnitt ${band.seg} (Seite ${pageIdx})`, ox + 1.8, oy + 7.6);
+          }
+          doc.setTextColor(0); doc.setFont('helvetica', 'normal');
+        } else if (layout.mode === 'grid') {
+          doc.setFont('helvetica', 'bold'); doc.setFontSize(6.5); doc.setTextColor(130);
+          doc.text(`Kachel ${band.tx + 1}/${layout.tilesX} x ${band.ty + 1}/${layout.tilesY}`, ox + 1.8, oy + 4.2);
+          doc.setTextColor(0); doc.setFont('helvetica', 'normal');
+        }
+
+        const nextOnPage = page.bands[bandIdx + 1];
+        if (layout.mode === 'stackV' || layout.mode === 'stackH') {
+          if (nextOnPage) {
+            doc.setDrawColor(46, 125, 94); doc.setLineWidth(0.4);
+            if (layout.mode === 'stackV') {
+              const segY = oy + bh + layout.bandGap / 2;
+              doc.setLineDashPattern([1.2, 1], 0);
+              doc.line(ox, segY, ox + bw, segY);
+              doc.setLineDashPattern([], 0);
+              doc.setFontSize(6.3); doc.setTextColor(46, 125, 94);
+              doc.text(`Naht: Abschnitt ${band.seg + 1} -> ${band.seg + 2} hier zusammenf\xfcgen`, ox + 1.8, segY + 2.0);
+            } else {
+              const segX = ox + bw + layout.bandGap / 2;
+              doc.setLineDashPattern([1.2, 1], 0);
+              doc.line(segX, oy, segX, oy + bh);
+              doc.setLineDashPattern([], 0);
+              doc.setFontSize(6.3); doc.setTextColor(46, 125, 94);
+              doc.text(`Naht ${band.seg + 1}->${band.seg + 2}`, segX - 9, oy - 0.8 < headerH ? oy + 4.2 : oy - 0.8);
+            }
+            doc.setTextColor(0);
+          } else if (band.seg < layout.totalSegs - 1) {
+            doc.setFontSize(6.3); doc.setTextColor(46, 125, 94);
+            const noteY = oy + bh + 4.5;
+            if (noteY < PH - 4) doc.text(`-> Fortsetzung: Abschnitt ${band.seg + 2} auf Seite ${pageIdx + 2}`, ox + 1.8, noteY);
+            doc.setTextColor(0);
+          }
+        }
+      });
+    });
+    return doc;
+  }
+
+  function holesTemplate() {
+    if (!result || result.kind !== 'row') return;
+    loadJsPDF(() => {
+      try {
+        const { L, centers, width, dia } = result.data;
+        const stripH = (width && width > 0) ? width : Math.min(40, Math.max(20, L * 0.05));
+        const pts = centers.map(c => ({ x: c, y: stripH / 2 }));
+        buildTemplate(pts, L, stripH, 'Bohrschablone Reihe', dia > 0 ? dia : 0).save('betterkerf-schablone-reihe.pdf');
+      } catch (e) { console.error(e); showAlert('Schablone konnte nicht erstellt werden.', { title: 'Fehler', icon: 'alert_circle', danger: true }); }
+    });
+  }
+
+  function gridTemplate() {
+    if (!result || result.kind !== 'grid') return;
+    loadJsPDF(() => {
+      try {
+        const { W, H, pts, dia } = result.data;
+        buildTemplate(pts.map(p => ({ x: p.x, y: p.y })), W, H, 'Bohrschablone Raster', dia > 0 ? dia : 0).save('betterkerf-schablone-raster.pdf');
+      } catch (e) { console.error(e); showAlert('Schablone konnte nicht erstellt werden.', { title: 'Fehler', icon: 'alert_circle', danger: true }); }
+    });
   }
 
   async function holesReset() {
@@ -331,13 +626,13 @@
       {:else}
         <!-- eslint-disable svelte/no-at-html-tags -->
         {@html result.top}
-        <div class="vis-wrap" onclick={() => openZoom(result.svg, result.caption)} onkeydown={(e) => { if (e.key === 'Enter' || e.key === ' ') openZoom(result.svg, result.caption); }} style="cursor:zoom-in" role="button" tabindex="0">
+        <div class="vis-wrap" bind:this={visWrap} onclick={() => openZoom(result.svg, result.caption)} onkeydown={(e) => { if (e.key === 'Enter' || e.key === ' ') openZoom(result.svg, result.caption); }} style="cursor:zoom-in" role="button" tabindex="0">
           {@html result.svg}
         </div>
         {@html result.bottom}
         <button class="action-btn" onclick={copyResult}><Icon name="content_copy" size={16} /> {result.kind === 'grid' ? 'Koordinaten' : 'Positionen'} kopieren</button>
-        <button class="action-btn" onclick={pdfTodo}><Icon name="download" size={16} /> Als PDF exportieren</button>
-        <button class="action-btn" onclick={pdfTodo}><Icon name="straighten" size={16} /> 1:1-Bohrschablone (PDF)</button>
+        <button class="action-btn" onclick={result.kind === 'row' ? holesPDF : gridPDF}><Icon name="download" size={16} /> Als PDF exportieren</button>
+        <button class="action-btn" onclick={result.kind === 'row' ? holesTemplate : gridTemplate}><Icon name="straighten" size={16} /> 1:1-Bohrschablone (PDF)</button>
       {/if}
     </div>
   {/if}
