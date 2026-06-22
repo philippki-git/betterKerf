@@ -5,34 +5,16 @@
   import { openZoom } from '../lib/zoom.svelte.js';
   import { norm, createOptimizer } from '../lib/cutlist.js';
   import { projects, saveProject, findProject, deleteProject } from '../lib/cutlistProjects.svelte.js';
+  import { cutlistSettings } from '../lib/cutlistSettings.svelte.js';
+  import { cutlistInput, EXAMPLE_STOCK, EXAMPLE_PARTS } from '../lib/cutlistInput.svelte.js';
   import { loadJsPDF, svgToPng } from '../lib/pdf.js';
   import { handoff } from '../lib/handoff.svelte.js';
   import { cutlistResult } from '../lib/cutlistResult.svelte.js';
   import { onMount } from 'svelte';
 
-  // ── Eingabedaten (Maße intern in mm). $state.raw: Tippen in den Feldern
-  //    mutiert die Objekte, ohne ein Re-Render auszulösen (kein Fokusverlust);
-  //    Struktur-Änderungen (add/del/sort/load) lösen via Neuzuweisung neu aus. ──
-  let stockData = $state.raw([
-    { id: 1, name: 'Brett A', l: 2000, w: 620, qty: 3 }
-  ]);
-  let partsData = $state.raw([
-    { id: 1, name: 'Seite', l: 900, w: 600, qty: 2, grain: false },
-    { id: 2, name: 'Boden / Deckel', l: 564, w: 600, qty: 2, grain: false },
-    { id: 3, name: 'Rückwand', l: 876, w: 576, qty: 1, grain: false }
-  ]);
-  let nextSId = 20, nextPId = 20;
-
-  // Optimierer-Einstellungen (in der Legacy-App im globalen Einstellungs-Screen;
-  // hier beim Modul, da sie nur den Zuschnitt betreffen). Werden mit Projekten gespeichert.
-  let kerf = $state(3);
-  let mode = $state('guillotine'); // 'guillotine' | 'free'
-  let allowRotate = $state(true);
-  let optmode = $state('waste');   // 'waste' | 'boards'
-
   let tab = $state('input');       // 'input' | 'projects' | 'result' | 'steps'
   let hasResult = $state(false);
-  let editStock = $state(false), editParts = $state(false), grainEnabled = $state(false);
+  let editStock = $state(false), editParts = $state(false);
   let projName = $state('');
 
   let lastResult = $state(null);
@@ -47,7 +29,7 @@
 
   const step = $derived(units.current === 'mm' ? '1' : (units.current === 'cm' ? '0.1' : '0.001'));
   const stockCls = $derived(editStock ? 'col-stock-e' : 'col-stock');
-  const partsCls = $derived(editParts && grainEnabled ? 'col-parts-eg' : editParts ? 'col-parts-e' : grainEnabled ? 'col-parts-g' : 'col-parts');
+  const partsCls = $derived(editParts && cutlistInput.grainEnabled ? 'col-parts-eg' : editParts ? 'col-parts-e' : cutlistInput.grainEnabled ? 'col-parts-g' : 'col-parts');
   const visibleTabs = $derived(['input', 'projects', ...(hasResult ? ['result', 'steps'] : [])]);
 
   function escQ(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;'); }
@@ -58,21 +40,29 @@
   function getColor(n) { if (!colorMap[n]) colorMap[n] = COLORS[ci++ % COLORS.length]; return colorMap[n]; }
 
   // ── Eingabelisten: Bretter ──
-  function setStock(id, key, val) { const b = stockData.find(x => x.id === id); if (b) b[key] = val; }
-  function addStock() { stockData = [...stockData, { id: nextSId++, name: 'Brett ' + String.fromCharCode(64 + stockData.length + 1), l: 1000, w: 150, qty: 1 }]; }
-  function dupStock(id) { const i = stockData.findIndex(x => x.id === id); if (i < 0) return; const c = { ...stockData[i], id: nextSId++ }; const a = [...stockData]; a.splice(i + 1, 0, c); stockData = a; }
-  function delStock(id) { stockData = stockData.filter(x => x.id !== id); }
+  function setStock(id, key, val) { const b = cutlistInput.stockData.find(x => x.id === id); if (b) b[key] = val; }
+  function addStock() { cutlistInput.stockData = [...cutlistInput.stockData, { id: cutlistInput.nextSId++, name: 'Brett ' + String.fromCharCode(64 + cutlistInput.stockData.length + 1), l: 1000, w: 150, qty: 1 }]; }
+  function dupStock(id) { const i = cutlistInput.stockData.findIndex(x => x.id === id); if (i < 0) return; const c = { ...cutlistInput.stockData[i], id: cutlistInput.nextSId++ }; const a = [...cutlistInput.stockData]; a.splice(i + 1, 0, c); cutlistInput.stockData = a; }
+  function delStock(id) { cutlistInput.stockData = cutlistInput.stockData.filter(x => x.id !== id); }
 
   // ── Eingabelisten: Teile ──
-  function setPart(id, key, val) { const p = partsData.find(x => x.id === id); if (p) p[key] = val; }
-  function addPart() { partsData = [...partsData, { id: nextPId++, name: 'Teil ' + (partsData.length + 1), l: 400, w: 100, qty: 1, grain: false }]; }
-  function dupPart(id) { const i = partsData.findIndex(x => x.id === id); if (i < 0) return; const c = { ...partsData[i], id: nextPId++ }; const a = [...partsData]; a.splice(i + 1, 0, c); partsData = a; }
-  function delPart(id) { partsData = partsData.filter(x => x.id !== id); }
-  function toggleGrain(id) { const p = partsData.find(x => x.id === id); if (p) { p.grain = !p.grain; partsData = [...partsData]; } }
+  function setPart(id, key, val) { const p = cutlistInput.partsData.find(x => x.id === id); if (p) p[key] = val; }
+  function addPart() { cutlistInput.partsData = [...cutlistInput.partsData, { id: cutlistInput.nextPId++, name: 'Teil ' + (cutlistInput.partsData.length + 1), l: 400, w: 100, qty: 1, grain: false }]; }
+  function dupPart(id) { const i = cutlistInput.partsData.findIndex(x => x.id === id); if (i < 0) return; const c = { ...cutlistInput.partsData[i], id: cutlistInput.nextPId++ }; const a = [...cutlistInput.partsData]; a.splice(i + 1, 0, c); cutlistInput.partsData = a; }
+  function delPart(id) { cutlistInput.partsData = cutlistInput.partsData.filter(x => x.id !== id); }
+  function toggleGrain(id) { const p = cutlistInput.partsData.find(x => x.id === id); if (p) { p.grain = !p.grain; cutlistInput.partsData = [...cutlistInput.partsData]; } }
+
+  const isEmpty = $derived(!cutlistInput.stockData.length && !cutlistInput.partsData.length);
+
+  function loadExample() {
+    cutlistInput.stockData = JSON.parse(JSON.stringify(EXAMPLE_STOCK));
+    cutlistInput.partsData = JSON.parse(JSON.stringify(EXAMPLE_PARTS));
+    cutlistInput.nextSId = 20; cutlistInput.nextPId = 20;
+  }
 
   function toggleEditStock() { editStock = !editStock; }
   function toggleEditParts() { editParts = !editParts; }
-  function toggleGrainMode() { if (!grainEnabled) { partsData.forEach(p => p.grain = false); partsData = [...partsData]; } }
+  function toggleGrainMode() { if (!cutlistInput.grainEnabled) { cutlistInput.partsData.forEach(p => p.grain = false); cutlistInput.partsData = [...cutlistInput.partsData]; } }
 
   // ── Drag-Sortierung (Pointer-Events, iOS + Desktop) ──
   function startDrag(e, which) {
@@ -102,10 +92,10 @@
       rows.forEach(r => r.classList.remove('drag-over'));
       row.classList.remove('dragging');
       if (overIdx !== fromIdx && overIdx >= 0) {
-        const arr = which === 'stock' ? [...stockData] : [...partsData];
+        const arr = which === 'stock' ? [...cutlistInput.stockData] : [...cutlistInput.partsData];
         const [moved] = arr.splice(fromIdx, 1);
         arr.splice(overIdx, 0, moved);
-        if (which === 'stock') stockData = arr; else partsData = arr;
+        if (which === 'stock') cutlistInput.stockData = arr; else cutlistInput.partsData = arr;
       }
     }
     document.addEventListener('pointermove', onMove);
@@ -115,10 +105,10 @@
   async function resetToExample() {
     const ok = await showConfirm('Zurücksetzen?', 'Alle eingegebenen Bretter und Teile werden gelöscht. Nicht gespeicherte Änderungen gehen verloren.', { confirmLabel: 'Zurücksetzen', danger: true, icon: 'restart_alt' });
     if (!ok) return;
-    stockData = []; partsData = [];
-    nextSId = 1; nextPId = 1;
-    kerf = 3; mode = 'guillotine'; allowRotate = true; optmode = 'waste';
-    grainEnabled = false; editStock = false; editParts = false;
+    cutlistInput.stockData = []; cutlistInput.partsData = [];
+    cutlistInput.nextSId = 1; cutlistInput.nextPId = 1;
+    cutlistSettings.kerf = 3; cutlistSettings.mode = 'guillotine'; cutlistSettings.allowRotate = true; cutlistSettings.optmode = 'waste';
+    cutlistInput.grainEnabled = false; editStock = false; editParts = false;
     lastResult = null; hasResult = false;
     stopTimers(); optimizing = false; optDone = false;
     tab = 'input';
@@ -128,13 +118,13 @@
   function stopTimers() { if (optTimer) clearTimeout(optTimer); if (ringTimer) clearTimeout(ringTimer); optTimer = ringTimer = null; }
 
   function calculate() {
-    if (!stockData.length || !partsData.length) { showAlert('Bitte Bretter und Teile eingeben.', { title: 'Fehlende Eingaben', icon: 'information' }); return; }
-    for (const s of stockData) { const n = norm(s); if (n.L < 1 || n.W < 1) { showAlert('Alle Bretter brauchen gültige Maße.', { title: 'Ungültige Maße', icon: 'information' }); return; } }
-    for (const p of partsData) { const n = norm(p); if (n.L < 1 || n.W < 1) { showAlert('Alle Teile brauchen gültige Maße.', { title: 'Ungültige Maße', icon: 'information' }); return; } }
+    if (!cutlistInput.stockData.length || !cutlistInput.partsData.length) { showAlert('Bitte Bretter und Teile eingeben.', { title: 'Fehlende Eingaben', icon: 'information' }); return; }
+    for (const s of cutlistInput.stockData) { const n = norm(s); if (n.L < 1 || n.W < 1) { showAlert('Alle Bretter brauchen gültige Maße.', { title: 'Ungültige Maße', icon: 'information' }); return; } }
+    for (const p of cutlistInput.partsData) { const n = norm(p); if (n.L < 1 || n.W < 1) { showAlert('Alle Teile brauchen gültige Maße.', { title: 'Ungültige Maße', icon: 'information' }); return; } }
 
     stopTimers();
-    const k = parseFloat(kerf) || 0;
-    currentOpt = createOptimizer(stockData, partsData, { kerf: k, mode, allowRotate, cutOptMode: optmode });
+    const k = parseFloat(cutlistSettings.kerf) || 0;
+    currentOpt = createOptimizer(cutlistInput.stockData, cutlistInput.partsData, { kerf: k, mode: cutlistSettings.mode, allowRotate: cutlistSettings.allowRotate, cutOptMode: cutlistSettings.optmode });
     // Erste brauchbare Lösung sofort
     currentOpt.runSlice(SLICE_MS, true);
     applyResult();
@@ -147,7 +137,7 @@
 
   function applyResult() {
     const sol = currentOpt.best;
-    lastResult = { expandedBoards: sol.boards, assignment: sol.assignment, unplaced: sol.unplaced, kerf: parseFloat(kerf) || 0, mode, allowRotate };
+    lastResult = { expandedBoards: sol.boards, assignment: sol.assignment, unplaced: sol.unplaced, kerf: parseFloat(cutlistSettings.kerf) || 0, mode: cutlistSettings.mode, allowRotate: cutlistSettings.allowRotate };
   }
 
   function runStep() {
@@ -180,9 +170,9 @@
   onMount(() => {
     const incoming = handoff.consumeCutlistParts();
     if (incoming && incoming.length) {
-      partsData = incoming;
-      nextPId = Math.max(19, ...incoming.map(p => p.id)) + 1;
-      grainEnabled = false;
+      cutlistInput.partsData = incoming;
+      cutlistInput.nextPId = Math.max(19, ...incoming.map(p => p.id)) + 1;
+      cutlistInput.grainEnabled = false;
       lastResult = null; hasResult = false;
       tab = 'input';
       showToast('Teile aus Korpusplaner übernommen ✓');
@@ -217,7 +207,7 @@
     }
 
     const byType = {};
-    stockData.forEach(s => { byType[s.id] = { name: s.name, avail: s.qty || 1, used: 0 }; });
+    cutlistInput.stockData.forEach(s => { byType[s.id] = { name: s.name, avail: s.qty || 1, used: 0 }; });
     usedBoards.forEach(b => { if (byType[b.stockId]) byType[b.stockId].used++; });
     html += `<div class="usage-box"><div class="usage-title">Brettverbrauch</div>
       ${Object.values(byType).map(t => `<div class="usage-row"><span class="usage-name">${escQ(t.name)}</span><span class="usage-count"><b>${t.used}</b> von ${t.avail} verwendet</span></div>`).join('')}
@@ -331,9 +321,9 @@
   function buildProject(name) {
     return {
       name, saved: new Date().toLocaleDateString('de-DE'),
-      stocks: JSON.parse(JSON.stringify(stockData)),
-      parts: JSON.parse(JSON.stringify(partsData)),
-      settings: { kerf, mode, allowRotate, optmode }
+      stocks: JSON.parse(JSON.stringify(cutlistInput.stockData)),
+      parts: JSON.parse(JSON.stringify(cutlistInput.partsData)),
+      settings: { kerf: cutlistSettings.kerf, mode: cutlistSettings.mode, allowRotate: cutlistSettings.allowRotate, optmode: cutlistSettings.optmode }
     };
   }
   async function saveProj() {
@@ -354,13 +344,13 @@
     if (!p) return;
     const ok = await showConfirm('Projekt „' + name + '" laden?', 'Die aktuelle Eingabe (Bretter, Teile und Einstellungen) wird dabei überschrieben.', { confirmLabel: 'Laden', icon: 'folder_open' });
     if (!ok) return;
-    stockData = JSON.parse(JSON.stringify(p.stocks));
-    partsData = JSON.parse(JSON.stringify(p.parts));
-    partsData.forEach(x => { if (x.grain === undefined) x.grain = false; });
-    nextSId = Math.max(19, ...stockData.map(x => x.id)) + 1;
-    nextPId = Math.max(19, ...partsData.map(x => x.id)) + 1;
-    if (p.settings) { kerf = p.settings.kerf ?? 3; mode = p.settings.mode || 'guillotine'; allowRotate = p.settings.allowRotate !== false; optmode = p.settings.optmode || 'waste'; }
-    grainEnabled = partsData.some(x => x.grain);
+    cutlistInput.stockData = JSON.parse(JSON.stringify(p.stocks));
+    cutlistInput.partsData = JSON.parse(JSON.stringify(p.parts));
+    cutlistInput.partsData.forEach(x => { if (x.grain === undefined) x.grain = false; });
+    cutlistInput.nextSId = Math.max(19, ...cutlistInput.stockData.map(x => x.id)) + 1;
+    cutlistInput.nextPId = Math.max(19, ...cutlistInput.partsData.map(x => x.id)) + 1;
+    if (p.settings) { cutlistSettings.kerf = p.settings.kerf ?? 3; cutlistSettings.mode = p.settings.mode || 'guillotine'; cutlistSettings.allowRotate = p.settings.allowRotate !== false; cutlistSettings.optmode = p.settings.optmode || 'waste'; }
+    cutlistInput.grainEnabled = cutlistInput.partsData.some(x => x.grain);
     tab = 'input';
   }
   async function delProj(name) {
@@ -393,10 +383,10 @@
     doc.setFont('helvetica', 'normal'); doc.setFontSize(9);
     const unplacedPart = unplaced.length ? `   Nicht platziert: ${unplaced.length}` : '';
     doc.text(`Bretter genutzt: ${usedBoards.length}   Teile verteilt: ${assignment.length}/${totalParts}   Verschnitt: ${wasteP}%${unplacedPart}`, lm, y); y += 10;
-    checkY(10 + stockData.length * 5); doc.setFont('helvetica', 'bold'); doc.setFontSize(12); doc.text('Brettverbrauch', lm, y); y += 6; doc.setFont('helvetica', 'normal'); doc.setFontSize(9);
-    stockData.forEach(s => { const n = { L: Math.max(s.l, s.w), W: Math.min(s.l, s.w) }; const used = usedBoards.filter(b => b.stockId === s.id).length; doc.text(`- ${pdfTxt(s.name)}: ${dispVal(n.L)} x ${dispUnit(n.W)} - ${used} von ${s.qty || 1} verwendet`, lm + 4, y); y += 5; }); y += 4;
-    checkY(10 + partsData.length * 5); doc.setFont('helvetica', 'bold'); doc.setFontSize(12); doc.text('Benötigte Teile', lm, y); y += 6; doc.setFont('helvetica', 'normal'); doc.setFontSize(9);
-    partsData.forEach(p => { const n = { L: Math.max(p.l, p.w), W: Math.min(p.l, p.w) }; doc.text(`- ${pdfTxt(p.name)}: ${dispVal(n.L)} x ${dispUnit(n.W)} - ${p.qty || 1} Stück${p.grain ? ' (Faser fix)' : ''}`, lm + 4, y); y += 5; }); y += 6;
+    checkY(10 + cutlistInput.stockData.length * 5); doc.setFont('helvetica', 'bold'); doc.setFontSize(12); doc.text('Brettverbrauch', lm, y); y += 6; doc.setFont('helvetica', 'normal'); doc.setFontSize(9);
+    cutlistInput.stockData.forEach(s => { const n = { L: Math.max(s.l, s.w), W: Math.min(s.l, s.w) }; const used = usedBoards.filter(b => b.stockId === s.id).length; doc.text(`- ${pdfTxt(s.name)}: ${dispVal(n.L)} x ${dispUnit(n.W)} - ${used} von ${s.qty || 1} verwendet`, lm + 4, y); y += 5; }); y += 4;
+    checkY(10 + cutlistInput.partsData.length * 5); doc.setFont('helvetica', 'bold'); doc.setFontSize(12); doc.text('Benötigte Teile', lm, y); y += 6; doc.setFont('helvetica', 'normal'); doc.setFontSize(9);
+    cutlistInput.partsData.forEach(p => { const n = { L: Math.max(p.l, p.w), W: Math.min(p.l, p.w) }; doc.text(`- ${pdfTxt(p.name)}: ${dispVal(n.L)} x ${dispUnit(n.W)} - ${p.qty || 1} Stück${p.grain ? ' (Faser fix)' : ''}`, lm + 4, y); y += 5; }); y += 6;
 
     const visBlocks = resultEl ? resultEl.querySelectorAll('.bvis') : [];
     if (visBlocks.length) {
@@ -443,6 +433,15 @@
     const cards = stepsEl ? stepsEl.querySelectorAll('.step-card') : [];
     cards.forEach((s, i) => { const title = pdfTxt(s.querySelector('.step-action').innerText); const detail = pdfTxt(s.querySelector('.step-detail').innerText); const lines = doc.splitTextToSize(detail, pw - 6); checkY(7 + lines.length * 4 + 4); doc.setFont('helvetica', 'bold'); doc.text(`Schritt ${i + 1}: ${title}`, lm, y); y += 4.5; doc.setFont('helvetica', 'normal'); doc.setTextColor(100); doc.text(lines, lm + 4, y); y += lines.length * 4 + 4; doc.setTextColor(0); });
     doc.save('betterkerf-schnittplan.pdf');
+    // iOS Safari ignoriert maximum-scale/user-scalable ab iOS 10 — nach dem Download
+    // resettet Safari den Zoom nicht automatisch. Viewport neu setzen erzwingt den Reset.
+    setTimeout(() => {
+      const vp = document.querySelector('meta[name="viewport"]');
+      if (!vp) return;
+      const orig = vp.getAttribute('content');
+      vp.setAttribute('content', 'width=device-width, initial-scale=1');
+      requestAnimationFrame(() => vp.setAttribute('content', orig));
+    }, 300);
   }
 
   // ── Tab-Swipe (innerhalb des Moduls; linker Rand bleibt der App für „Zurück") ──
@@ -471,13 +470,15 @@
     <div class="section">
       <div class="slabel-row"><div class="slabel">Verfügbare Bretter</div><button class="edit-toggle" class:on={editStock} onclick={toggleEditStock}>{editStock ? 'Fertig' : 'Sortieren'}</button></div>
       <div class="hint-box">Maße in beliebiger Reihenfolge — die längere Seite wird automatisch als Länge erkannt.</div>
+      {#if cutlistInput.stockData.length}
       <div class="col-hd {stockCls}">
         {#if editStock}<span></span>{/if}
         <span>Bezeichnung</span><span>Maß A {unitLabel()}</span><span>Maß B {unitLabel()}</span><span>Stk.</span>
         {#if editStock}<span></span>{/if}<span></span>
       </div>
+      {/if}
       <div id="cut-stock-list">
-        {#each stockData as b (b.id)}
+        {#each cutlistInput.stockData as b (b.id)}
           <div class="row {stockCls}">
             {#if editStock}<div class="drag-handle" onpointerdown={(e) => startDrag(e, 'stock')} role="button" tabindex="-1" aria-label="Verschieben">≡</div>{/if}
             <input value={escQ(b.name)} oninput={(e) => setStock(b.id, 'name', e.target.value)} placeholder="Name" autocomplete="off" autocorrect="off">
@@ -494,49 +495,32 @@
 
     <div class="section">
       <div class="slabel-row"><div class="slabel">Benötigte Teile</div><button class="edit-toggle" class:on={editParts} onclick={toggleEditParts}>{editParts ? 'Fertig' : 'Sortieren'}</button></div>
+      {#if cutlistInput.partsData.length}
       <div class="col-hd {partsCls}">
         {#if editParts}<span></span>{/if}
         <span>Bezeichnung</span><span>Maß A {unitLabel()}</span><span>Maß B {unitLabel()}</span><span>Stk.</span>
-        {#if grainEnabled}<span>Faser</span>{/if}{#if editParts}<span></span>{/if}<span></span>
+        {#if cutlistInput.grainEnabled}<span>Faser</span>{/if}{#if editParts}<span></span>{/if}<span></span>
       </div>
+      {/if}
       <div id="cut-parts-list">
-        {#each partsData as p (p.id)}
+        {#each cutlistInput.partsData as p (p.id)}
           <div class="row {partsCls}">
             {#if editParts}<div class="drag-handle" onpointerdown={(e) => startDrag(e, 'parts')} role="button" tabindex="-1" aria-label="Verschieben">≡</div>{/if}
             <input value={escQ(p.name)} oninput={(e) => setPart(p.id, 'name', e.target.value)} placeholder="Name" autocomplete="off" autocorrect="off">
             <input type="number" inputmode="decimal" {step} value={inputVal(p.l)} min="0" oninput={(e) => setPart(p.id, 'l', toMM(e.target.value))}>
             <input type="number" inputmode="decimal" {step} value={inputVal(p.w)} min="0" oninput={(e) => setPart(p.id, 'w', toMM(e.target.value))}>
             <input type="number" inputmode="numeric" value={p.qty || 1} min="1" max="99" oninput={(e) => setPart(p.id, 'qty', +e.target.value)}>
-            {#if grainEnabled}<button class="grain-btn{p.grain ? ' locked' : ''}" onclick={() => toggleGrain(p.id)} title={p.grain ? 'Maserung fixiert – keine Drehung' : 'Maserung egal – Drehung erlaubt'}>{p.grain ? '↕' : '⤢'}</button>{/if}
+            {#if cutlistInput.grainEnabled}<button class="grain-btn{p.grain ? ' locked' : ''}" onclick={() => toggleGrain(p.id)} title={p.grain ? 'Maserung fixiert – keine Drehung' : 'Maserung egal – Drehung erlaubt'}>{p.grain ? '↕' : '⤢'}</button>{/if}
             {#if editParts}<button class="dup-btn" onclick={() => dupPart(p.id)} title="Duplizieren">⧉</button>{/if}
             <button class="del-btn" onclick={() => delPart(p.id)}>×</button>
           </div>
         {/each}
       </div>
       <button class="add-btn" onclick={addPart}>+ Teil hinzufügen</button>
-      <div class="srow" style="margin-top:10px"><div><div class="srow-label">Maserungsrichtung beachten</div><div class="srow-hint">Pro Teil festlegen, ob es gedreht werden darf</div></div><input type="checkbox" class="toggle" bind:checked={grainEnabled} onchange={toggleGrainMode}></div>
-    </div>
-
-    <div class="section">
-      <div class="slabel">Einstellungen</div>
-      <div class="srow"><div><div class="srow-label">Schnittbreite (Kerf)</div><div class="srow-hint">Materialverlust pro Schnitt — immer in mm</div></div><div class="nm"><input type="number" bind:value={kerf} min="0" max="10" step="0.5"><span>mm</span></div></div>
-      <div class="srow srow-col" style="margin-top:6px">
-        <div class="srow-label">Schnittmodus</div>
-        <div class="radio-group">
-          <label class="radio-lbl"><input type="radio" name="cut-mode" value="guillotine" bind:group={mode}> Guillotinenschnitte (Tischkreissäge)</label>
-          <label class="radio-lbl"><input type="radio" name="cut-mode" value="free" bind:group={mode}> Freie Schnitte (CNC)</label>
-        </div>
-        <div class="srow-hint" style="margin-top:0">Guillotine = durchgehende gerade Schnitte, kein Umsetzen nötig</div>
-      </div>
-      <div class="srow" style="margin-top:6px"><div><div class="srow-label">Teile automatisch drehen</div><div class="srow-hint">90°-Rotation wenn platzsparender — mit ↻ markiert</div></div><input type="checkbox" class="toggle" bind:checked={allowRotate}></div>
-      <div class="srow srow-col" style="margin-top:6px">
-        <div class="srow-label">Optimierungsziel</div>
-        <div class="radio-group">
-          <label class="radio-lbl"><input type="radio" name="cut-optmode" value="waste" bind:group={optmode}> Wenigster Verschnitt</label>
-          <label class="radio-lbl"><input type="radio" name="cut-optmode" value="boards" bind:group={optmode}> Wenigste Bretter</label>
-        </div>
-        <div class="srow-hint" style="margin-top:0">Verschnitt = kleinste genutzte Materialfläche. Wenigste Bretter = lieber ein großes Brett statt mehrerer kleiner, auch wenn etwas mehr Verschnitt entsteht.</div>
-      </div>
+      {#if isEmpty}<button class="example-btn" onclick={loadExample}>Beispieldaten laden</button>{/if}
+      {#if cutlistInput.partsData.length}
+      <div class="srow" style="margin-top:10px"><div><div class="srow-label">Maserungsrichtung beachten</div><div class="srow-hint">Pro Teil festlegen, ob es gedreht werden darf</div></div><input type="checkbox" class="toggle" bind:checked={cutlistInput.grainEnabled} onchange={toggleGrainMode}></div>
+      {/if}
     </div>
 
     <button class="calc-btn" onclick={calculate}>▶ Zuschnitt berechnen</button>

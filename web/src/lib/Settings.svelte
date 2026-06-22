@@ -1,5 +1,6 @@
 <script>
   import { units, UNITS } from './units.svelte.js';
+  import { cutlistSettings } from './cutlistSettings.svelte.js';
   let legal = $state(null); // 'privacy' | 'disclaimer' | null
 </script>
 
@@ -17,6 +18,29 @@
         </div>
       </div>
       <div class="info-note">Die gewählte Einheit wird auf diesem Gerät gespeichert und bleibt nach dem Schließen erhalten.</div>
+    </div>
+
+    <div class="section" style="margin-top:22px">
+      <div class="slabel">Zuschnittoptimierer</div>
+      <div class="hint-box">Diese Einstellungen gelten für alle Berechnungen im Zuschnittoptimierer und werden auf diesem Gerät gespeichert. Beim Laden eines Projekts werden sie durch die gespeicherten Projektwerte überschrieben.</div>
+      <div class="srow"><div><div class="srow-label">Schnittbreite (Kerf)</div><div class="srow-hint">Materialverlust pro Schnitt — immer in mm</div></div><div class="nm"><input type="number" bind:value={cutlistSettings.kerf} min="0" max="10" step="0.5"><span>mm</span></div></div>
+      <div class="srow srow-col" style="margin-top:6px">
+        <div class="srow-label">Schnittmodus</div>
+        <div class="radio-group">
+          <label class="radio-lbl"><input type="radio" name="cut-mode" value="guillotine" bind:group={cutlistSettings.mode}> Guillotinenschnitte (Tischkreissäge)</label>
+          <label class="radio-lbl"><input type="radio" name="cut-mode" value="free" bind:group={cutlistSettings.mode}> Freie Schnitte (CNC)</label>
+        </div>
+        <div class="srow-hint" style="margin-top:0">Guillotine = durchgehende gerade Schnitte, kein Umsetzen nötig</div>
+      </div>
+      <div class="srow" style="margin-top:6px"><div><div class="srow-label">Teile automatisch drehen</div><div class="srow-hint">90°-Rotation wenn platzsparender — mit ↻ markiert</div></div><input type="checkbox" class="toggle" bind:checked={cutlistSettings.allowRotate}></div>
+      <div class="srow srow-col" style="margin-top:6px">
+        <div class="srow-label">Optimierungsziel</div>
+        <div class="radio-group">
+          <label class="radio-lbl"><input type="radio" name="cut-optmode" value="waste" bind:group={cutlistSettings.optmode}> Wenigster Verschnitt</label>
+          <label class="radio-lbl"><input type="radio" name="cut-optmode" value="boards" bind:group={cutlistSettings.optmode}> Wenigste Bretter</label>
+        </div>
+        <div class="srow-hint" style="margin-top:0">Verschnitt = kleinste genutzte Materialfläche. Wenigste Bretter = lieber ein großes Brett statt mehrerer kleiner, auch wenn etwas mehr Verschnitt entsteht.</div>
+      </div>
     </div>
 
     <div class="section" style="margin-top:22px">
