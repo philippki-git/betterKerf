@@ -2,6 +2,7 @@
 // portierte stehen auf status:'soon', bis sie an die Reihe kommen.
 import Holes from '../modules/Holes.svelte';
 import Cutlist from '../modules/Cutlist.svelte';
+import Korpus from '../modules/Korpus.svelte';
 
 export const MODULES = [
   {
@@ -12,7 +13,7 @@ export const MODULES = [
   {
     id: 'korpus', title: 'Korpusplaner', sub: 'Schränke & Möbel planen', icon: 'shelves',
     desc: 'Aus Außenmaßen automatisch die Zuschnittliste für Korpusteile (Seiten, Boden, Deckel, Rückwand) berechnen.',
-    status: 'soon'
+    status: 'ready', component: Korpus
   },
   {
     id: 'drawer', title: 'Schubladenplaner', sub: 'Schubkästen & Auszüge planen', icon: 'drawer',

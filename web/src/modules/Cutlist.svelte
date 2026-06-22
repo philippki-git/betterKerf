@@ -6,6 +6,8 @@
   import { norm, createOptimizer } from '../lib/cutlist.js';
   import { projects, saveProject, findProject, deleteProject } from '../lib/cutlistProjects.svelte.js';
   import { loadJsPDF, svgToPng } from '../lib/pdf.js';
+  import { handoff } from '../lib/handoff.svelte.js';
+  import { onMount } from 'svelte';
 
   // ── Eingabedaten (Maße intern in mm). $state.raw: Tippen in den Feldern
   //    mutiert die Objekte, ohne ein Re-Render auszulösen (kein Fokusverlust);
@@ -171,6 +173,19 @@
   }
 
   $effect(() => () => stopTimers()); // Aufräumen beim Verlassen des Moduls
+
+  // Vom Korpusplaner übergebene Teile übernehmen (beim Mounten)
+  onMount(() => {
+    const incoming = handoff.consumeCutlistParts();
+    if (incoming && incoming.length) {
+      partsData = incoming;
+      nextPId = Math.max(19, ...incoming.map(p => p.id)) + 1;
+      grainEnabled = false;
+      lastResult = null; hasResult = false;
+      tab = 'input';
+      showToast('Teile aus Korpusplaner übernommen ✓');
+    }
+  });
 
   // ── Ergebnis-HTML ──
   function woodGrain(ox, oy, w, h) { let s = ''; for (let i = 0; i < 10; i++) { const y = oy + Math.round(h / 10 * i + h / 20); s += `<line x1="${ox}" y1="${y}" x2="${ox + w}" y2="${y}" stroke="#D4C4A0" stroke-width="0.5" opacity="0.3"/>`; } return s; }

@@ -35,10 +35,16 @@ web/
       holes.js            Reine Bohrloch-Mathematik (DOM-frei)
       cutlist.js          Reine Zuschnitt-Optimierung (Bin-Packing, DOM-frei)
       cutlistProjects.svelte.js  Gespeicherte Projekte (localStorage, reaktiv)
+      korpus.js           Reine Korpus-Geometrie, Skizze & Bau-Anleitung (DOM-frei)
+      korpusProjects.svelte.js   Gespeicherte Korpus-Projekte (localStorage, reaktiv)
       pdf.js              jsPDF lazy laden + SVG→PNG (gemeinsam genutzt)
+      nav.svelte.js       Modul-übergreifende Navigationsanforderung
+      handoff.svelte.js   Daten-Übergabe zwischen Modulen (Korpus → Zuschnitt)
+      InfoSheet.svelte    Wiederverwendbares Info-Bottom-Sheet
     modules/
       Holes.svelte        Modul „Bohrlochplaner" (migriert)
       Cutlist.svelte      Modul „Zuschnitt-Optimierer" (migriert)
+      Korpus.svelte       Modul „Korpusplaner" (migriert)
 ```
 
 ## Migrationsstand
@@ -47,13 +53,13 @@ web/
 |-------|--------|
 | 📐 Zuschnitt-Optimierer | ✅ migriert (Optimierung, Projekte, PDF) |
 | 🎯 Bohrlochplaner | ✅ migriert (Reihe + Raster, PDF & 1:1-Schablone) |
-| 🗄️ Korpusplaner | ⏳ offen |
+| 🗄️ Korpusplaner | ✅ migriert (Skizze, Anleitung, Projekte, PDF, Übergabe) |
 | 🧰 Schubladenplaner | ⏳ offen |
 | 💰 Kostenkalkulator | ⏳ offen |
 | ♻️ Reststück-Lager | 💡 geplant |
 
 ### Noch offen
-- Korpusplaner, Schubladenplaner und Kostenkalkulator portieren
+- Schubladenplaner und Kostenkalkulator portieren
 - PWA-Assets (`manifest.json`, `icons/`, Service Worker) in `web/public/` übernehmen
 - GitHub-Pages-Deploy auf den Build-Output umstellen (Cutover)
 

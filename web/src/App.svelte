@@ -6,6 +6,7 @@
   import Toast from './lib/Toast.svelte';
   import Zoom from './lib/Zoom.svelte';
   import { MODULES } from './lib/modules.js';
+  import { nav } from './lib/nav.svelte.js';
 
   // Routing: view = 'home' | 'settings' | 'module'
   let view = $state('home');
@@ -43,6 +44,15 @@
       goHome();
     }
   }
+
+  // Modul-übergreifende Navigationsanforderung (z. B. Korpus → Zuschnitt)
+  $effect(() => {
+    if (nav.target) {
+      const id = nav.target;
+      nav.clear();
+      openModule(id);
+    }
+  });
 
   const showBack = $derived(view !== 'home');
   const showGear = $derived(view !== 'settings');
