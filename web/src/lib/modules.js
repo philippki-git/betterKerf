@@ -3,6 +3,7 @@
 import Holes from '../modules/Holes.svelte';
 import Cutlist from '../modules/Cutlist.svelte';
 import Korpus from '../modules/Korpus.svelte';
+import Drawer from '../modules/Drawer.svelte';
 
 export const MODULES = [
   {
@@ -18,7 +19,7 @@ export const MODULES = [
   {
     id: 'drawer', title: 'Schubladenplaner', sub: 'Schubkästen & Auszüge planen', icon: 'drawer',
     desc: 'Aus Korpusöffnung und Auszugssystem automatisch die Zuschnittmaße eines Schubkastens berechnen.',
-    status: 'soon'
+    status: 'ready', component: Drawer
   },
   {
     id: 'holes', title: 'Bohrlochplaner', sub: 'Bohrungen gleichmäßig verteilen', icon: 'adjust',

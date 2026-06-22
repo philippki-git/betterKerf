@@ -1,10 +1,12 @@
 <script>
+  import { onMount } from 'svelte';
   import Icon from '../lib/Icon.svelte';
   import { units, UNITS, unitLabel, dispVal, dispUnit, toMM, inputVal } from '../lib/units.svelte.js';
   import { showConfirm, showAlert, showToast } from '../lib/dialog.svelte.js';
   import { openZoom } from '../lib/zoom.svelte.js';
   import { computeHoles, axisEdgeIssues, widthEdgeIssue } from '../lib/holes.js';
   import { loadJsPDF, svgToPng } from '../lib/pdf.js';
+  import { handoff } from '../lib/handoff.svelte.js';
 
   let mode = $state('row');
 
@@ -522,6 +524,19 @@
 
   // Symmetrie: Endabstand spiegelt Anfang
   $effect(() => { if (hSym) hEnd = hStart; });
+
+  // Handoff vom Schubladenplaner (Griffbohrung)
+  onMount(() => {
+    const d = handoff.consumeHolesData();
+    if (!d) return;
+    mode = 'row';
+    hLen = inputVal(d.length); hCount = d.count;
+    hUseMargin = d.useMargin; hSym = d.sym;
+    hStart = inputVal(d.start); hEnd = inputVal(d.end);
+    if (d.width > 0) hWidth = inputVal(d.width);
+    if (d.dia > 0) hDia = inputVal(d.dia);
+    holesCalc();
+  });
 </script>
 
 <div class="pane active" style="display:block">
