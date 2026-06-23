@@ -430,16 +430,20 @@
     checkY(22); doc.setFont('helvetica', 'bold'); doc.setFontSize(12); doc.text('Schnittanleitung', lm, y); y += 6; doc.setFont('helvetica', 'normal'); doc.setFontSize(9);
     const cards = stepsEl ? stepsEl.querySelectorAll('.step-card') : [];
     cards.forEach((s, i) => { const title = pdfTxt(s.querySelector('.step-action').innerText); const detail = pdfTxt(s.querySelector('.step-detail').innerText); const lines = doc.splitTextToSize(detail, pw - 6); checkY(7 + lines.length * 4 + 4); doc.setFont('helvetica', 'bold'); doc.text(`Schritt ${i + 1}: ${title}`, lm, y); y += 4.5; doc.setFont('helvetica', 'normal'); doc.setTextColor(100); doc.text(lines, lm + 4, y); y += lines.length * 4 + 4; doc.setTextColor(0); });
-    // On iOS, doc.save() triggers a programmatic blob-link click which causes
-    // Safari to zoom the page. Use the Web Share API instead — it opens the
-    // native share/save sheet without triggering a download and thus no zoom.
     const filename = 'betterkerf-schnittplan.pdf';
     const blob = doc.output('blob');
-    const file = new File([blob], filename, { type: 'application/pdf' });
-    if (navigator.canShare && navigator.canShare({ files: [file] })) {
-      await navigator.share({ files: [file], title: filename });
+    const blobUrl = URL.createObjectURL(blob);
+    const isIOS = /iP(hone|ad|od)/.test(navigator.userAgent);
+    if (isIOS) {
+      // On iOS, open the PDF in a new tab — Safari shows it in its native viewer
+      // with a built-in share/save button, avoiding the zoom-after-download bug.
+      window.open(blobUrl, '_blank');
     } else {
-      doc.save(filename);
+      const a = document.createElement('a');
+      a.href = blobUrl;
+      a.download = filename;
+      a.click();
+      setTimeout(() => URL.revokeObjectURL(blobUrl), 10000);
     }
   }
 
