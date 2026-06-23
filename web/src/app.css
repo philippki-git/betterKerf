@@ -234,6 +234,12 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 .vis-wrap{border-radius:8px;overflow:hidden;position:relative}
 .zoom-hint{position:absolute;bottom:6px;right:8px;font-size:11px;color:var(--text2);background:rgba(28,26,23,.75);padding:3px 7px;border-radius:6px;pointer-events:none}
 .zoom-overlay{position:fixed;inset:0;background:rgba(10,8,5,.92);z-index:1000;display:none;flex-direction:column;padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom)}
+.pdf-preview-overlay{position:fixed;inset:0;z-index:900;background:var(--bg);display:flex;flex-direction:column;padding-top:env(safe-area-inset-top,0px)}
+.pdf-preview-bar{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:.5px solid var(--border);flex-shrink:0}
+.pdf-preview-title{font-size:16px;font-weight:600;color:var(--text)}
+.pdf-preview-close{border:.5px solid var(--border2);background:var(--bg2);color:var(--text);width:34px;height:34px;border-radius:9px;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1}
+.pdf-preview-body{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:16px 14px}
+.pdf-preview-footer{padding:12px 14px;padding-bottom:calc(12px + env(safe-area-inset-bottom,0px));border-top:.5px solid var(--border);flex-shrink:0}
 .zoom-overlay.show{display:flex}
 .zoom-bar{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;flex-shrink:0}
 .zoom-bar span{font-size:13px;color:var(--text2)}
