@@ -8,7 +8,7 @@ document.addEventListener('gesturestart', e => e.preventDefault());
 // Service Worker registrieren (Offline-Fähigkeit / PWA)
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('./sw.js').catch(() => {});
+    navigator.serviceWorker.register('./sw.js').then(reg => reg.update()).catch(() => {});
     navigator.serviceWorker.addEventListener('message', e => {
       if (e.data?.type === 'UPDATE') window.location.reload();
     });
