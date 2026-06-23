@@ -8,6 +8,7 @@
   import { korpusProjects, saveKorpusProject, findKorpusProject, deleteKorpusProject } from '../lib/korpusProjects.svelte.js';
   import { handoff } from '../lib/handoff.svelte.js';
   import { nav } from '../lib/nav.svelte.js';
+  import { openZoom } from '../lib/zoom.svelte.js';
 
   // ── Eingaben (Anzeigeeinheit) ──
   let kpH = $state(inputVal(900)), kpB = $state(inputVal(600)), kpT = $state(inputVal(600));
@@ -379,7 +380,10 @@
       {:else if calc.state === 'ok'}
         <div class="section"><div class="slabel">Skizze</div>
           <!-- eslint-disable-next-line svelte/no-at-html-tags -->
-          <div bind:this={sketchEl}>{@html sketchHTML}</div>
+          <div bind:this={sketchEl} style="cursor:zoom-in" role="button" tabindex="0" aria-label="Skizze vergrößern"
+            onclick={() => { const svg = sketchEl?.querySelector('svg'); if (svg) { const c = svg.cloneNode(true); c.removeAttribute('width'); c.setAttribute('style', 'width:min(90vw,600px);height:auto'); openZoom(c.outerHTML, 'Korpus-Skizze'); } }}
+            onkeydown={(e) => { if (e.key === 'Enter' || e.key === ' ') { const svg = sketchEl?.querySelector('svg'); if (svg) { const c = svg.cloneNode(true); c.removeAttribute('width'); c.setAttribute('style', 'width:min(90vw,600px);height:auto'); openZoom(c.outerHTML, 'Korpus-Skizze'); } } }}
+          >{@html sketchHTML}</div>
         </div>
         <div class="section"><div class="slabel">Zuschnittliste</div>
           <div class="kp-cut-head"><span>Bauteil</span><span>Maß ({unitLabel()})</span><span>Anz.</span></div>
