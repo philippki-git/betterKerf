@@ -45,6 +45,42 @@
     }
   }
 
+  // Text in Eingabefeldern bei Fokus automatisch markieren.
+  // Safari setzt den Cursor nach focusin beim mouseup neu — daher select() auf
+  // pointerup wiederholen, aber nur wenn das Feld gerade erst fokussiert wurde.
+  $effect(() => {
+    const TYPES_SKIP = new Set(['checkbox','radio','file','hidden','color','range']);
+    let justFocused = null;
+
+    function isTextInput(el) {
+      return el.tagName === 'INPUT' && !TYPES_SKIP.has(el.type);
+    }
+    function onPointerDown(e) {
+      const el = e.target;
+      if (isTextInput(el) && document.activeElement !== el) justFocused = el;
+    }
+    function onPointerUp(e) {
+      if (justFocused && justFocused === e.target) {
+        justFocused.select();
+      }
+      justFocused = null;
+    }
+    function onFocusIn(e) {
+      const el = e.target;
+      // Keyboard-fokus (Tab): kein Pointer-Event davor → sofort selektieren
+      if (isTextInput(el) && el !== justFocused) el.select();
+    }
+
+    document.addEventListener('pointerdown', onPointerDown, true);
+    document.addEventListener('pointerup', onPointerUp, true);
+    document.addEventListener('focusin', onFocusIn);
+    return () => {
+      document.removeEventListener('pointerdown', onPointerDown, true);
+      document.removeEventListener('pointerup', onPointerUp, true);
+      document.removeEventListener('focusin', onFocusIn);
+    };
+  });
+
   // Modul-übergreifende Navigationsanforderung (z. B. Korpus → Zuschnitt)
   $effect(() => {
     if (nav.target) {

@@ -13,11 +13,9 @@
   import { onMount } from 'svelte';
 
   let tab = $state('input');       // 'input' | 'projects' | 'result' | 'steps'
-  let hasResult = $state(false);
   let editStock = $state(false), editParts = $state(false);
   let projName = $state('');
 
-  let lastResult = $state(null);
   let resultEl = $state(null), stepsEl = $state(null);
 
   // Optimierungs-Fortschritt
@@ -30,7 +28,7 @@
   const step = $derived(units.current === 'mm' ? '1' : (units.current === 'cm' ? '0.1' : '0.001'));
   const stockCls = $derived(editStock ? 'col-stock-e' : 'col-stock');
   const partsCls = $derived(editParts && cutlistInput.grainEnabled ? 'col-parts-eg' : editParts ? 'col-parts-e' : cutlistInput.grainEnabled ? 'col-parts-g' : 'col-parts');
-  const visibleTabs = $derived(['input', 'projects', ...(hasResult ? ['result', 'steps'] : [])]);
+  const visibleTabs = $derived(['input', 'projects', ...(cutlistInput.hasResult ? ['result', 'steps'] : [])]);
 
   function escQ(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;'); }
 
@@ -109,7 +107,7 @@
     cutlistInput.nextSId = 1; cutlistInput.nextPId = 1;
     cutlistSettings.kerf = 3; cutlistSettings.mode = 'guillotine'; cutlistSettings.allowRotate = true; cutlistSettings.optmode = 'waste';
     cutlistInput.grainEnabled = false; editStock = false; editParts = false;
-    lastResult = null; hasResult = false;
+    cutlistInput.lastResult = null; cutlistInput.hasResult = false;
     stopTimers(); optimizing = false; optDone = false;
     tab = 'input';
   }
@@ -128,7 +126,7 @@
     // Erste brauchbare Lösung sofort
     currentOpt.runSlice(SLICE_MS, true);
     applyResult();
-    hasResult = true; tab = 'result';
+    cutlistInput.hasResult = true; tab = 'result';
     optimizing = true; optDone = false; optAccepted = false;
     optStart = Date.now(); optFrac = 0;
     tickRing();
@@ -137,7 +135,7 @@
 
   function applyResult() {
     const sol = currentOpt.best;
-    lastResult = { expandedBoards: sol.boards, assignment: sol.assignment, unplaced: sol.unplaced, kerf: parseFloat(cutlistSettings.kerf) || 0, mode: cutlistSettings.mode, allowRotate: cutlistSettings.allowRotate };
+    cutlistInput.lastResult = { expandedBoards: sol.boards, assignment: sol.assignment, unplaced: sol.unplaced, kerf: parseFloat(cutlistSettings.kerf) || 0, mode: cutlistSettings.mode, allowRotate: cutlistSettings.allowRotate };
   }
 
   function runStep() {
@@ -164,7 +162,7 @@
   }
 
   $effect(() => () => stopTimers()); // Aufräumen beim Verlassen des Moduls
-  $effect(() => { cutlistResult.set(lastResult); });
+  $effect(() => { cutlistResult.set(cutlistInput.lastResult); });
 
   // Vom Korpusplaner übergebene Teile übernehmen (beim Mounten)
   onMount(() => {
@@ -173,7 +171,7 @@
       cutlistInput.partsData = incoming;
       cutlistInput.nextPId = Math.max(19, ...incoming.map(p => p.id)) + 1;
       cutlistInput.grainEnabled = false;
-      lastResult = null; hasResult = false;
+      cutlistInput.lastResult = null; cutlistInput.hasResult = false;
       tab = 'input';
       showToast('Teile aus Korpusplaner übernommen ✓');
     }
@@ -305,8 +303,8 @@
       </div>`).join('')}`;
   }
 
-  const resultHTML = $derived(lastResult ? renderResultHTML(lastResult) : '');
-  const stepsHTML = $derived(lastResult ? renderStepsHTML(lastResult) : '');
+  const resultHTML = $derived(cutlistInput.lastResult ? renderResultHTML(cutlistInput.lastResult) : '');
+  const stepsHTML = $derived(cutlistInput.lastResult ? renderStepsHTML(cutlistInput.lastResult) : '');
 
   function onResultClick(e) {
     const w = e.target.closest('.vis-wrap');
@@ -361,13 +359,13 @@
 
   // ── PDF-Export ──
   function exportPDF() {
-    if (!lastResult) { showAlert('Bitte zuerst berechnen.', { title: 'Kein Ergebnis', icon: 'information' }); return; }
+    if (!cutlistInput.lastResult) { showAlert('Bitte zuerst berechnen.', { title: 'Kein Ergebnis', icon: 'information' }); return; }
     loadJsPDF(() => { doExport().catch(err => { console.error(err); showAlert('PDF konnte nicht erstellt werden.', { title: 'Fehler', icon: 'alert_circle', danger: true }); }); });
   }
   async function doExport() {
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF({ unit: 'mm', format: 'a4' });
-    const { expandedBoards, assignment, unplaced, kerf } = lastResult;
+    const { expandedBoards, assignment, unplaced, kerf } = cutlistInput.lastResult;
     const usedBoards = expandedBoards.filter(b => assignment.some(a => a.boardIdx === b.boardIdx));
     let y = 15; const lm = 15, pw = 180;
     const checkY = n => { if (y + n > 272) { doc.addPage(); y = 15; } };
@@ -433,15 +431,16 @@
     const cards = stepsEl ? stepsEl.querySelectorAll('.step-card') : [];
     cards.forEach((s, i) => { const title = pdfTxt(s.querySelector('.step-action').innerText); const detail = pdfTxt(s.querySelector('.step-detail').innerText); const lines = doc.splitTextToSize(detail, pw - 6); checkY(7 + lines.length * 4 + 4); doc.setFont('helvetica', 'bold'); doc.text(`Schritt ${i + 1}: ${title}`, lm, y); y += 4.5; doc.setFont('helvetica', 'normal'); doc.setTextColor(100); doc.text(lines, lm + 4, y); y += lines.length * 4 + 4; doc.setTextColor(0); });
     doc.save('betterkerf-schnittplan.pdf');
-    // iOS Safari ignoriert maximum-scale/user-scalable ab iOS 10 — nach dem Download
-    // resettet Safari den Zoom nicht automatisch. Viewport neu setzen erzwingt den Reset.
+    // iOS Safari zooms in after a file download and doesn't auto-reset.
+    // Fix: briefly set initial-scale=1 (no maximum-scale), wait a frame for
+    // the browser to apply it, then restore the full original content.
     setTimeout(() => {
       const vp = document.querySelector('meta[name="viewport"]');
       if (!vp) return;
       const orig = vp.getAttribute('content');
       vp.setAttribute('content', 'width=device-width, initial-scale=1');
-      requestAnimationFrame(() => vp.setAttribute('content', orig));
-    }, 300);
+      setTimeout(() => vp.setAttribute('content', orig), 300);
+    }, 500);
   }
 
   // ── Tab-Swipe (innerhalb des Moduls; linker Rand bleibt der App für „Zurück") ──
@@ -461,8 +460,8 @@
   <div class="tabs">
     <button class="tab" class:active={tab === 'input'} onclick={() => tab = 'input'}>Eingabe</button>
     <button class="tab" class:active={tab === 'projects'} onclick={() => tab = 'projects'}>Projekte</button>
-    {#if hasResult}<button class="tab" class:active={tab === 'result'} onclick={() => tab = 'result'}>Schnittplan</button>{/if}
-    {#if hasResult}<button class="tab" class:active={tab === 'steps'} onclick={() => tab = 'steps'}>Anleitung</button>{/if}
+    {#if cutlistInput.hasResult}<button class="tab" class:active={tab === 'result'} onclick={() => tab = 'result'}>Schnittplan</button>{/if}
+    {#if cutlistInput.hasResult}<button class="tab" class:active={tab === 'steps'} onclick={() => tab = 'steps'}>Anleitung</button>{/if}
   </div>
 
   <!-- EINGABE -->
@@ -567,7 +566,7 @@
       <!-- eslint-disable-next-line svelte/no-at-html-tags -->
       {@html resultHTML}
     </div>
-    {#if hasResult}
+    {#if cutlistInput.hasResult}
       <button class="action-btn" onclick={exportPDF}><Icon name="download" size={16} /> Als PDF exportieren</button>
     {/if}
   </div>
@@ -578,7 +577,7 @@
       <!-- eslint-disable-next-line svelte/no-at-html-tags -->
       {@html stepsHTML}
     </div>
-    {#if hasResult}
+    {#if cutlistInput.hasResult}
       <button class="action-btn" onclick={exportPDF}><Icon name="download" size={16} /> Als PDF exportieren</button>
     {/if}
   </div>

@@ -3,6 +3,8 @@ let _parts = $state.raw([]);
 let _nextSId = $state(1);
 let _nextPId = $state(1);
 let _grainEnabled = $state(false);
+let _lastResult = $state(null);
+let _hasResult = $state(false);
 
 export const cutlistInput = {
   get stockData()    { return _stock; },
@@ -15,6 +17,10 @@ export const cutlistInput = {
   set nextPId(v)     { _nextPId = v; },
   get grainEnabled() { return _grainEnabled; },
   set grainEnabled(v){ _grainEnabled = v; },
+  get lastResult()   { return _lastResult; },
+  set lastResult(v)  { _lastResult = v; },
+  get hasResult()    { return _hasResult; },
+  set hasResult(v)   { _hasResult = v; },
 };
 
 export const EXAMPLE_STOCK = [
