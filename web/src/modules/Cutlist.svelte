@@ -360,7 +360,7 @@
   // ── PDF-Export ──
   function exportPDF() {
     if (!cutlistInput.lastResult) { showAlert('Bitte zuerst berechnen.', { title: 'Kein Ergebnis', icon: 'information' }); return; }
-    loadJsPDF(() => { doExport().catch(err => { console.error(err); showAlert('PDF konnte nicht erstellt werden.', { title: 'Fehler', icon: 'alert_circle', danger: true }); }); });
+    loadJsPDF(() => { doExport().catch(err => { if (err?.name === 'AbortError') return; console.error(err); showAlert('PDF konnte nicht erstellt werden.', { title: 'Fehler', icon: 'alert_circle', danger: true }); }); });
   }
   async function doExport() {
     const { jsPDF } = window.jspdf;
