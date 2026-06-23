@@ -247,7 +247,7 @@
   // ── PDF ──
   function holesPDF() {
     if (!result || result.kind !== 'row') return;
-    loadJsPDF(() => { holesDoExport().catch(e => { console.error(e); showAlert('PDF konnte nicht erstellt werden.', { title: 'Fehler', icon: 'alert_circle', danger: true }); }); });
+    loadJsPDF(() => { holesDoExport().catch(e => { if (e?.name === 'AbortError') return; console.error(e); showAlert('PDF konnte nicht erstellt werden.', { title: 'Fehler', icon: 'alert_circle', danger: true }); }); });
   }
 
   async function holesDoExport() {
@@ -281,12 +281,19 @@
       [String(i + 1), dispVal(c), i > 0 ? dispVal(gaps[i - 1]) : '–'].forEach((v, ci) => { doc.text(String(v), xi + 1, y); xi += colW[ci]; });
       y += 5.5;
     });
-    doc.save('betterkerf-lochabstaende.pdf');
+    const filename = 'betterkerf-lochabstaende.pdf';
+    const blob = doc.output('blob');
+    const file = new File([blob], filename, { type: 'application/pdf' });
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      await navigator.share({ files: [file], title: filename });
+    } else {
+      doc.save(filename);
+    }
   }
 
   function gridPDF() {
     if (!result || result.kind !== 'grid') return;
-    loadJsPDF(() => { gridDoExport().catch(e => { console.error(e); showAlert('PDF konnte nicht erstellt werden.', { title: 'Fehler', icon: 'alert_circle', danger: true }); }); });
+    loadJsPDF(() => { gridDoExport().catch(e => { if (e?.name === 'AbortError') return; console.error(e); showAlert('PDF konnte nicht erstellt werden.', { title: 'Fehler', icon: 'alert_circle', danger: true }); }); });
   }
 
   async function gridDoExport() {
@@ -325,7 +332,14 @@
       [String(i + 1), `R${p.row} S${p.col}`, dispVal(p.x), dispVal(p.y)].forEach((v, ci) => { doc.text(String(v), xi + 1, y); xi += tc[ci]; });
       y += 5.5;
     });
-    doc.save('betterkerf-lochraster.pdf');
+    const filename = 'betterkerf-lochraster.pdf';
+    const blob = doc.output('blob');
+    const file = new File([blob], filename, { type: 'application/pdf' });
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      await navigator.share({ files: [file], title: filename });
+    } else {
+      doc.save(filename);
+    }
   }
 
   // ── 1:1-Bohrschablone ──
@@ -489,24 +503,38 @@
 
   function holesTemplate() {
     if (!result || result.kind !== 'row') return;
-    loadJsPDF(() => {
-      try {
-        const { L, centers, width, dia } = result.data;
-        const stripH = (width && width > 0) ? width : Math.min(40, Math.max(20, L * 0.05));
-        const pts = centers.map(c => ({ x: c, y: stripH / 2 }));
-        buildTemplate(pts, L, stripH, 'Bohrschablone Reihe', dia > 0 ? dia : 0).save('betterkerf-schablone-reihe.pdf');
-      } catch (e) { console.error(e); showAlert('Schablone konnte nicht erstellt werden.', { title: 'Fehler', icon: 'alert_circle', danger: true }); }
-    });
+    loadJsPDF(() => { holesTemplateExport().catch(e => { if (e?.name === 'AbortError') return; console.error(e); showAlert('Schablone konnte nicht erstellt werden.', { title: 'Fehler', icon: 'alert_circle', danger: true }); }); });
+  }
+  async function holesTemplateExport() {
+    const { L, centers, width, dia } = result.data;
+    const stripH = (width && width > 0) ? width : Math.min(40, Math.max(20, L * 0.05));
+    const pts = centers.map(c => ({ x: c, y: stripH / 2 }));
+    const doc = buildTemplate(pts, L, stripH, 'Bohrschablone Reihe', dia > 0 ? dia : 0);
+    const filename = 'betterkerf-schablone-reihe.pdf';
+    const blob = doc.output('blob');
+    const file = new File([blob], filename, { type: 'application/pdf' });
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      await navigator.share({ files: [file], title: filename });
+    } else {
+      doc.save(filename);
+    }
   }
 
   function gridTemplate() {
     if (!result || result.kind !== 'grid') return;
-    loadJsPDF(() => {
-      try {
-        const { W, H, pts, dia } = result.data;
-        buildTemplate(pts.map(p => ({ x: p.x, y: p.y })), W, H, 'Bohrschablone Raster', dia > 0 ? dia : 0).save('betterkerf-schablone-raster.pdf');
-      } catch (e) { console.error(e); showAlert('Schablone konnte nicht erstellt werden.', { title: 'Fehler', icon: 'alert_circle', danger: true }); }
-    });
+    loadJsPDF(() => { gridTemplateExport().catch(e => { if (e?.name === 'AbortError') return; console.error(e); showAlert('Schablone konnte nicht erstellt werden.', { title: 'Fehler', icon: 'alert_circle', danger: true }); }); });
+  }
+  async function gridTemplateExport() {
+    const { W, H, pts, dia } = result.data;
+    const doc = buildTemplate(pts.map(p => ({ x: p.x, y: p.y })), W, H, 'Bohrschablone Raster', dia > 0 ? dia : 0);
+    const filename = 'betterkerf-schablone-raster.pdf';
+    const blob = doc.output('blob');
+    const file = new File([blob], filename, { type: 'application/pdf' });
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      await navigator.share({ files: [file], title: filename });
+    } else {
+      doc.save(filename);
+    }
   }
 
   async function holesReset() {

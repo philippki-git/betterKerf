@@ -237,7 +237,7 @@
   // ── PDF ──
   function drawerPDF() {
     if (calc.state !== 'ok') { showAlert('Bitte zuerst gültige Maße eingeben.', { title: 'Fehlende Maße', icon: 'information' }); return; }
-    loadJsPDF(() => { drawerDoPDF().catch(e => { console.error(e); showAlert('PDF konnte nicht erstellt werden.', { title: 'Fehler', icon: 'alert_circle', danger: true }); }); });
+    loadJsPDF(() => { drawerDoPDF().catch(e => { if (e?.name === 'AbortError') return; console.error(e); showAlert('PDF konnte nicht erstellt werden.', { title: 'Fehler', icon: 'alert_circle', danger: true }); }); });
   }
   async function drawerDoPDF() {
     const { jsPDF } = window.jspdf;
@@ -296,7 +296,14 @@
     });
     doc.setTextColor(0);
     doc.setFontSize(8); doc.setTextColor(150, 140, 130); doc.text('Masse als Zuschnittmasse der Einzelteile. Schienen-/Beschlagabzuege nach Herstellerangabe pruefen.', lm, 289);
-    doc.save('betterkerf-schubkasten.pdf');
+    const filename = 'betterkerf-schubkasten.pdf';
+    const blob = doc.output('blob');
+    const file = new File([blob], filename, { type: 'application/pdf' });
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      await navigator.share({ files: [file], title: filename });
+    } else {
+      doc.save(filename);
+    }
   }
 
   // ── Info-Sheet-Inhalte ──

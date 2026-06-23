@@ -175,7 +175,7 @@
   // ── PDF ──
   function korpusPDF() {
     if (!kpParts.length) { showAlert('Bitte zuerst gültige Außenmaße eingeben.', { title: 'Fehlende Maße', icon: 'information' }); return; }
-    loadJsPDF(() => { korpusDoPDF().catch(e => { console.error(e); showAlert('PDF konnte nicht erstellt werden.', { title: 'Fehler', icon: 'alert_circle', danger: true }); }); });
+    loadJsPDF(() => { korpusDoPDF().catch(e => { if (e?.name === 'AbortError') return; console.error(e); showAlert('PDF konnte nicht erstellt werden.', { title: 'Fehler', icon: 'alert_circle', danger: true }); }); });
   }
   async function korpusDoPDF() {
     const { jsPDF } = window.jspdf;
@@ -251,7 +251,14 @@
     doc.setTextColor(0);
     doc.setFontSize(8); doc.setTextColor(150, 140, 130);
     doc.text('Maße als Zuschnittmaße der Einzelteile. Verbindungsmittel (Dübel, Lamello o.ä.) nach eigener Konstruktion.', lm, 289);
-    doc.save('betterkerf-korpus.pdf');
+    const filename = 'betterkerf-korpus.pdf';
+    const blob = doc.output('blob');
+    const file = new File([blob], filename, { type: 'application/pdf' });
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      await navigator.share({ files: [file], title: filename });
+    } else {
+      doc.save(filename);
+    }
   }
 
   // ── Tab-Swipe ──

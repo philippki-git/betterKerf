@@ -183,9 +183,9 @@
   // ── PDF ──
   function exportPDF() {
     if (!lastCost) { showAlert('Bitte zuerst die Kosten berechnen.', { title: 'Kein Ergebnis', icon: 'information' }); return; }
-    loadJsPDF(() => { try { doPDF(); } catch (e) { console.error(e); showAlert('PDF konnte nicht erstellt werden.', { title: 'Fehler', icon: 'alert_circle', danger: true }); } });
+    loadJsPDF(() => { doPDF().catch(e => { if (e?.name === 'AbortError') return; console.error(e); showAlert('PDF konnte nicht erstellt werden.', { title: 'Fehler', icon: 'alert_circle', danger: true }); }); });
   }
-  function doPDF() {
+  async function doPDF() {
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF({ unit: 'mm', format: 'a4' });
     const c = lastCost; const ul = unitLabel();
@@ -238,7 +238,14 @@
     }
     doc.setFontSize(8); doc.setTextColor(150, 140, 130);
     doc.text('Alle Preise in EUR. Teil-Preise anteilig nach Flaeche; Verschnittwert separat.', lm, 287);
-    doc.save('betterkerf-materialkosten.pdf');
+    const filename = 'betterkerf-materialkosten.pdf';
+    const blob = doc.output('blob');
+    const file = new File([blob], filename, { type: 'application/pdf' });
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      await navigator.share({ files: [file], title: filename });
+    } else {
+      doc.save(filename);
+    }
   }
 </script>
 
