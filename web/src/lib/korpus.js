@@ -110,7 +110,7 @@ export function korpusSketch(H, B, T, s, sr, constr, back, nut, shelves, divider
   const ox = pad, oy = pad;
   const sx = pad + fW + gap;
 
-  const col = { body: '#5B8DB8', bodyFill: 'rgba(91,141,184,.18)', back: '#9B6B9B', backFill: 'rgba(155,107,155,.28)', shelf: '#2E7D5E', div: '#C07A2E', line: '#7A7268', txt: '#B8AF9E' };
+  const col = { body: '#2E7D5E', bodyFill: 'rgba(46,125,94,.18)', back: '#9B6B9B', backFill: 'rgba(155,107,155,.28)', shelf: '#5090BE', div: '#C07A2E', line: '#7A7268', txt: '#B8AF9E' };
   let p = '';
   p += `<rect x="${ox}" y="${oy}" width="${fW}" height="${fH}" fill="${col.bodyFill}" stroke="${col.body}" stroke-width="1.2"/>`;
   if (constr === 'sides') {
