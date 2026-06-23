@@ -7,7 +7,7 @@
   import { projects, saveProject, findProject, deleteProject } from '../lib/cutlistProjects.svelte.js';
   import { cutlistSettings } from '../lib/cutlistSettings.svelte.js';
   import { cutlistInput, EXAMPLE_STOCK, EXAMPLE_PARTS } from '../lib/cutlistInput.svelte.js';
-  import { loadJsPDF, svgToPng } from '../lib/pdf.js';
+  import { loadJsPDF, svgToPng, savePDF } from '../lib/pdf.js';
   import { handoff } from '../lib/handoff.svelte.js';
   import { cutlistResult } from '../lib/cutlistResult.svelte.js';
   import { onMount } from 'svelte';
@@ -433,14 +433,7 @@
     // On iOS, doc.save() triggers a programmatic blob-link click which causes
     // Safari to zoom the page. Use the Web Share API instead — it opens the
     // native share/save sheet without triggering a download and thus no zoom.
-    const filename = 'betterkerf-schnittplan.pdf';
-    const blob = doc.output('blob');
-    const file = new File([blob], filename, { type: 'application/pdf' });
-    if (navigator.canShare && navigator.canShare({ files: [file] })) {
-      await navigator.share({ files: [file], title: filename });
-    } else {
-      doc.save(filename);
-    }
+    await savePDF(doc, 'betterkerf-schnittplan.pdf');
   }
 
   // ── Tab-Swipe (innerhalb des Moduls; linker Rand bleibt der App für „Zurück") ──

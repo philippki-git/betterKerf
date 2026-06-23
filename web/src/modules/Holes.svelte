@@ -5,7 +5,7 @@
   import { showConfirm, showAlert, showToast } from '../lib/dialog.svelte.js';
   import { openZoom } from '../lib/zoom.svelte.js';
   import { computeHoles, axisEdgeIssues, widthEdgeIssue } from '../lib/holes.js';
-  import { loadJsPDF, svgToPng } from '../lib/pdf.js';
+  import { loadJsPDF, svgToPng, savePDF } from '../lib/pdf.js';
   import { handoff } from '../lib/handoff.svelte.js';
 
   let mode = $state('row');
@@ -281,14 +281,7 @@
       [String(i + 1), dispVal(c), i > 0 ? dispVal(gaps[i - 1]) : '–'].forEach((v, ci) => { doc.text(String(v), xi + 1, y); xi += colW[ci]; });
       y += 5.5;
     });
-    const filename = 'betterkerf-lochabstaende.pdf';
-    const blob = doc.output('blob');
-    const file = new File([blob], filename, { type: 'application/pdf' });
-    if (navigator.canShare && navigator.canShare({ files: [file] })) {
-      await navigator.share({ files: [file], title: filename });
-    } else {
-      doc.save(filename);
-    }
+    await savePDF(doc, 'betterkerf-lochabstaende.pdf');
   }
 
   function gridPDF() {
@@ -332,14 +325,7 @@
       [String(i + 1), `R${p.row} S${p.col}`, dispVal(p.x), dispVal(p.y)].forEach((v, ci) => { doc.text(String(v), xi + 1, y); xi += tc[ci]; });
       y += 5.5;
     });
-    const filename = 'betterkerf-lochraster.pdf';
-    const blob = doc.output('blob');
-    const file = new File([blob], filename, { type: 'application/pdf' });
-    if (navigator.canShare && navigator.canShare({ files: [file] })) {
-      await navigator.share({ files: [file], title: filename });
-    } else {
-      doc.save(filename);
-    }
+    await savePDF(doc, 'betterkerf-lochraster.pdf');
   }
 
   // ── 1:1-Bohrschablone ──
@@ -510,14 +496,7 @@
     const stripH = (width && width > 0) ? width : Math.min(40, Math.max(20, L * 0.05));
     const pts = centers.map(c => ({ x: c, y: stripH / 2 }));
     const doc = buildTemplate(pts, L, stripH, 'Bohrschablone Reihe', dia > 0 ? dia : 0);
-    const filename = 'betterkerf-schablone-reihe.pdf';
-    const blob = doc.output('blob');
-    const file = new File([blob], filename, { type: 'application/pdf' });
-    if (navigator.canShare && navigator.canShare({ files: [file] })) {
-      await navigator.share({ files: [file], title: filename });
-    } else {
-      doc.save(filename);
-    }
+    await savePDF(doc, 'betterkerf-schablone-reihe.pdf');
   }
 
   function gridTemplate() {
@@ -527,14 +506,7 @@
   async function gridTemplateExport() {
     const { W, H, pts, dia } = result.data;
     const doc = buildTemplate(pts.map(p => ({ x: p.x, y: p.y })), W, H, 'Bohrschablone Raster', dia > 0 ? dia : 0);
-    const filename = 'betterkerf-schablone-raster.pdf';
-    const blob = doc.output('blob');
-    const file = new File([blob], filename, { type: 'application/pdf' });
-    if (navigator.canShare && navigator.canShare({ files: [file] })) {
-      await navigator.share({ files: [file], title: filename });
-    } else {
-      doc.save(filename);
-    }
+    await savePDF(doc, 'betterkerf-schablone-raster.pdf');
   }
 
   async function holesReset() {

@@ -3,7 +3,7 @@
   import { unitLabel, dispVal, toMM, inputVal } from '../lib/units.svelte.js';
   import { showAlert, showConfirm } from '../lib/dialog.svelte.js';
   import { cutlistResult } from '../lib/cutlistResult.svelte.js';
-  import { loadJsPDF } from '../lib/pdf.js';
+  import { loadJsPDF, savePDF } from '../lib/pdf.js';
   import { nav } from '../lib/nav.svelte.js';
 
   // ── State ──
@@ -238,14 +238,7 @@
     }
     doc.setFontSize(8); doc.setTextColor(150, 140, 130);
     doc.text('Alle Preise in EUR. Teil-Preise anteilig nach Flaeche; Verschnittwert separat.', lm, 287);
-    const filename = 'betterkerf-materialkosten.pdf';
-    const blob = doc.output('blob');
-    const file = new File([blob], filename, { type: 'application/pdf' });
-    if (navigator.canShare && navigator.canShare({ files: [file] })) {
-      await navigator.share({ files: [file], title: filename });
-    } else {
-      doc.save(filename);
-    }
+    await savePDF(doc, 'betterkerf-materialkosten.pdf');
   }
 </script>
 

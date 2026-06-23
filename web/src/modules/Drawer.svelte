@@ -4,7 +4,7 @@
   import { units, UNITS, unitLabel, dispVal, toMM, inputVal } from '../lib/units.svelte.js';
   import { showConfirm, showAlert, showToast } from '../lib/dialog.svelte.js';
   import { openZoom } from '../lib/zoom.svelte.js';
-  import { loadJsPDF, svgToPng } from '../lib/pdf.js';
+  import { loadJsPDF, svgToPng, savePDF } from '../lib/pdf.js';
   import { DR_PRESETS, drawerGeometry, drawerGuide, drawerSketch, bestStd } from '../lib/drawer.js';
   import { drawerProjects, saveDrawerProject, findDrawerProject, deleteDrawerProject } from '../lib/drawerProjects.svelte.js';
   import { handoff } from '../lib/handoff.svelte.js';
@@ -296,14 +296,7 @@
     });
     doc.setTextColor(0);
     doc.setFontSize(8); doc.setTextColor(150, 140, 130); doc.text('Masse als Zuschnittmasse der Einzelteile. Schienen-/Beschlagabzuege nach Herstellerangabe pruefen.', lm, 289);
-    const filename = 'betterkerf-schubkasten.pdf';
-    const blob = doc.output('blob');
-    const file = new File([blob], filename, { type: 'application/pdf' });
-    if (navigator.canShare && navigator.canShare({ files: [file] })) {
-      await navigator.share({ files: [file], title: filename });
-    } else {
-      doc.save(filename);
-    }
+    await savePDF(doc, 'betterkerf-schubkasten.pdf');
   }
 
   // ── Info-Sheet-Inhalte ──

@@ -3,7 +3,7 @@
   import InfoSheet from '../lib/InfoSheet.svelte';
   import { units, UNITS, unitLabel, dispVal, toMM, inputVal } from '../lib/units.svelte.js';
   import { showConfirm, showAlert, showToast } from '../lib/dialog.svelte.js';
-  import { loadJsPDF, svgToPng } from '../lib/pdf.js';
+  import { loadJsPDF, svgToPng, savePDF } from '../lib/pdf.js';
   import { korpusGeometry, korpusGuide, korpusSketch, computeShelfPositions, computeDivPositions } from '../lib/korpus.js';
   import { korpusProjects, saveKorpusProject, findKorpusProject, deleteKorpusProject } from '../lib/korpusProjects.svelte.js';
   import { handoff } from '../lib/handoff.svelte.js';
@@ -251,14 +251,7 @@
     doc.setTextColor(0);
     doc.setFontSize(8); doc.setTextColor(150, 140, 130);
     doc.text('Maße als Zuschnittmaße der Einzelteile. Verbindungsmittel (Dübel, Lamello o.ä.) nach eigener Konstruktion.', lm, 289);
-    const filename = 'betterkerf-korpus.pdf';
-    const blob = doc.output('blob');
-    const file = new File([blob], filename, { type: 'application/pdf' });
-    if (navigator.canShare && navigator.canShare({ files: [file] })) {
-      await navigator.share({ files: [file], title: filename });
-    } else {
-      doc.save(filename);
-    }
+    await savePDF(doc, 'betterkerf-korpus.pdf');
   }
 
   // ── Tab-Swipe ──

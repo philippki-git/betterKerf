@@ -11,6 +11,21 @@ export function loadJsPDF(cb) {
   document.body.appendChild(s);
 }
 
+// PDF speichern: Web Share API auf iOS (verhindert Zoom-Bug), direkter
+// Download per <a> auf allen anderen Plattformen.
+export async function savePDF(doc, filename) {
+  const isIOS = /iP(hone|ad|od)/.test(navigator.userAgent);
+  if (isIOS) {
+    const blob = doc.output('blob');
+    const file = new File([blob], filename, { type: 'application/pdf' });
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      await navigator.share({ files: [file], title: filename });
+      return;
+    }
+  }
+  doc.save(filename);
+}
+
 // Ein Inline-<svg> in eine PNG-Data-URL rastern (sf = Auflösungsfaktor).
 export function svgToPng(svgEl, sf = 3) {
   return new Promise((resolve, reject) => {
