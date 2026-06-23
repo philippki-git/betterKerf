@@ -9,15 +9,9 @@
   import { handoff } from '../lib/handoff.svelte.js';
   import { nav } from '../lib/nav.svelte.js';
   import { openZoom } from '../lib/zoom.svelte.js';
+  import { korpusInput } from '../lib/korpusInput.svelte.js';
 
-  // ── Eingaben (Anzeigeeinheit) ──
-  let kpH = $state(inputVal(900)), kpB = $state(inputVal(600)), kpT = $state(inputVal(600));
-  let kpS = $state(inputVal(18)), kpSr = $state(inputVal(5));
-  let shelves = $state(0), dividers = $state(0);
-  let kpConstr = $state('sides');     // 'sides' | 'topbot'
-  let kpBack = $state('inset');       // 'inset' | 'framed' | 'overlay' | 'none'
-  let kpShelfCustom = $state(false), kpShelfStates = $state([]); // [{fixed,posMM,disp}]
-  let kpDivCustom = $state(false), kpDivStates = $state([]);
+  const ki = korpusInput;
 
   let tab = $state('input');          // 'input' | 'projects' | 'guide'
   let projName = $state('');
@@ -25,45 +19,45 @@
   let sketchEl = $state(null);
 
   // ── Maße in mm ──
-  const H = $derived(toMM(kpH)), B = $derived(toMM(kpB)), T = $derived(toMM(kpT));
-  const s = $derived(toMM(kpS) || 18), sr = $derived(toMM(kpSr) || 5), nut = $derived((toMM(kpSr) || 5) + 1);
-  const shelvesN = $derived(Math.max(0, parseInt(shelves) || 0));
-  const dividersN = $derived(Math.max(0, parseInt(dividers) || 0));
+  const H = $derived(toMM(ki.kpH)), B = $derived(toMM(ki.kpB)), T = $derived(toMM(ki.kpT));
+  const s = $derived(toMM(ki.kpS) || 18), sr = $derived(toMM(ki.kpSr) || 5), nut = $derived((toMM(ki.kpSr) || 5) + 1);
+  const shelvesN = $derived(Math.max(0, parseInt(ki.shelves) || 0));
+  const dividersN = $derived(Math.max(0, parseInt(ki.dividers) || 0));
   const innerH = $derived(Math.max(0, H - 2 * s));
   const innerW = $derived(Math.max(0, B - 2 * s));
 
   // Custom-Status-Arrays an die Anzahl anpassen
   $effect(() => {
-    if (shelvesN === 0) { if (kpShelfCustom) kpShelfCustom = false; if (kpShelfStates.length) kpShelfStates = []; return; }
-    if (kpShelfCustom && kpShelfStates.length !== shelvesN + 1) {
-      const old = kpShelfStates;
-      kpShelfStates = Array.from({ length: shelvesN + 1 }, (_, i) => old[i] || { fixed: false, posMM: 0, disp: '' });
+    if (shelvesN === 0) { if (ki.kpShelfCustom) ki.kpShelfCustom = false; if (ki.kpShelfStates.length) ki.kpShelfStates = []; return; }
+    if (ki.kpShelfCustom && ki.kpShelfStates.length !== shelvesN + 1) {
+      const old = ki.kpShelfStates;
+      ki.kpShelfStates = Array.from({ length: shelvesN + 1 }, (_, i) => old[i] || { fixed: false, posMM: 0, disp: '' });
     }
   });
   $effect(() => {
-    if (dividersN === 0) { if (kpDivCustom) kpDivCustom = false; if (kpDivStates.length) kpDivStates = []; return; }
-    if (kpDivCustom && kpDivStates.length !== dividersN + 1) {
-      const old = kpDivStates;
-      kpDivStates = Array.from({ length: dividersN + 1 }, (_, i) => old[i] || { fixed: false, posMM: 0, disp: '' });
+    if (dividersN === 0) { if (ki.kpDivCustom) ki.kpDivCustom = false; if (ki.kpDivStates.length) ki.kpDivStates = []; return; }
+    if (ki.kpDivCustom && ki.kpDivStates.length !== dividersN + 1) {
+      const old = ki.kpDivStates;
+      ki.kpDivStates = Array.from({ length: dividersN + 1 }, (_, i) => old[i] || { fixed: false, posMM: 0, disp: '' });
     }
   });
 
-  const shelfComputed = $derived(kpShelfStates.length ? computeShelfPositions(kpShelfStates, innerH, s) : []);
-  const divComputed = $derived(kpDivStates.length ? computeDivPositions(kpDivStates, innerW, s) : []);
-  const shelfPos = $derived(kpShelfCustom && kpShelfStates.length > 0 ? shelfComputed : null);
-  const divPos = $derived(kpDivCustom && kpDivStates.length > 0 ? divComputed : null);
+  const shelfComputed = $derived(ki.kpShelfStates.length ? computeShelfPositions(ki.kpShelfStates, innerH, s) : []);
+  const divComputed = $derived(ki.kpDivStates.length ? computeDivPositions(ki.kpDivStates, innerW, s) : []);
+  const shelfPos = $derived(ki.kpShelfCustom && ki.kpShelfStates.length > 0 ? shelfComputed : null);
+  const divPos = $derived(ki.kpDivCustom && ki.kpDivStates.length > 0 ? divComputed : null);
 
   // ── Berechnung (rein reaktiv) ──
   const calc = $derived.by(() => {
     if (H <= 0 || B <= 0 || T <= 0) return { state: 'empty' };
     if (2 * s >= B || 2 * s >= H) return { state: 'warn', head: '⚠️ Maße prüfen', hint: 'Die Plattenstärke ist zu groß für die angegebenen Außenmaße. Bitte Werte korrigieren.' };
     if (dividersN > 0 && (B - 2 * s - dividersN * s) / (dividersN + 1) < 10) return { state: 'warn', head: '⚠️ Zu viele Trennwände', hint: `Bei dieser Breite bleibt für ${dividersN + 1} Fächer kein sinnvoller Platz. Reduziere die Anzahl der Trennwände oder vergrößere die Breite.` };
-    return { state: 'ok', parts: korpusGeometry(H, B, T, s, sr, kpConstr, kpBack, nut, shelvesN, dividersN) };
+    return { state: 'ok', parts: korpusGeometry(H, B, T, s, sr, ki.kpConstr, ki.kpBack, nut, shelvesN, dividersN) };
   });
   const kpParts = $derived(calc.state === 'ok' ? calc.parts : []);
   const hasGuide = $derived(calc.state === 'ok');
-  const sketchHTML = $derived(calc.state === 'ok' ? korpusSketch(H, B, T, s, sr, kpConstr, kpBack, nut, shelvesN, dividersN, shelfPos, divPos) : '');
-  const guideSteps = $derived(calc.state === 'ok' ? korpusGuide(kpConstr, kpBack, nut, shelvesN, dividersN, shelfPos, kpShelfCustom, kpShelfStates) : []);
+  const sketchHTML = $derived(calc.state === 'ok' ? korpusSketch(H, B, T, s, sr, ki.kpConstr, ki.kpBack, nut, shelvesN, dividersN, shelfPos, divPos) : '');
+  const guideSteps = $derived(calc.state === 'ok' ? korpusGuide(ki.kpConstr, ki.kpBack, nut, shelvesN, dividersN, shelfPos, ki.kpShelfCustom, ki.kpShelfStates) : []);
   const totalPieces = $derived(kpParts.reduce((a, p) => a + p.qty, 0));
   const totalAreaStr = $derived((kpParts.reduce((a, p) => a + p.l * p.w * p.qty, 0) / 1e6).toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
 
@@ -81,25 +75,25 @@
     if (u === prevU) return;
     const oldF = UNITS[prevU].f;
     const conv = v => { if (v === '' || v == null) return v; const mm = (parseFloat(String(v).replace(',', '.')) || 0) * oldF; return mm ? inputVal(mm) : ''; };
-    kpH = conv(kpH); kpB = conv(kpB); kpT = conv(kpT); kpS = conv(kpS); kpSr = conv(kpSr);
-    kpShelfStates.forEach(st => { if (st.fixed) st.disp = st.posMM ? String(inputVal(st.posMM)) : ''; });
-    kpDivStates.forEach(st => { if (st.fixed) st.disp = st.posMM ? String(inputVal(st.posMM)) : ''; });
+    ki.kpH = conv(ki.kpH); ki.kpB = conv(ki.kpB); ki.kpT = conv(ki.kpT); ki.kpS = conv(ki.kpS); ki.kpSr = conv(ki.kpSr);
+    ki.kpShelfStates.forEach(st => { if (st.fixed) st.disp = st.posMM ? String(inputVal(st.posMM)) : ''; });
+    ki.kpDivStates.forEach(st => { if (st.fixed) st.disp = st.posMM ? String(inputVal(st.posMM)) : ''; });
     prevU = u;
   });
 
   // ── Custom-Positionen: Lock-Umschalten & Eingabe ──
   function toggleShelfFixed(i) {
-    const st = kpShelfStates[i]; if (!st) return;
-    if (!st.fixed) { const c = computeShelfPositions(kpShelfStates, innerH, s); st.fixed = true; st.posMM = c[i]; st.disp = String(inputVal(c[i])); }
+    const st = ki.kpShelfStates[i]; if (!st) return;
+    if (!st.fixed) { const c = computeShelfPositions(ki.kpShelfStates, innerH, s); st.fixed = true; st.posMM = c[i]; st.disp = String(inputVal(c[i])); }
     else { st.fixed = false; st.posMM = 0; st.disp = ''; }
   }
-  function setShelfPos(i, val) { const st = kpShelfStates[i]; if (st) { st.disp = val; st.posMM = toMM(val); } }
+  function setShelfPos(i, val) { const st = ki.kpShelfStates[i]; if (st) { st.disp = val; st.posMM = toMM(val); } }
   function toggleDivFixed(i) {
-    const st = kpDivStates[i]; if (!st) return;
-    if (!st.fixed) { const c = computeDivPositions(kpDivStates, innerW, s); st.fixed = true; st.posMM = c[i]; st.disp = String(inputVal(c[i])); }
+    const st = ki.kpDivStates[i]; if (!st) return;
+    if (!st.fixed) { const c = computeDivPositions(ki.kpDivStates, innerW, s); st.fixed = true; st.posMM = c[i]; st.disp = String(inputVal(c[i])); }
     else { st.fixed = false; st.posMM = 0; st.disp = ''; }
   }
-  function setDivPos(i, val) { const st = kpDivStates[i]; if (st) { st.disp = val; st.posMM = toMM(val); } }
+  function setDivPos(i, val) { const st = ki.kpDivStates[i]; if (st) { st.disp = val; st.posMM = toMM(val); } }
 
   const backInfoItems = [
     { title: 'Eingenutet', html: 'Die Rückwand sitzt in einer umlaufenden Nut, die in Seiten, Boden und Deckel gefräst wird. Sie ist von außen unsichtbar und der Korpus wirkt rundum geschlossen. Etwas aufwändiger in der Fertigung, da die Nut exakt sitzen muss. <strong>Die Nuttiefe wird automatisch berechnet: Rückwandstärke + 1 mm.</strong>' },
@@ -116,9 +110,7 @@
   async function korpusReset() {
     const ok = await showConfirm('Korpusplaner zurücksetzen?', 'Alle eingegebenen Maße werden auf die Standardwerte zurückgesetzt.', { confirmLabel: 'Zurücksetzen', danger: true, icon: 'restart_alt' });
     if (!ok) return;
-    kpH = inputVal(900); kpB = inputVal(600); kpT = inputVal(600); kpS = inputVal(18); kpSr = inputVal(5);
-    shelves = 0; dividers = 0; kpConstr = 'sides'; kpBack = 'inset';
-    kpShelfCustom = false; kpShelfStates = []; kpDivCustom = false; kpDivStates = [];
+    ki.reset();
     tab = 'input';
   }
 
@@ -126,11 +118,11 @@
   function buildProject(name) {
     return {
       name, saved: new Date().toLocaleDateString('de-DE'),
-      dims: { H: toMM(kpH), B: toMM(kpB), T: toMM(kpT), s: toMM(kpS), sr: toMM(kpSr) },
-      shelves: parseInt(shelves) || 0, dividers: parseInt(dividers) || 0,
-      constr: kpConstr, back: kpBack,
-      shelfCustom: kpShelfCustom, shelfStates: kpShelfCustom ? kpShelfStates.map(st => ({ fixed: st.fixed, posMM: st.posMM })) : [],
-      divCustom: kpDivCustom, divStates: kpDivCustom ? kpDivStates.map(st => ({ fixed: st.fixed, posMM: st.posMM })) : []
+      dims: { H: toMM(ki.kpH), B: toMM(ki.kpB), T: toMM(ki.kpT), s: toMM(ki.kpS), sr: toMM(ki.kpSr) },
+      shelves: parseInt(ki.shelves) || 0, dividers: parseInt(ki.dividers) || 0,
+      constr: ki.kpConstr, back: ki.kpBack,
+      shelfCustom: ki.kpShelfCustom, shelfStates: ki.kpShelfCustom ? ki.kpShelfStates.map(st => ({ fixed: st.fixed, posMM: st.posMM })) : [],
+      divCustom: ki.kpDivCustom, divStates: ki.kpDivCustom ? ki.kpDivStates.map(st => ({ fixed: st.fixed, posMM: st.posMM })) : []
     };
   }
   async function saveProj() {
@@ -151,14 +143,14 @@
     const p = findKorpusProject(name); if (!p) return;
     const ok = await showConfirm('Projekt „' + name + '" laden?', 'Die aktuelle Eingabe wird dabei überschrieben.', { confirmLabel: 'Laden', icon: 'folder_open' });
     if (!ok) return;
-    kpH = p.dims.H ? inputVal(p.dims.H) : ''; kpB = p.dims.B ? inputVal(p.dims.B) : ''; kpT = p.dims.T ? inputVal(p.dims.T) : '';
-    kpS = p.dims.s ? inputVal(p.dims.s) : ''; kpSr = p.dims.sr ? inputVal(p.dims.sr) : '';
-    shelves = p.shelves || 0; dividers = p.dividers || 0;
-    kpConstr = p.constr || 'sides'; kpBack = p.back || 'inset';
-    kpShelfCustom = p.shelfCustom || false;
-    kpShelfStates = (p.shelfStates || []).map(st => ({ fixed: !!st.fixed, posMM: st.posMM || 0, disp: st.fixed && st.posMM ? String(inputVal(st.posMM)) : '' }));
-    kpDivCustom = p.divCustom || false;
-    kpDivStates = (p.divStates || []).map(st => ({ fixed: !!st.fixed, posMM: st.posMM || 0, disp: st.fixed && st.posMM ? String(inputVal(st.posMM)) : '' }));
+    ki.kpH = p.dims.H ? inputVal(p.dims.H) : ''; ki.kpB = p.dims.B ? inputVal(p.dims.B) : ''; ki.kpT = p.dims.T ? inputVal(p.dims.T) : '';
+    ki.kpS = p.dims.s ? inputVal(p.dims.s) : ''; ki.kpSr = p.dims.sr ? inputVal(p.dims.sr) : '';
+    ki.shelves = p.shelves || 0; ki.dividers = p.dividers || 0;
+    ki.kpConstr = p.constr || 'sides'; ki.kpBack = p.back || 'inset';
+    ki.kpShelfCustom = p.shelfCustom || false;
+    ki.kpShelfStates = (p.shelfStates || []).map(st => ({ fixed: !!st.fixed, posMM: st.posMM || 0, disp: st.fixed && st.posMM ? String(inputVal(st.posMM)) : '' }));
+    ki.kpDivCustom = p.divCustom || false;
+    ki.kpDivStates = (p.divStates || []).map(st => ({ fixed: !!st.fixed, posMM: st.posMM || 0, disp: st.fixed && st.posMM ? String(inputVal(st.posMM)) : '' }));
     tab = 'input';
   }
   async function delProj(name) {
@@ -202,16 +194,16 @@
     doc.text(`Außenmaße: ${dispVal(H)} x ${dispVal(B)} x ${dispVal(T)} ${u}  (HxBxT)`, lm + 3, y + 3);
     y += 15; doc.setTextColor(0);
 
-    const constrTxt = kpConstr === 'sides' ? 'Seiten durchgehend' : 'Boden/Deckel durchgehend';
-    const backTxt = { inset: 'eingenutet', framed: 'eingelassen', overlay: 'aufgesetzt', none: 'keine' }[kpBack];
+    const constrTxt = ki.kpConstr === 'sides' ? 'Seiten durchgehend' : 'Boden/Deckel durchgehend';
+    const backTxt = { inset: 'eingenutet', framed: 'eingelassen', overlay: 'aufgesetzt', none: 'keine' }[ki.kpBack];
     doc.setFont('helvetica', 'normal'); doc.setFontSize(9.5);
-    const cfg = `Plattenstärke ${dispVal(s)} ${u}  -  Konstruktion: ${constrTxt}  -  Rückwand: ${backTxt}${kpBack !== 'none' ? ` (${dispVal(sr)} ${u}` + (kpBack === 'inset' ? `, Nut ${dispVal(nut)} ${u} (auto)` : '') + ')' : ''}`;
+    const cfg = `Plattenstärke ${dispVal(s)} ${u}  -  Konstruktion: ${constrTxt}  -  Rückwand: ${backTxt}${ki.kpBack !== 'none' ? ` (${dispVal(sr)} ${u}` + (ki.kpBack === 'inset' ? `, Nut ${dispVal(nut)} ${u} (auto)` : '') + ')' : ''}`;
     const cfgLines = doc.splitTextToSize(cfg, pw);
     doc.text(cfgLines, lm, y); y += 5 + (cfgLines.length > 1 ? 4 : 0);
     if (dividersN > 0 || shelvesN > 0) {
       let shelfTxt = `Trennwände: ${dividersN}  -  Einlegeböden: ${shelvesN * (dividersN + 1)}${dividersN > 0 ? ` (${shelvesN} je Fach)` : ''}`;
-      if (shelfPos && kpShelfStates.some(st => st.fixed)) {
-        const fixedParts = kpShelfStates.map((st, i) => st.fixed ? `B${i + 1}=${dispVal(shelfPos[i])}` : '').filter(Boolean);
+      if (shelfPos && ki.kpShelfStates.some(st => st.fixed)) {
+        const fixedParts = ki.kpShelfStates.map((st, i) => st.fixed ? `B${i + 1}=${dispVal(shelfPos[i])}` : '').filter(Boolean);
         shelfTxt += `  -  Individuell: ${fixedParts.join(', ')} ${u}`;
       }
       const shelfLines = doc.splitTextToSize(shelfTxt, pw);
@@ -244,7 +236,7 @@
     doc.text(`Gesamt: ${totalPieces} Teile  -  ${totalAreaStr} m² Plattenfläche`, lm, y); y += 10;
     doc.setFont('helvetica', 'normal');
 
-    const guide = korpusGuide(kpConstr, kpBack, nut, shelvesN, dividersN, shelfPos, kpShelfCustom, kpShelfStates);
+    const guide = korpusGuide(ki.kpConstr, ki.kpBack, nut, shelvesN, dividersN, shelfPos, ki.kpShelfCustom, ki.kpShelfStates);
     checkY(14);
     doc.setFont('helvetica', 'bold'); doc.setFontSize(12); doc.text('Bau-Anleitung', lm, y); y += 7;
     doc.setFontSize(9.5);
@@ -288,17 +280,17 @@
       <div class="slabel">Außenmaße</div>
       <div class="hint-box">Die fertigen Außenmaße des Korpus. Die App berechnet daraus die Zuschnittmaße der Einzelteile.</div>
       <div class="kp-dims">
-        <div class="kp-field"><label for="kp-h">Höhe <span class="ku">{unitLabel()}</span></label><input id="kp-h" type="number" inputmode="decimal" bind:value={kpH} placeholder="0"></div>
-        <div class="kp-field"><label for="kp-b">Breite <span class="ku">{unitLabel()}</span></label><input id="kp-b" type="number" inputmode="decimal" bind:value={kpB} placeholder="0"></div>
-        <div class="kp-field"><label for="kp-t">Tiefe <span class="ku">{unitLabel()}</span></label><input id="kp-t" type="number" inputmode="decimal" bind:value={kpT} placeholder="0"></div>
+        <div class="kp-field"><label for="kp-h">Höhe <span class="ku">{unitLabel()}</span></label><input id="kp-h" type="number" inputmode="decimal" bind:value={ki.kpH} placeholder="0"></div>
+        <div class="kp-field"><label for="kp-b">Breite <span class="ku">{unitLabel()}</span></label><input id="kp-b" type="number" inputmode="decimal" bind:value={ki.kpB} placeholder="0"></div>
+        <div class="kp-field"><label for="kp-t">Tiefe <span class="ku">{unitLabel()}</span></label><input id="kp-t" type="number" inputmode="decimal" bind:value={ki.kpT} placeholder="0"></div>
       </div>
     </div>
 
     <div class="section">
       <div class="slabel">Material</div>
       <div class="kp-dims kp-dims-2">
-        <div class="kp-field"><label for="kp-s">Plattenstärke <span class="ku">{unitLabel()}</span></label><input id="kp-s" type="number" inputmode="decimal" bind:value={kpS} placeholder="18"></div>
-        <div class="kp-field"><label for="kp-sr">Rückwandstärke <span class="ku">{unitLabel()}</span></label><input id="kp-sr" type="number" inputmode="decimal" bind:value={kpSr} placeholder="5"></div>
+        <div class="kp-field"><label for="kp-s">Plattenstärke <span class="ku">{unitLabel()}</span></label><input id="kp-s" type="number" inputmode="decimal" bind:value={ki.kpS} placeholder="18"></div>
+        <div class="kp-field"><label for="kp-sr">Rückwandstärke <span class="ku">{unitLabel()}</span></label><input id="kp-sr" type="number" inputmode="decimal" bind:value={ki.kpSr} placeholder="5"></div>
       </div>
     </div>
 
@@ -306,8 +298,8 @@
       <div class="slabel-row"><div class="slabel">Konstruktion</div><button class="info-btn" onclick={() => showConstrInfo = true} aria-label="Erklärung zur Konstruktionsart">ⓘ</button></div>
       <div class="kp-seg-label">Verbindung Seiten / Boden &amp; Deckel</div>
       <div class="cost-seg kp-seg">
-        <button class:on={kpConstr === 'sides'} onclick={() => kpConstr = 'sides'}>Seiten durchgehend</button>
-        <button class:on={kpConstr === 'topbot'} onclick={() => kpConstr = 'topbot'}>Boden/Deckel durchgehend</button>
+        <button class:on={ki.kpConstr === 'sides'} onclick={() => ki.kpConstr = 'sides'}>Seiten durchgehend</button>
+        <button class:on={ki.kpConstr === 'topbot'} onclick={() => ki.kpConstr = 'topbot'}>Boden/Deckel durchgehend</button>
       </div>
     </div>
 
@@ -315,24 +307,24 @@
       <div class="slabel-row"><div class="slabel">Rückwand</div><button class="info-btn" onclick={() => showBackInfo = true} aria-label="Erklärung zu den Rückwand-Varianten">ⓘ</button></div>
       <div class="kp-seg-label">Befestigung &amp; Einbauart der Rückwand</div>
       <div class="cost-seg kp-seg kp-seg-4">
-        <button class:on={kpBack === 'inset'} onclick={() => kpBack = 'inset'}>eingenutet</button>
-        <button class:on={kpBack === 'framed'} onclick={() => kpBack = 'framed'}>eingelassen</button>
-        <button class:on={kpBack === 'overlay'} onclick={() => kpBack = 'overlay'}>aufgesetzt</button>
-        <button class:on={kpBack === 'none'} onclick={() => kpBack = 'none'}>keine</button>
+        <button class:on={ki.kpBack === 'inset'} onclick={() => ki.kpBack = 'inset'}>eingenutet</button>
+        <button class:on={ki.kpBack === 'framed'} onclick={() => ki.kpBack = 'framed'}>eingelassen</button>
+        <button class:on={ki.kpBack === 'overlay'} onclick={() => ki.kpBack = 'overlay'}>aufgesetzt</button>
+        <button class:on={ki.kpBack === 'none'} onclick={() => ki.kpBack = 'none'}>keine</button>
       </div>
-      {#if kpBack === 'inset'}<div class="srow-hint" style="margin-top:6px">Nuttiefe = Rückwandstärke + 1 mm (wird automatisch berechnet)</div>{/if}
+      {#if ki.kpBack === 'inset'}<div class="srow-hint" style="margin-top:6px">Nuttiefe = Rückwandstärke + 1 mm (wird automatisch berechnet)</div>{/if}
     </div>
 
     <div class="section">
-      <div class="srow"><div><div class="srow-label">Trennwände</div><div class="srow-hint">Senkrechte Trennwände teilen den Korpus in Fächer</div></div><div class="nm"><input type="number" inputmode="numeric" bind:value={dividers} min="0" max="20"><span>Stk</span></div></div>
+      <div class="srow"><div><div class="srow-label">Trennwände</div><div class="srow-hint">Senkrechte Trennwände teilen den Korpus in Fächer</div></div><div class="nm"><input type="number" inputmode="numeric" bind:value={ki.dividers} min="0" max="20"><span>Stk</span></div></div>
       {#if dividersN > 0}
-        <div class="srow" style="margin-top:4px"><div><div class="srow-label">Fachbreiten</div><div class="srow-hint">Lichte Breite jedes Fachs selbst festlegen</div></div><input type="checkbox" class="toggle" bind:checked={kpDivCustom}></div>
-        {#if kpDivCustom}
+        <div class="srow" style="margin-top:4px"><div><div class="srow-label">Fachbreiten</div><div class="srow-hint">Lichte Breite jedes Fachs selbst festlegen</div></div><input type="checkbox" class="toggle" bind:checked={ki.kpDivCustom}></div>
+        {#if ki.kpDivCustom}
           <div style="margin-top:8px">
-            {#each kpDivStates as st, i (i)}
+            {#each ki.kpDivStates as st, i (i)}
               <div class="srow">
-                <div><div class="srow-label">Fach {i + 1}{i === kpDivStates.length - 1 ? ' (rechts)' : ''}</div>
-                  {#if st.fixed}<div class="srow-hint">{i === kpDivStates.length - 1 ? 'Rechtestes Fach · Fachbreite individuell' : 'Fachbreite individuell · lichtes Maß'}</div>
+                <div><div class="srow-label">Fach {i + 1}{i === ki.kpDivStates.length - 1 ? ' (rechts)' : ''}</div>
+                  {#if st.fixed}<div class="srow-hint">{i === ki.kpDivStates.length - 1 ? 'Rechtestes Fach · Fachbreite individuell' : 'Fachbreite individuell · lichtes Maß'}</div>
                   {:else}<div class="srow-hint">Auto · Fachbreite: {dispVal(divComputed[i])} {unitLabel()}</div>{/if}
                 </div>
                 <div style="display:flex;align-items:center;gap:6px">
@@ -348,15 +340,15 @@
           </div>
         {/if}
       {/if}
-      <div class="srow"><div><div class="srow-label">{shelvesLabel}</div><div class="srow-hint">{shelvesHint}</div></div><div class="nm"><input type="number" inputmode="numeric" bind:value={shelves} min="0" max="50"><span>Stk</span></div></div>
+      <div class="srow"><div><div class="srow-label">{shelvesLabel}</div><div class="srow-hint">{shelvesHint}</div></div><div class="nm"><input type="number" inputmode="numeric" bind:value={ki.shelves} min="0" max="50"><span>Stk</span></div></div>
       {#if shelvesN > 0}
-        <div class="srow" style="margin-top:4px"><div><div class="srow-label">Fachhöhen</div><div class="srow-hint">Lichte Höhe jedes Fachs selbst festlegen</div></div><input type="checkbox" class="toggle" bind:checked={kpShelfCustom}></div>
-        {#if kpShelfCustom}
+        <div class="srow" style="margin-top:4px"><div><div class="srow-label">Fachhöhen</div><div class="srow-hint">Lichte Höhe jedes Fachs selbst festlegen</div></div><input type="checkbox" class="toggle" bind:checked={ki.kpShelfCustom}></div>
+        {#if ki.kpShelfCustom}
           <div style="margin-top:8px">
-            {#each kpShelfStates as st, i (i)}
+            {#each ki.kpShelfStates as st, i (i)}
               <div class="srow">
-                <div><div class="srow-label">Fach {i + 1}{i === kpShelfStates.length - 1 ? ' (oben)' : ''}</div>
-                  {#if st.fixed}<div class="srow-hint">{i === kpShelfStates.length - 1 ? 'Oberstes Fach · Fachhöhe individuell' : 'Fachhöhe individuell · lichtes Maß'}</div>
+                <div><div class="srow-label">Fach {i + 1}{i === ki.kpShelfStates.length - 1 ? ' (oben)' : ''}</div>
+                  {#if st.fixed}<div class="srow-hint">{i === ki.kpShelfStates.length - 1 ? 'Oberstes Fach · Fachhöhe individuell' : 'Fachhöhe individuell · lichtes Maß'}</div>
                   {:else}<div class="srow-hint">Auto · Fachhöhe: {dispVal(shelfComputed[i])} {unitLabel()}</div>{/if}
                 </div>
                 <div style="display:flex;align-items:center;gap:6px">
