@@ -431,16 +431,19 @@
     const cards = stepsEl ? stepsEl.querySelectorAll('.step-card') : [];
     cards.forEach((s, i) => { const title = pdfTxt(s.querySelector('.step-action').innerText); const detail = pdfTxt(s.querySelector('.step-detail').innerText); const lines = doc.splitTextToSize(detail, pw - 6); checkY(7 + lines.length * 4 + 4); doc.setFont('helvetica', 'bold'); doc.text(`Schritt ${i + 1}: ${title}`, lm, y); y += 4.5; doc.setFont('helvetica', 'normal'); doc.setTextColor(100); doc.text(lines, lm + 4, y); y += lines.length * 4 + 4; doc.setTextColor(0); });
     doc.save('betterkerf-schnittplan.pdf');
-    // iOS Safari zooms in after a file download and doesn't auto-reset.
-    // Fix: briefly set initial-scale=1 (no maximum-scale), wait a frame for
-    // the browser to apply it, then restore the full original content.
-    setTimeout(() => {
-      const vp = document.querySelector('meta[name="viewport"]');
-      if (!vp) return;
+    // iOS Safari zooms in when a file download is triggered. Force a zoom reset
+    // by toggling the viewport meta tag: remove maximum-scale so iOS accepts
+    // initial-scale=1, then restore the original constraints after one frame.
+    const vp = document.querySelector('meta[name="viewport"]');
+    if (vp) {
       const orig = vp.getAttribute('content');
-      vp.setAttribute('content', 'width=device-width, initial-scale=1');
-      setTimeout(() => vp.setAttribute('content', orig), 300);
-    }, 500);
+      vp.setAttribute('content', 'width=device-width, initial-scale=1.0');
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          vp.setAttribute('content', orig);
+        });
+      });
+    }
   }
 
   // ── Tab-Swipe (innerhalb des Moduls; linker Rand bleibt der App für „Zurück") ──
