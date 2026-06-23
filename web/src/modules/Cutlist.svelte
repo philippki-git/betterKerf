@@ -13,7 +13,6 @@
   import { onMount } from 'svelte';
 
   let tab = $state('input');       // 'input' | 'projects' | 'result' | 'steps'
-  let showPreview = $state(false);
   let editStock = $state(false), editParts = $state(false);
   let projName = $state('');
 
@@ -359,11 +358,8 @@
   }
 
   // ── PDF-Export ──
-  function openPreview() {
-    if (!cutlistInput.lastResult) { showAlert('Bitte zuerst berechnen.', { title: 'Kein Ergebnis', icon: 'information' }); return; }
-    showPreview = true;
-  }
   function exportPDF() {
+    if (!cutlistInput.lastResult) { showAlert('Bitte zuerst berechnen.', { title: 'Kein Ergebnis', icon: 'information' }); return; }
     loadJsPDF(() => { doExport().catch(err => { if (err?.name === 'AbortError') return; console.error(err); showAlert('PDF konnte nicht erstellt werden.', { title: 'Fehler', icon: 'alert_circle', danger: true }); }); });
   }
   async function doExport() {
@@ -434,6 +430,9 @@
     checkY(22); doc.setFont('helvetica', 'bold'); doc.setFontSize(12); doc.text('Schnittanleitung', lm, y); y += 6; doc.setFont('helvetica', 'normal'); doc.setFontSize(9);
     const cards = stepsEl ? stepsEl.querySelectorAll('.step-card') : [];
     cards.forEach((s, i) => { const title = pdfTxt(s.querySelector('.step-action').innerText); const detail = pdfTxt(s.querySelector('.step-detail').innerText); const lines = doc.splitTextToSize(detail, pw - 6); checkY(7 + lines.length * 4 + 4); doc.setFont('helvetica', 'bold'); doc.text(`Schritt ${i + 1}: ${title}`, lm, y); y += 4.5; doc.setFont('helvetica', 'normal'); doc.setTextColor(100); doc.text(lines, lm + 4, y); y += lines.length * 4 + 4; doc.setTextColor(0); });
+    // On iOS, doc.save() triggers a programmatic blob-link click which causes
+    // Safari to zoom the page. Use the Web Share API instead — it opens the
+    // native share/save sheet without triggering a download and thus no zoom.
     const filename = 'betterkerf-schnittplan.pdf';
     const blob = doc.output('blob');
     const file = new File([blob], filename, { type: 'application/pdf' });
@@ -568,7 +567,7 @@
       {@html resultHTML}
     </div>
     {#if cutlistInput.hasResult}
-      <button class="action-btn" onclick={openPreview}><Icon name="download" size={16} /> Als PDF exportieren</button>
+      <button class="action-btn" onclick={exportPDF}><Icon name="download" size={16} /> Als PDF exportieren</button>
     {/if}
   </div>
 
@@ -579,25 +578,7 @@
       {@html stepsHTML}
     </div>
     {#if cutlistInput.hasResult}
-      <button class="action-btn" onclick={openPreview}><Icon name="download" size={16} /> Als PDF exportieren</button>
+      <button class="action-btn" onclick={exportPDF}><Icon name="download" size={16} /> Als PDF exportieren</button>
     {/if}
   </div>
 </div>
-
-{#if showPreview}
-<div class="pdf-preview-overlay">
-  <div class="pdf-preview-bar">
-    <span class="pdf-preview-title">Vorschau</span>
-    <button class="pdf-preview-close" onclick={() => showPreview = false}>×</button>
-  </div>
-  <div class="pdf-preview-body">
-    <!-- eslint-disable-next-line svelte/no-at-html-tags -->
-    {@html resultHTML}
-    <!-- eslint-disable-next-line svelte/no-at-html-tags -->
-    {@html stepsHTML}
-  </div>
-  <div class="pdf-preview-footer">
-    <button class="action-btn" style="margin-top:0" onclick={exportPDF}><Icon name="download" size={16} /> Als PDF speichern</button>
-  </div>
-</div>
-{/if}
