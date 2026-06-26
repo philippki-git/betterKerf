@@ -3,7 +3,7 @@
   import { unitLabel, dispVal, toMM, inputVal } from '../lib/units.svelte.js';
   import { showAlert, showConfirm } from '../lib/dialog.svelte.js';
   import { cutlistResult } from '../lib/cutlistResult.svelte.js';
-  import { loadJsPDF, savePDF } from '../lib/pdf.js';
+  import { loadJsPDF, savePDF, addLogoToDoc } from '../lib/pdf.js';
   import { nav } from '../lib/nav.svelte.js';
 
   // ── State ──
@@ -193,21 +193,22 @@
     const checkY = k => { if (y + k > 272) { doc.addPage(); y = 15; } };
     const eur = v => v.toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' EUR';
     doc.setFont('helvetica', 'bold'); doc.setFontSize(18);
-    doc.text('betterKerf - Kostenkalkulator', lm, y); y += 9;
-    doc.setFont('helvetica', 'normal'); doc.setFontSize(9); doc.setTextColor(120, 110, 100);
+    const titleOff = await addLogoToDoc(doc, lm, y);
+    doc.text('betterKerf - Kostenkalkulator', lm + titleOff, y); y += 9;
+    doc.setFont('helvetica', 'normal'); doc.setFontSize(9); doc.setTextColor(0);
     doc.text('Erstellt: ' + new Date().toLocaleDateString('de-DE') + (c.qty > 1 ? '  |  Hochrechnung: ' + c.qty + ' Sets' : ''), lm, y);
     y += 11; doc.setTextColor(0);
-    doc.setFillColor(245, 237, 214); doc.rect(lm, y - 5, pw, 12, 'F');
+    doc.setFillColor(213, 229, 223); doc.rect(lm, y - 5, pw, 12, 'F');
     doc.setFont('helvetica', 'bold'); doc.setFontSize(13);
     doc.text('Gesamtkosten' + (c.qty > 1 ? ' (' + c.qty + 'x)' : ''), lm + 3, y + 3);
     doc.text(eur(c.total), lm + pw - 3, y + 3, { align: 'right' }); y += 15; doc.setTextColor(0);
     doc.setFont('helvetica', 'bold'); doc.setFontSize(12); doc.text('Bretter & Preise', lm, y); y += 6;
     const cols = [14, 86, 40, 40]; const heads = ['Anz.', 'Brett', 'Einzelpreis', 'Summe'];
-    doc.setFillColor(245, 237, 214); doc.rect(lm, y - 5, pw, 7, 'F'); doc.setFontSize(9); doc.setFont('helvetica', 'bold');
+    doc.setFillColor(213, 229, 223); doc.rect(lm, y - 5, pw, 7, 'F'); doc.setFontSize(9); doc.setFont('helvetica', 'bold');
     let x0 = lm; heads.forEach((h, i) => { doc.text(h, x0 + 1, y - 1); x0 += cols[i]; }); y += 4; doc.setFont('helvetica', 'normal');
     c.byType.forEach((b, i) => {
       checkY(6);
-      if (i % 2 === 0) { doc.setFillColor(252, 250, 246); doc.rect(lm, y - 3.5, pw, 5.5, 'F'); }
+      if (i % 2 === 0) { doc.setFillColor(245, 249, 247); doc.rect(lm, y - 3.5, pw, 5.5, 'F'); }
       let xi = lm;
       const dim = b.L && b.W ? ' (' + dispVal(b.L) + 'x' + dispVal(b.W) + ' ' + ul + ')' : '';
       [String(b.count), b.name + dim, eur(b.unit), eur(b.sum)].forEach((v, ci) => { doc.text(String(v), xi + 1, y); xi += cols[ci]; });
@@ -217,11 +218,11 @@
       checkY(20); doc.setFont('helvetica', 'bold'); doc.setFontSize(12);
       doc.text('Kosten pro Teil (anteilig nach Flaeche)', lm, y); y += 6;
       const tc = [100, 40, 40]; const th = ['Teil', 'Anzahl', 'je Stueck'];
-      doc.setFillColor(245, 237, 214); doc.rect(lm, y - 5, pw, 7, 'F'); doc.setFontSize(9); doc.setFont('helvetica', 'bold');
+      doc.setFillColor(213, 229, 223); doc.rect(lm, y - 5, pw, 7, 'F'); doc.setFontSize(9); doc.setFont('helvetica', 'bold');
       let x2 = lm; th.forEach((h, i) => { doc.text(h, x2 + 1, y - 1); x2 += tc[i]; }); y += 4; doc.setFont('helvetica', 'normal');
       Object.entries(c.perPart).forEach(([name, d], i) => {
         checkY(6);
-        if (i % 2 === 0) { doc.setFillColor(252, 250, 246); doc.rect(lm, y - 3.5, pw, 5.5, 'F'); }
+        if (i % 2 === 0) { doc.setFillColor(245, 249, 247); doc.rect(lm, y - 3.5, pw, 5.5, 'F'); }
         let x3 = lm; [name, d.count + 'x', eur(d.unit)].forEach((v, ci) => { doc.text(String(v), x3 + 1, y); x3 += tc[ci]; }); y += 5.5;
       }); y += 8;
       checkY(30);
@@ -236,7 +237,7 @@
       doc.setTextColor(46, 125, 94); doc.text('Verschnitt: ' + eur(c.wasteValue) + ' (' + wastePct + ' %)', lm + pw, y, { align: 'right' });
       doc.setTextColor(0); y += 8;
     }
-    doc.setFontSize(8); doc.setTextColor(150, 140, 130);
+    doc.setFontSize(8); doc.setTextColor(90, 130, 110);
     doc.text('Alle Preise in EUR. Teil-Preise anteilig nach Flaeche; Verschnittwert separat.', lm, 287);
     await savePDF(doc, 'betterkerf-materialkosten.pdf');
   }
@@ -410,7 +411,7 @@
 <style>
   .cost-state{display:flex;align-items:flex-start;gap:11px;border-radius:12px;padding:12px 13px;margin-bottom:14px;border:.5px solid var(--border)}
   .cost-state-info{background:rgba(91,141,184,.12);border-color:rgba(91,141,184,.4)}
-  .cost-state-ok{background:rgba(107,143,94,.13);border-color:rgba(107,143,94,.45)}
+  .cost-state-ok{background:rgba(46,125,94,.13);border-color:rgba(46,125,94,.45)}
   .cost-state-hint{background:var(--bg2)}
   .cost-state-icon{font-size:20px;line-height:1.3;flex-shrink:0;color:var(--text2)}
   .cost-state-body{flex:1;min-width:0}

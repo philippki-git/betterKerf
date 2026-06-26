@@ -7,7 +7,7 @@
   import { projects, saveProject, findProject, deleteProject } from '../lib/cutlistProjects.svelte.js';
   import { cutlistSettings } from '../lib/cutlistSettings.svelte.js';
   import { cutlistInput, EXAMPLE_STOCK, EXAMPLE_PARTS } from '../lib/cutlistInput.svelte.js';
-  import { loadJsPDF, svgToPng, savePDF } from '../lib/pdf.js';
+  import { loadJsPDF, svgToPng, savePDF, addLogoToDoc } from '../lib/pdf.js';
   import { handoff } from '../lib/handoff.svelte.js';
   import { cutlistResult } from '../lib/cutlistResult.svelte.js';
   import { onMount } from 'svelte';
@@ -178,7 +178,7 @@
   });
 
   // ── Ergebnis-HTML ──
-  function woodGrain(ox, oy, w, h) { let s = ''; for (let i = 0; i < 10; i++) { const y = oy + Math.round(h / 10 * i + h / 20); s += `<line x1="${ox}" y1="${y}" x2="${ox + w}" y2="${y}" stroke="#D4C4A0" stroke-width="0.5" opacity="0.3"/>`; } return s; }
+  function woodGrain(ox, oy, w, h) { let s = ''; for (let i = 0; i < 10; i++) { const y = oy + Math.round(h / 10 * i + h / 20); s += `<line x1="${ox}" y1="${y}" x2="${ox + w}" y2="${y}" stroke="#7AB89A" stroke-width="0.5" opacity="0.3"/>`; } return s; }
 
   function renderResultHTML(result) {
     const { expandedBoards, assignment, unplaced, kerf } = result;
@@ -223,14 +223,14 @@
       const boardLabel = board.qty > 1 ? `${board.name} (${board.instance}/${board.qty})` : board.name;
       const mid = `m${board.boardIdx}`;
       const dimSVG = `<defs>
-        <marker id="ah${mid}" markerWidth="5" markerHeight="5" refX="4" refY="2.5" orient="auto"><polygon points="0,0 5,2.5 0,5" fill="#9A8D7A"/></marker>
-        <marker id="at${mid}" markerWidth="5" markerHeight="5" refX="1" refY="2.5" orient="auto-start-reverse"><polygon points="0,0 5,2.5 0,5" fill="#9A8D7A"/></marker></defs>
-        <line x1="${ML + 5}" y1="12" x2="${Math.max(ML + 5, ML + bW / 2 - 40)}" y2="12" stroke="#9A8D7A" stroke-width=".8" ${bW > 90 ? `marker-start="url(#at${mid})"` : ''}/>
-        <line x1="${Math.min(ML + bW - 5, ML + bW / 2 + 40)}" y1="12" x2="${ML + bW - 5}" y2="12" stroke="#9A8D7A" stroke-width=".8" ${bW > 90 ? `marker-end="url(#ah${mid})"` : ''}/>
-        <text x="${ML + bW / 2}" y="14" text-anchor="middle" font-size="10" font-weight="600" fill="#9A8D7A"><tspan dx="0">L ${dispUnit(board.L)}</tspan></text>
-        <line x1="12" y1="${MT + 5}" x2="12" y2="${Math.max(MT + 5, MT + bH / 2 - 40)}" stroke="#9A8D7A" stroke-width=".8" ${bH > 90 ? `marker-start="url(#at${mid})"` : ''}/>
-        <line x1="12" y1="${Math.min(MT + bH - 5, MT + bH / 2 + 40)}" x2="12" y2="${MT + bH - 5}" stroke="#9A8D7A" stroke-width=".8" ${bH > 90 ? `marker-end="url(#ah${mid})"` : ''}/>
-        <text x="12" y="${MT + bH / 2}" text-anchor="middle" dominant-baseline="middle" font-size="10" font-weight="600" fill="#9A8D7A" transform="rotate(-90,12,${MT + bH / 2})">B ${dispUnit(board.W)}</text>`;
+        <marker id="ah${mid}" markerWidth="5" markerHeight="5" refX="4" refY="2.5" orient="auto"><polygon points="0,0 5,2.5 0,5" fill="#F2EEE8"/></marker>
+        <marker id="at${mid}" markerWidth="5" markerHeight="5" refX="1" refY="2.5" orient="auto-start-reverse"><polygon points="0,0 5,2.5 0,5" fill="#F2EEE8"/></marker></defs>
+        <line x1="${ML + 5}" y1="12" x2="${Math.max(ML + 5, ML + bW / 2 - 40)}" y2="12" stroke="rgba(176,173,166,.4)" stroke-width=".8" ${bW > 90 ? `marker-start="url(#at${mid})"` : ''}/>
+        <line x1="${Math.min(ML + bW - 5, ML + bW / 2 + 40)}" y1="12" x2="${ML + bW - 5}" y2="12" stroke="rgba(176,173,166,.4)" stroke-width=".8" ${bW > 90 ? `marker-end="url(#ah${mid})"` : ''}/>
+        <text x="${ML + bW / 2}" y="14" text-anchor="middle" font-size="10" font-weight="600" fill="#F2EEE8"><tspan dx="0">L ${dispUnit(board.L)}</tspan></text>
+        <line x1="12" y1="${MT + 5}" x2="12" y2="${Math.max(MT + 5, MT + bH / 2 - 40)}" stroke="rgba(176,173,166,.4)" stroke-width=".8" ${bH > 90 ? `marker-start="url(#at${mid})"` : ''}/>
+        <line x1="12" y1="${Math.min(MT + bH - 5, MT + bH / 2 + 40)}" x2="12" y2="${MT + bH - 5}" stroke="rgba(176,173,166,.4)" stroke-width=".8" ${bH > 90 ? `marker-end="url(#ah${mid})"` : ''}/>
+        <text x="12" y="${MT + bH / 2}" text-anchor="middle" dominant-baseline="middle" font-size="10" font-weight="600" fill="#F2EEE8" transform="rotate(-90,12,${MT + bH / 2})">B ${dispUnit(board.W)}</text>`;
       const partsSVG = bA.map(a => {
         const ex = a.rotated ? a.part.W : a.part.L, ey = a.rotated ? a.part.L : a.part.W;
         const x = ML + Math.round(a.x * scale), y = MT + Math.round(a.y * scale);
@@ -248,10 +248,10 @@
         const fh = Math.max(2, Math.min(MT + Math.round((a.y + ey + kerf) * scale) - y - 1, MT + bH - y - 1));
         return `<rect x="${x}" y="${y}" width="${fw}" height="${fh}" fill="${col}" opacity=".95"/>${lbl}`;
       }).join('');
-      const svgMarkup = `<svg viewBox="0 0 ${svgW} ${svgH}" style="width:100%;height:${svgH}px;display:block">
-          <rect x="${ML}" y="${MT}" width="${bW}" height="${bH}" fill="#F5EDD6"/>
-          ${woodGrain(ML, MT, bW, bH)}${dimSVG}${partsSVG}
-          <rect x="${ML}" y="${MT}" width="${bW}" height="${bH}" fill="none" stroke="#4A4740" stroke-width="1"/>
+      const svgMarkup = `<svg viewBox="0 0 ${svgW} ${svgH}" style="width:100%;height:${svgH}px;display:block" font-family="sans-serif">
+          <rect x="${ML}" y="${MT}" width="${bW}" height="${bH}" fill="rgba(46,125,94,.18)"/>
+          ${dimSVG}${partsSVG}
+          <rect x="${ML}" y="${MT}" width="${bW}" height="${bH}" fill="none" stroke="#2E7D5E" stroke-width="1"/>
         </svg>`;
       html += `<div class="bvis">
         <div class="bvis-top"><span><b>${escQ(boardLabel)}</b> — ${dispVal(board.L)}×${dispUnit(board.W)} · ${bA.length} Teil(e)</span><span style="color:${wasteB > 40 ? '#C04848' : '#6C9B6A'}">${wasteB}% Rest</span></div>
@@ -370,8 +370,10 @@
     let y = 15; const lm = 15, pw = 180;
     const checkY = n => { if (y + n > 272) { doc.addPage(); y = 15; } };
     const pdfTxt = t => t.replace(/→/g, '->').replace(/↻/g, '(ged.)').replace(/—/g, '-').replace(/–/g, '-').replace(/·/g, '-').replace(/[^\x00-\xFF]/g, '?');
-    doc.setFont('helvetica', 'bold'); doc.setFontSize(18); doc.text('betterKerf — Schnittplan', lm, y); y += 9;
-    doc.setFont('helvetica', 'normal'); doc.setFontSize(9); doc.setTextColor(120, 110, 100);
+    doc.setFont('helvetica', 'bold'); doc.setFontSize(18);
+    const titleOff = await addLogoToDoc(doc, lm, y);
+    doc.text('betterKerf — Schnittplan', lm + titleOff, y); y += 9;
+    doc.setFont('helvetica', 'normal'); doc.setFontSize(9); doc.setTextColor(0);
     doc.text(`Erstellt: ${new Date().toLocaleDateString('de-DE')} | Kerf: ${kerf} mm | Einheit: ${unitLabel()}`, lm, y); y += 11; doc.setTextColor(0);
     const usedArea = assignment.reduce((s, a) => s + a.part.L * a.part.W, 0);
     const usedBoardsArea = usedBoards.reduce((s, b) => s + b.L * b.W, 0);
@@ -395,7 +397,7 @@
         const topSpans = [...((block.querySelector('.bvis-top') || {}).querySelectorAll?.('span') || [])];
         const topText = topSpans.length ? topSpans.map(s => (s.innerText || s.textContent || '').trim()).join('  ') : ((block.querySelector('.bvis-top') || {}).textContent || '');
         let png = null;
-        try { png = await svgToPng(svg, 3); } catch (e) { png = null; }
+        try { png = await svgToPng(svg, 3, true); } catch (e) { png = null; }
         if (png) {
           const imgW = pw, imgH = imgW * (png.h / png.w);
           checkY(imgH + 8);
@@ -424,9 +426,9 @@
 
     checkY(24); doc.setFont('helvetica', 'bold'); doc.setFontSize(12); doc.text('Schnittliste', lm, y); y += 6;
     const cols = [8, 52, 26, 26, 36, 32]; const heads = ['#', 'Teil', `Länge (${unitLabel()})`, `Breite (${unitLabel()})`, 'Brett', `Position (${unitLabel()})`];
-    doc.setFillColor(245, 237, 214); doc.rect(lm, y - 5, pw, 7, 'F'); doc.setFontSize(8); doc.setFont('helvetica', 'bold');
+    doc.setFillColor(213, 229, 223); doc.rect(lm, y - 5, pw, 7, 'F'); doc.setFontSize(8); doc.setFont('helvetica', 'bold');
     let x = lm; heads.forEach((h, i) => { doc.text(h, x + 1, y - 1); x += cols[i]; }); y += 4; doc.setFont('helvetica', 'normal');
-    assignment.forEach((a, i) => { checkY(6); if (i % 2 === 0) { doc.setFillColor(252, 250, 246); doc.rect(lm, y - 3.5, pw, 5.5, 'F'); } let xi = lm; const bn = a.boardQty > 1 ? `${a.boardName} (${a.boardInst})` : a.boardName;[String(i + 1), pdfTxt(a.part.name) + (a.part.qty > 1 ? ' #' + a.part.instance : '') + (a.rotated ? ' (gedreht)' : ''), dispVal(a.part.L), dispVal(a.part.W), pdfTxt(bn), dispVal(a.x) + ' x ' + dispVal(a.y)].forEach((v, ci) => { doc.text(String(v), xi + 1, y); xi += cols[ci]; }); y += 5.5; }); y += 8;
+    assignment.forEach((a, i) => { checkY(6); if (i % 2 === 0) { doc.setFillColor(245, 249, 247); doc.rect(lm, y - 3.5, pw, 5.5, 'F'); } let xi = lm; const bn = a.boardQty > 1 ? `${a.boardName} (${a.boardInst})` : a.boardName;[String(i + 1), pdfTxt(a.part.name) + (a.part.qty > 1 ? ' #' + a.part.instance : '') + (a.rotated ? ' (gedreht)' : ''), dispVal(a.part.L), dispVal(a.part.W), pdfTxt(bn), dispVal(a.x) + ' x ' + dispVal(a.y)].forEach((v, ci) => { doc.text(String(v), xi + 1, y); xi += cols[ci]; }); y += 5.5; }); y += 8;
     checkY(22); doc.setFont('helvetica', 'bold'); doc.setFontSize(12); doc.text('Schnittanleitung', lm, y); y += 6; doc.setFont('helvetica', 'normal'); doc.setFontSize(9);
     const cards = stepsEl ? stepsEl.querySelectorAll('.step-card') : [];
     cards.forEach((s, i) => { const title = pdfTxt(s.querySelector('.step-action').innerText); const detail = pdfTxt(s.querySelector('.step-detail').innerText); const lines = doc.splitTextToSize(detail, pw - 6); checkY(7 + lines.length * 4 + 4); doc.setFont('helvetica', 'bold'); doc.text(`Schritt ${i + 1}: ${title}`, lm, y); y += 4.5; doc.setFont('helvetica', 'normal'); doc.setTextColor(100); doc.text(lines, lm + 4, y); y += lines.length * 4 + 4; doc.setTextColor(0); });

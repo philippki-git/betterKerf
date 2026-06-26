@@ -108,7 +108,20 @@
 <!-- gemountet in #app (siehe index.html), daher hier kein erneuter #app-Wrapper -->
 <div class="header">
     <button class="header-back" class:show={showBack} onclick={goBack} aria-label="Zurück">‹</button>
-    <div class="header-icon"><Icon name={header.icon} size={20} /></div>
+    <div class="header-icon">
+      {#if !header.plainTitle}
+        <div class="app-logo-wrap">
+          <svg class="app-logo" viewBox="74 74 364 364" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <rect width="512" height="512" fill="#1B1A1C"/>
+            <rect x="76" y="76" width="242" height="242" rx="18" fill="#2E7D5E"/>
+            <rect x="334" y="76" width="102" height="242" rx="14" fill="#3E9E74" opacity=".55"/>
+            <rect x="76" y="334" width="360" height="102" rx="14" fill="#3E9E74" opacity=".45"/>
+          </svg>
+        </div>
+      {:else}
+        <Icon name={header.icon} size={20} />
+      {/if}
+    </div>
     <div class="header-titles">
       <h1>
         {#if header.plainTitle}{header.plainTitle}{:else}<span class="bk-better">better</span><span class="bk-kerf">Kerf</span>{/if}

@@ -3,7 +3,7 @@
   import InfoSheet from '../lib/InfoSheet.svelte';
   import { units, UNITS, unitLabel, dispVal, toMM, inputVal } from '../lib/units.svelte.js';
   import { showConfirm, showAlert, showToast } from '../lib/dialog.svelte.js';
-  import { loadJsPDF, svgToPng, savePDF } from '../lib/pdf.js';
+  import { loadJsPDF, svgToPng, savePDF, addLogoToDoc } from '../lib/pdf.js';
   import { korpusGeometry, korpusGuide, korpusSketch, computeShelfPositions, computeDivPositions } from '../lib/korpus.js';
   import { korpusProjects, saveKorpusProject, findKorpusProject, deleteKorpusProject } from '../lib/korpusProjects.svelte.js';
   import { handoff } from '../lib/handoff.svelte.js';
@@ -46,6 +46,50 @@
   const divComputed = $derived(ki.kpDivStates.length ? computeDivPositions(ki.kpDivStates, innerW, s) : []);
   const shelfPos = $derived(ki.kpShelfCustom && ki.kpShelfStates.length > 0 ? shelfComputed : null);
   const divPos = $derived(ki.kpDivCustom && ki.kpDivStates.length > 0 ? divComputed : null);
+
+  // Remaining space available for each individual compartment (for per-field warnings)
+  const divRemaining = $derived.by(() => {
+    if (!ki.kpDivStates.length) return [];
+    const avail = innerW - dividersN * s;
+    return ki.kpDivStates.map((_, i) => {
+      const otherFixed = ki.kpDivStates.reduce((a, st, j) => a + (j !== i && st.fixed ? (st.posMM || 0) : 0), 0);
+      return Math.round(avail - otherFixed);
+    });
+  });
+  const shelfRemaining = $derived.by(() => {
+    if (!ki.kpShelfStates.length) return [];
+    const avail = innerH - shelvesN * s;
+    return ki.kpShelfStates.map((_, i) => {
+      const otherFixed = ki.kpShelfStates.reduce((a, st, j) => a + (j !== i && st.fixed ? (st.posMM || 0) : 0), 0);
+      return Math.round(avail - otherFixed);
+    });
+  });
+
+  // Auto-reduce the last fixed compartment when other compartments expand into its space
+  $effect(() => {
+    if (!ki.kpDivCustom || ki.kpDivStates.length < 2) return;
+    const last = ki.kpDivStates.length - 1;
+    const lastSt = ki.kpDivStates[last];
+    if (!lastSt?.fixed) return;
+    const remaining = divRemaining[last];
+    if (remaining !== undefined && remaining < (lastSt.posMM || 0)) {
+      const clamped = Math.max(0, remaining);
+      lastSt.posMM = clamped;
+      lastSt.disp = clamped > 0 ? String(inputVal(clamped)) : '';
+    }
+  });
+  $effect(() => {
+    if (!ki.kpShelfCustom || ki.kpShelfStates.length < 2) return;
+    const last = ki.kpShelfStates.length - 1;
+    const lastSt = ki.kpShelfStates[last];
+    if (!lastSt?.fixed) return;
+    const remaining = shelfRemaining[last];
+    if (remaining !== undefined && remaining < (lastSt.posMM || 0)) {
+      const clamped = Math.max(0, remaining);
+      lastSt.posMM = clamped;
+      lastSt.disp = clamped > 0 ? String(inputVal(clamped)) : '';
+    }
+  });
 
   // ── Berechnung (rein reaktiv) ──
   const calc = $derived.by(() => {
@@ -185,11 +229,13 @@
     const checkY = k => { if (y + k > 278) { doc.addPage(); y = 15; } };
     const pdfTxt = t => String(t).replace(/→/g, '->').replace(/—/g, '-').replace(/–/g, '-').replace(/·/g, '-').replace(/×/g, 'x').replace(/[^\x00-\xFF]/g, '?');
 
-    doc.setFont('helvetica', 'bold'); doc.setFontSize(18); doc.text('betterKerf — Korpus', lm, y); y += 9;
-    doc.setFont('helvetica', 'normal'); doc.setFontSize(9); doc.setTextColor(120, 110, 100);
+    doc.setFont('helvetica', 'bold'); doc.setFontSize(18);
+    const titleOff = await addLogoToDoc(doc, lm, y);
+    doc.text('betterKerf — Korpus', lm + titleOff, y); y += 9;
+    doc.setFont('helvetica', 'normal'); doc.setFontSize(9); doc.setTextColor(0);
     doc.text(`Erstellt: ${new Date().toLocaleDateString('de-DE')}  |  Einheit: ${u}`, lm, y); y += 11; doc.setTextColor(0);
 
-    doc.setFillColor(245, 237, 214); doc.rect(lm, y - 5, pw, 12, 'F');
+    doc.setFillColor(213, 229, 223); doc.rect(lm, y - 5, pw, 12, 'F');
     doc.setFont('helvetica', 'bold'); doc.setFontSize(11);
     doc.text(`Außenmaße: ${dispVal(H)} x ${dispVal(B)} x ${dispVal(T)} ${u}  (HxBxT)`, lm + 3, y + 3);
     y += 15; doc.setTextColor(0);
@@ -214,7 +260,7 @@
     const svgEl = sketchEl ? sketchEl.querySelector('svg') : null;
     if (svgEl) {
       try {
-        const png = await svgToPng(svgEl, 3);
+        const png = await svgToPng(svgEl, 3, true);
         const maxW = pw, maxH = 80;
         let iw = png.w, ih = png.h; const r = Math.min(maxW / iw, maxH / ih); iw *= r; ih *= r;
         checkY(ih + 8);
@@ -226,10 +272,10 @@
     checkY(16);
     doc.setFont('helvetica', 'bold'); doc.setFontSize(12); doc.text('Zuschnittliste', lm, y); y += 6;
     const cols = [96, 54, 30]; const heads = ['Bauteil', `Maß (${u})`, 'Anzahl'];
-    doc.setFillColor(245, 237, 214); doc.rect(lm, y - 5, pw, 7, 'F'); doc.setFontSize(9); doc.setFont('helvetica', 'bold');
+    doc.setFillColor(213, 229, 223); doc.rect(lm, y - 5, pw, 7, 'F'); doc.setFontSize(9); doc.setFont('helvetica', 'bold');
     let x = lm; heads.forEach((h, i) => { doc.text(h, x + 1, y - 1); x += cols[i]; }); y += 4; doc.setFont('helvetica', 'normal');
     kpParts.forEach((p, i) => {
-      checkY(6); if (i % 2 === 0) { doc.setFillColor(252, 250, 246); doc.rect(lm, y - 3.5, pw, 5.5, 'F'); }
+      checkY(6); if (i % 2 === 0) { doc.setFillColor(245, 249, 247); doc.rect(lm, y - 3.5, pw, 5.5, 'F'); }
       let xi = lm;[pdfTxt(p.name), `${dispVal(p.l)} x ${dispVal(p.w)}`, `${p.qty}x`].forEach((v, ci) => { doc.text(String(v), xi + 1, y); xi += cols[ci]; }); y += 5.5;
     });
     y += 2; doc.setFont('helvetica', 'bold'); doc.setFontSize(9);
@@ -249,7 +295,7 @@
       y += lines.length * 4.6 + 3;
     });
     doc.setTextColor(0);
-    doc.setFontSize(8); doc.setTextColor(150, 140, 130);
+    doc.setFontSize(8); doc.setTextColor(90, 130, 110);
     doc.text('Maße als Zuschnittmaße der Einzelteile. Verbindungsmittel (Dübel, Lamello o.ä.) nach eigener Konstruktion.', lm, 289);
     await savePDF(doc, 'betterkerf-korpus.pdf');
   }
@@ -322,15 +368,18 @@
         {#if ki.kpDivCustom}
           <div style="margin-top:8px">
             {#each ki.kpDivStates as st, i (i)}
+              {@const divOverflow = st.fixed && divRemaining[i] !== undefined && (st.posMM || 0) > divRemaining[i]}
               <div class="srow">
                 <div><div class="srow-label">Fach {i + 1}{i === ki.kpDivStates.length - 1 ? ' (rechts)' : ''}</div>
-                  {#if st.fixed}<div class="srow-hint">{i === ki.kpDivStates.length - 1 ? 'Rechtestes Fach · Fachbreite individuell' : 'Fachbreite individuell · lichtes Maß'}</div>
+                  {#if divOverflow}
+                    <div class="srow-hint" style="color:#E08080;display:flex;align-items:center;gap:4px"><Icon name="alert" size={13} /> Zu groß — Trennwand würde außerhalb des Korpus liegen</div>
+                  {:else if st.fixed}<div class="srow-hint">{i === ki.kpDivStates.length - 1 ? 'Rechtestes Fach · Fachbreite individuell' : 'Fachbreite individuell · lichtes Maß'}</div>
                   {:else}<div class="srow-hint">Auto · Fachbreite: {dispVal(divComputed[i])} {unitLabel()}</div>{/if}
                 </div>
                 <div style="display:flex;align-items:center;gap:6px">
                   <button class="grain-btn{st.fixed ? ' locked' : ''}" onclick={() => toggleDivFixed(i)} title={st.fixed ? 'Zurück zu Auto' : 'Individuell festlegen'} style="font-size:17px;flex-shrink:0">{st.fixed ? '●' : '○'}</button>
                   <div class="nm">
-                    {#if st.fixed}<input type="number" inputmode="decimal" value={st.disp} min="1" oninput={(e) => setDivPos(i, e.target.value)}>
+                    {#if st.fixed}<input type="number" inputmode="decimal" value={st.disp} min="1" oninput={(e) => setDivPos(i, e.target.value)} style={divOverflow ? 'border-color:rgba(192,80,80,.6)' : ''}>
                     {:else}<input type="number" inputmode="decimal" value={inputVal(divComputed[i])} disabled style="opacity:.45">{/if}
                     <span>{unitLabel()}</span>
                   </div>
@@ -346,15 +395,18 @@
         {#if ki.kpShelfCustom}
           <div style="margin-top:8px">
             {#each ki.kpShelfStates as st, i (i)}
+              {@const shelfOverflow = st.fixed && shelfRemaining[i] !== undefined && (st.posMM || 0) > shelfRemaining[i]}
               <div class="srow">
                 <div><div class="srow-label">Fach {i + 1}{i === ki.kpShelfStates.length - 1 ? ' (oben)' : ''}</div>
-                  {#if st.fixed}<div class="srow-hint">{i === ki.kpShelfStates.length - 1 ? 'Oberstes Fach · Fachhöhe individuell' : 'Fachhöhe individuell · lichtes Maß'}</div>
+                  {#if shelfOverflow}
+                    <div class="srow-hint" style="color:#E08080;display:flex;align-items:center;gap:4px"><Icon name="alert" size={13} /> Zu groß — Einlegeboden würde außerhalb des Korpus liegen</div>
+                  {:else if st.fixed}<div class="srow-hint">{i === ki.kpShelfStates.length - 1 ? 'Oberstes Fach · Fachhöhe individuell' : 'Fachhöhe individuell · lichtes Maß'}</div>
                   {:else}<div class="srow-hint">Auto · Fachhöhe: {dispVal(shelfComputed[i])} {unitLabel()}</div>{/if}
                 </div>
                 <div style="display:flex;align-items:center;gap:6px">
                   <button class="grain-btn{st.fixed ? ' locked' : ''}" onclick={() => toggleShelfFixed(i)} title={st.fixed ? 'Zurück zu Auto' : 'Individuell festlegen'} style="font-size:17px;flex-shrink:0">{st.fixed ? '●' : '○'}</button>
                   <div class="nm">
-                    {#if st.fixed}<input type="number" inputmode="decimal" value={st.disp} min="1" oninput={(e) => setShelfPos(i, e.target.value)}>
+                    {#if st.fixed}<input type="number" inputmode="decimal" value={st.disp} min="1" oninput={(e) => setShelfPos(i, e.target.value)} style={shelfOverflow ? 'border-color:rgba(192,80,80,.6)' : ''}>
                     {:else}<input type="number" inputmode="decimal" value={inputVal(shelfComputed[i])} disabled style="opacity:.45">{/if}
                     <span>{unitLabel()}</span>
                   </div>

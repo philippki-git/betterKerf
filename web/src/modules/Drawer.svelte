@@ -4,7 +4,7 @@
   import { units, UNITS, unitLabel, dispVal, toMM, inputVal } from '../lib/units.svelte.js';
   import { showConfirm, showAlert, showToast } from '../lib/dialog.svelte.js';
   import { openZoom } from '../lib/zoom.svelte.js';
-  import { loadJsPDF, svgToPng, savePDF } from '../lib/pdf.js';
+  import { loadJsPDF, svgToPng, savePDF, addLogoToDoc } from '../lib/pdf.js';
   import { DR_PRESETS, drawerGeometry, drawerGuide, drawerSketch, bestStd } from '../lib/drawer.js';
   import { drawerProjects, saveDrawerProject, findDrawerProject, deleteDrawerProject } from '../lib/drawerProjects.svelte.js';
   import { handoff } from '../lib/handoff.svelte.js';
@@ -248,10 +248,12 @@
     const { o, geo, guide, totalPieces, totalArea } = calc;
     const pr = DR_PRESETS[sys];
 
-    doc.setFont('helvetica', 'bold'); doc.setFontSize(18); doc.text('betterKerf — Schubkasten', lm, y); y += 9;
-    doc.setFont('helvetica', 'normal'); doc.setFontSize(9); doc.setTextColor(120, 110, 100);
+    doc.setFont('helvetica', 'bold'); doc.setFontSize(18);
+    const titleOff = await addLogoToDoc(doc, lm, y);
+    doc.text('betterKerf — Schubkasten', lm + titleOff, y); y += 9;
+    doc.setFont('helvetica', 'normal'); doc.setFontSize(9); doc.setTextColor(0);
     doc.text(`Erstellt: ${new Date().toLocaleDateString('de-DE')}  |  Einheit: ${u}`, lm, y); y += 11; doc.setTextColor(0);
-    doc.setFillColor(245, 237, 214); doc.rect(lm, y - 5, pw, 12, 'F');
+    doc.setFillColor(213, 229, 223); doc.rect(lm, y - 5, pw, 12, 'F');
     doc.setFont('helvetica', 'bold'); doc.setFontSize(11);
     doc.text(`Oeffnung: ${dispVal(o.OW)} x ${dispVal(o.OH)} x ${dispVal(o.CD)} ${u}   Kasten: ${dispVal(geo.BW)} x ${dispVal(geo.BD)} ${u}`, lm + 3, y + 3); y += 15; doc.setTextColor(0);
     doc.setFont('helvetica', 'normal'); doc.setFontSize(9.5);
@@ -270,7 +272,7 @@
     const svgEl = sketchEl?.querySelector('svg');
     if (svgEl) {
       try {
-        const png = await svgToPng(svgEl, 3);
+        const png = await svgToPng(svgEl, 3, true);
         const maxW = pw, maxH = 72; let iw = png.w, ih = png.h;
         const r = Math.min(maxW / iw, maxH / ih); iw *= r; ih *= r;
         checkY(ih + 8); doc.addImage(png.data, 'PNG', lm + (pw - iw) / 2, y, iw, ih); y += ih + 8;
@@ -278,10 +280,10 @@
     }
     checkY(16); doc.setFont('helvetica', 'bold'); doc.setFontSize(12); doc.text('Zuschnittliste', lm, y); y += 6;
     const cols = [96, 54, 30]; const heads = ['Bauteil', `Mas (${u})`, 'Anzahl'];
-    doc.setFillColor(245, 237, 214); doc.rect(lm, y - 5, pw, 7, 'F'); doc.setFontSize(9); doc.setFont('helvetica', 'bold');
+    doc.setFillColor(213, 229, 223); doc.rect(lm, y - 5, pw, 7, 'F'); doc.setFontSize(9); doc.setFont('helvetica', 'bold');
     let hx = lm; heads.forEach((h, i) => { doc.text(h, hx + 1, y - 1); hx += cols[i]; }); y += 4; doc.setFont('helvetica', 'normal');
     geo.parts.forEach((pp, i) => {
-      checkY(6); if (i % 2 === 0) { doc.setFillColor(252, 250, 246); doc.rect(lm, y - 3.5, pw, 5.5, 'F'); }
+      checkY(6); if (i % 2 === 0) { doc.setFillColor(245, 249, 247); doc.rect(lm, y - 3.5, pw, 5.5, 'F'); }
       let x = lm; [pp.name, `${dispVal(pp.l)} x ${dispVal(pp.w)}`, `${pp.qty}x`].forEach((v, ci) => { doc.text(String(v), x + 1, y); x += cols[ci]; }); y += 5.5;
     });
     y += 2; doc.setFont('helvetica', 'bold'); doc.setFontSize(9);
@@ -295,7 +297,7 @@
       y += lines.length * 4.6 + 3;
     });
     doc.setTextColor(0);
-    doc.setFontSize(8); doc.setTextColor(150, 140, 130); doc.text('Masse als Zuschnittmasse der Einzelteile. Schienen-/Beschlagabzuege nach Herstellerangabe pruefen.', lm, 289);
+    doc.setFontSize(8); doc.setTextColor(90, 130, 110); doc.text('Masse als Zuschnittmasse der Einzelteile. Schienen-/Beschlagabzuege nach Herstellerangabe pruefen.', lm, 289);
     await savePDF(doc, 'betterkerf-schubkasten.pdf');
   }
 

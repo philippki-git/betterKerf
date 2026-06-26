@@ -20,6 +20,9 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 .header-back.show{display:flex}
 .header-icon{width:34px;height:34px;background:var(--accent);border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .header-icon svg{width:20px;height:20px;fill:#fff}
+.header-icon:has(.app-logo-wrap){background:none;width:auto;height:auto}
+.app-logo-wrap{width:42px;height:42px;border-radius:10px;border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0}
+.app-logo{width:38px;height:38px}
 .header-titles{flex:1;min-width:0}
 .header h1{font-size:20px;font-weight:600;letter-spacing:-.3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .header h1 .bk-better{color:var(--text2);font-weight:400}

@@ -1,14 +1,35 @@
 <script>
   import { onMount } from 'svelte';
   import Icon from '../lib/Icon.svelte';
+  import InfoSheet from '../lib/InfoSheet.svelte';
   import { units, UNITS, unitLabel, dispVal, dispUnit, toMM, inputVal } from '../lib/units.svelte.js';
   import { showConfirm, showAlert, showToast } from '../lib/dialog.svelte.js';
   import { openZoom } from '../lib/zoom.svelte.js';
   import { computeHoles, axisEdgeIssues, widthEdgeIssue } from '../lib/holes.js';
-  import { loadJsPDF, svgToPng, savePDF } from '../lib/pdf.js';
+  import { loadJsPDF, svgToPng, savePDF, addLogoToDoc } from '../lib/pdf.js';
   import { handoff } from '../lib/handoff.svelte.js';
+  import { holesState } from '../lib/holesState.svelte.js';
 
   let mode = $state('row');
+  const visibleTabs = $derived(['input', ...(holesState.hasResult ? ['plan'] : [])]);
+  let showPatternInfo = $state(false);
+
+  const reiheSketch = `<svg viewBox="0 0 220 56" style="width:100%;max-width:220px;display:block;margin:10px auto" xmlns="http://www.w3.org/2000/svg">
+    <rect x="4" y="20" width="212" height="16" rx="3" fill="rgba(46,125,94,.18)" stroke="#2E7D5E" stroke-width="1"/>
+    ${[30,74,110,146,190].map(cx => `<circle cx="${cx}" cy="28" r="6" fill="#1A1510" stroke="#5B8DB8" stroke-width="1.5"/><circle cx="${cx}" cy="28" r="1.5" fill="#5B8DB8"/>`).join('')}
+    <text x="4" y="52" font-size="9" fill="#6B8F6E" font-family="sans-serif">← gleichmäßiger Abstand →</text>
+  </svg>`;
+
+  const rasterSketch = `<svg viewBox="0 0 180 130" style="width:100%;max-width:180px;display:block;margin:10px auto" xmlns="http://www.w3.org/2000/svg">
+    <rect x="4" y="4" width="172" height="122" rx="3" fill="rgba(46,125,94,.18)" stroke="#2E7D5E" stroke-width="1"/>
+    ${[38,90,142].flatMap(cx => [28,65,102].map(cy => `<circle cx="${cx}" cy="${cy}" r="5.5" fill="#1A1510" stroke="#5B8DB8" stroke-width="1.5"/><circle cx="${cx}" cy="${cy}" r="1.5" fill="#5B8DB8"/>`)).join('')}
+    <text x="90" y="120" text-anchor="middle" font-size="9" fill="#6B8F6E" font-family="sans-serif">X-Abstand · Y-Abstand</text>
+  </svg>`;
+
+  const patternInfoItems = [
+    { title: 'Reihe', html: `Löcher werden gleichmäßig entlang einer geraden Linie verteilt — z.B. für Griffbohrungen, Beschlagslöcher oder Einlegeboden-Bohrungen.${reiheSketch}` },
+    { title: 'Raster', html: `Löcher werden als gleichmäßiges Gitter über eine Fläche verteilt — z.B. für Lochrasterplatten, Rasterschienen oder Rastermöbel-Systeme.${rasterSketch}` }
+  ];
 
   // ── Eingaben (Werte in der aktuellen Anzeigeeinheit) ──
   // Reihe
@@ -30,7 +51,6 @@
   let gMy = $state(inputVal(50));
   let gDia = $state('');
 
-  let result = $state(null); // {kind, error?, top, svg, caption, bottom, copyText, data}
   let visWrap = $state(null);
 
   // Beim Einheitenwechsel die Eingabefelder umrechnen.
@@ -48,10 +68,10 @@
     hWidth = conv(hWidth); hDia = conv(hDia);
     gWid = conv(gWid); gHei = conv(gHei); gMx = conv(gMx); gMy = conv(gMy); gDia = conv(gDia);
     prevU = u;
-    result = null; // Ergebnis verwirft sich beim Wechsel (wie in der Legacy-App)
+    holesState.result = null; // Ergebnis verwirft sich beim Wechsel (wie in der Legacy-App)
   });
 
-  function setMode(m) { mode = m; result = null; }
+  function setMode(m) { mode = m; holesState.result = null; holesState.hasResult = false; holesState.tab = 'input'; }
 
   function edgeWarningBox(messages) {
     if (!messages.length) return '';
@@ -64,15 +84,15 @@
     const n = parseInt(hCount) || 0;
     const width = toMM(hWidth);
     const dia = toMM(hDia);
-    if (L < 1) { result = { kind: 'error', msg: 'Bitte eine gültige Länge eingeben.' }; return; }
-    if (n < 1) { result = { kind: 'error', msg: 'Bitte mindestens 1 Loch angeben.' }; return; }
+    if (L < 1) { holesState.result = { kind: 'error', msg: 'Bitte eine gültige Länge eingeben.' }; return; }
+    if (n < 1) { holesState.result = { kind: 'error', msg: 'Bitte mindestens 1 Loch angeben.' }; return; }
 
     let startM = null, endM = null;
     if (hUseMargin) {
       startM = toMM(hStart);
       endM = hSym ? startM : toMM(hEnd);
-      if (startM + endM >= L && n > 1) { result = { kind: 'error', msg: 'Die Randabstände sind größer als die Länge. Bitte anpassen.' }; return; }
-      if (startM > L) { result = { kind: 'error', msg: 'Der Randabstand ist größer als die Länge.' }; return; }
+      if (startM + endM >= L && n > 1) { holesState.result = { kind: 'error', msg: 'Die Randabstände sind größer als die Länge. Bitte anpassen.' }; return; }
+      if (startM > L) { holesState.result = { kind: 'error', msg: 'Der Randabstand ist größer als die Länge.' }; return; }
     }
     const { centers, gaps } = computeHoles(L, n, startM, endM);
     const u = unitLabel();
@@ -112,13 +132,23 @@
 
     const copyText = `Bohrlochplaner — ${n} Löcher auf ${dispVal(L)} ${u}\n\n` + centers.map((c, i) => `Loch ${i + 1}: ${dispVal(c)} ${u}`).join('\n');
 
-    result = { kind: 'row', top, svg: holesSVG(L, centers), caption: 'Bohrschablone', bottom, copyText, data: { L, n, centers, gaps, width: toMM(hWidth), dia: toMM(hDia) } };
+    holesState.result = { kind: 'row', top, svg: holesSVG(L, centers), caption: 'Bohrschablone', bottom, copyText, data: { L, n, centers, gaps, width: toMM(hWidth), dia: toMM(hDia) } };
+    holesState.hasResult = true; holesState.tab = 'plan';
   }
 
   function holesSVG(L, centers) {
-    const ML = 14, MR = 14, MT = 30, MB = 34, H = 70;
+    const ML = 14, MR = 14, H = 70;
     const innerW = Math.min(window.innerWidth - 32, 420) - ML - MR;
     const scale = innerW / L;
+    const spacing = centers.length > 1 ? (centers[centers.length - 1] - centers[0]) / (centers.length - 1) * scale : innerW;
+    // stagger levels based on label density
+    const levels = spacing < 14 ? 3 : spacing < 24 ? 2 : 1;
+    const topOffsets = levels === 3 ? [8, 20, 32] : levels === 2 ? [8, 20] : [8];
+    const botOffsets = levels === 3 ? [12, 22, 32] : levels === 2 ? [12, 22] : [12];
+    const MT = topOffsets[topOffsets.length - 1] + 8;
+    const maxBot = botOffsets[botOffsets.length - 1];
+    const dimsY = maxBot + 14;
+    const MB = dimsY + 8;
     const barY = MT, barH = H;
     const svgW = innerW + ML + MR, svgH = H + MT + MB;
     const holeR = Math.max(3, Math.min(7, innerW / L * 8));
@@ -126,17 +156,19 @@
     centers.forEach((c, i) => {
       const x = ML + c * scale, cy = barY + barH / 2;
       dots += `<circle cx="${x}" cy="${cy}" r="${holeR}" fill="#1A1510" stroke="#5B8DB8" stroke-width="1.5"/><circle cx="${x}" cy="${cy}" r="1.5" fill="#5B8DB8"/>`;
-      const lblY = barY - 8;
-      labels += `<line x1="${x}" y1="${barY}" x2="${x}" y2="${lblY + 3}" stroke="#7A7268" stroke-width=".5" stroke-dasharray="2,2"/><text x="${x}" y="${lblY}" text-anchor="middle" font-size="8" fill="#B8AF9E" font-weight="600">${dispVal(c)}</text>`;
-      labels += `<text x="${x}" y="${barY + barH + 12}" text-anchor="middle" font-size="8" fill="#7A7268">#${i + 1}</text>`;
+      const topOff = topOffsets[i % levels];
+      const lblY = barY - topOff;
+      labels += `<line x1="${x}" y1="${barY}" x2="${x}" y2="${lblY + 3}" stroke="rgba(176,173,166,.4)" stroke-width=".5" stroke-dasharray="2,2"/><text x="${x}" y="${lblY}" text-anchor="middle" font-size="8" fill="#F2EEE8" font-weight="600">${dispVal(c)}</text>`;
+      const botOff = botOffsets[i % levels];
+      labels += `<text x="${x}" y="${barY + barH + botOff}" text-anchor="middle" font-size="8" fill="#B0ADA6">#${i + 1}</text>`;
     });
-    const dims = `<text x="${ML}" y="${barY + barH + 26}" font-size="8" fill="#7A7268">0</text><text x="${ML + L * scale}" y="${barY + barH + 26}" text-anchor="end" font-size="8" fill="#7A7268">${dispVal(L)}</text>`;
+    const dims = `<text x="${ML}" y="${barY + barH + dimsY}" font-size="8" fill="#B0ADA6">0</text><text x="${ML + L * scale}" y="${barY + barH + dimsY}" text-anchor="end" font-size="8" fill="#B0ADA6">${dispVal(L)}</text>`;
     let grid = '';
-    for (let i = 0; i < 8; i++) { const yy = barY + barH / 8 * i + barH / 16; grid += `<line x1="${ML}" y1="${yy}" x2="${ML + L * scale}" y2="${yy}" stroke="#D4C4A0" stroke-width="0.5" opacity="0.3"/>`; }
-    return `<svg viewBox="0 0 ${svgW} ${svgH}" style="width:100%;height:${svgH}px;display:block">
-      <rect x="${ML}" y="${barY}" width="${L * scale}" height="${barH}" rx="4" fill="#F5EDD6"/>
+    for (let i = 0; i < 8; i++) { const yy = barY + barH / 8 * i + barH / 16; grid += `<line x1="${ML}" y1="${yy}" x2="${ML + L * scale}" y2="${yy}" stroke="rgba(176,173,166,.2)" stroke-width="0.5" opacity="0.3"/>`; }
+    return `<svg viewBox="0 0 ${svgW} ${svgH}" style="width:100%;height:${svgH}px;display:block" font-family="sans-serif">
+      <rect x="${ML}" y="${barY}" width="${L * scale}" height="${barH}" rx="4" fill="rgba(46,125,94,.18)"/>
       ${grid}
-      <rect x="${ML}" y="${barY}" width="${L * scale}" height="${barH}" rx="4" fill="none" stroke="#4A4740" stroke-width="1"/>
+      <rect x="${ML}" y="${barY}" width="${L * scale}" height="${barH}" rx="4" fill="none" stroke="#2E7D5E" stroke-width="1"/>
       ${dots}${labels}${dims}
     </svg>`;
   }
@@ -146,14 +178,14 @@
     const W = toMM(gWid), H = toMM(gHei);
     const cols = parseInt(gCols) || 0, rows = parseInt(gRows) || 0;
     const dia = toMM(gDia);
-    if (W < 1 || H < 1) { result = { kind: 'error', msg: 'Bitte gültige Plattenmaße eingeben.' }; return; }
-    if (cols < 1 || rows < 1) { result = { kind: 'error', msg: 'Bitte mindestens 1 Spalte und 1 Reihe angeben.' }; return; }
+    if (W < 1 || H < 1) { holesState.result = { kind: 'error', msg: 'Bitte gültige Plattenmaße eingeben.' }; return; }
+    if (cols < 1 || rows < 1) { holesState.result = { kind: 'error', msg: 'Bitte mindestens 1 Spalte und 1 Reihe angeben.' }; return; }
 
     let mx = null, my = null;
     if (gUseMargin) {
       mx = toMM(gMx); my = toMM(gMy);
-      if (cols > 1 && 2 * mx >= W) { result = { kind: 'error', msg: 'Horizontaler Rand ist größer als die Breite.' }; return; }
-      if (rows > 1 && 2 * my >= H) { result = { kind: 'error', msg: 'Vertikaler Rand ist größer als die Höhe.' }; return; }
+      if (cols > 1 && 2 * mx >= W) { holesState.result = { kind: 'error', msg: 'Horizontaler Rand ist größer als die Breite.' }; return; }
+      if (rows > 1 && 2 * my >= H) { holesState.result = { kind: 'error', msg: 'Vertikaler Rand ist größer als die Höhe.' }; return; }
     }
     const xs = computeHoles(W, cols, mx, mx).centers;
     const ys = computeHoles(H, rows, my, my).centers;
@@ -195,7 +227,8 @@
 
     const copyText = `Lochraster — ${cols}×${rows} auf ${dispVal(W)}×${dispVal(H)} ${u}\n\n` + pts.map((p, i) => `${i + 1}. R${p.row} S${p.col}: X=${dispVal(p.x)} Y=${dispVal(p.y)} ${u}`).join('\n');
 
-    result = { kind: 'grid', top, svg: gridSVG(g), caption: 'Lochraster', bottom, copyText, data: { W, H, cols, rows, xs, ys, pts, dia: toMM(gDia) } };
+    holesState.result = { kind: 'grid', top, svg: gridSVG(g), caption: 'Lochraster', bottom, copyText, data: { W, H, cols, rows, xs, ys, pts, dia: toMM(gDia) } };
+    holesState.hasResult = true; holesState.tab = 'plan';
   }
 
   function gridSVG(g) {
@@ -214,23 +247,23 @@
       dots += `<circle cx="${cx}" cy="${cy}" r="${holeR}" fill="#1A1510" stroke="#5B8DB8" stroke-width="1.3"/><circle cx="${cx}" cy="${cy}" r="1.2" fill="#5B8DB8"/>`;
     });
     let guides = '';
-    g.xs.forEach(x => { const gx = ML + x * sx; guides += `<line x1="${gx}" y1="${MT}" x2="${gx}" y2="${MT + drawH}" stroke="#7A7268" stroke-width=".4" stroke-dasharray="2,3" opacity=".5"/>`; });
-    g.ys.forEach(y => { const gy = MT + y * sy; guides += `<line x1="${ML}" y1="${gy}" x2="${ML + drawW}" y2="${gy}" stroke="#7A7268" stroke-width=".4" stroke-dasharray="2,3" opacity=".5"/>`; });
-    const labels = `<text x="${ML}" y="${MT - 7}" font-size="8" fill="#7A7268">0</text>
-      <text x="${ML + drawW}" y="${MT - 7}" text-anchor="end" font-size="8" fill="#B8AF9E" font-weight="600">${dispUnit(g.W)} (X)</text>
-      <text x="${ML - 6}" y="${MT + drawH + 12}" font-size="8" fill="#B8AF9E" font-weight="600" transform="rotate(-90,${ML - 6},${MT + drawH + 12})">${dispUnit(g.H)} (Y)</text>`;
-    return `<svg viewBox="0 0 ${svgW} ${svgH}" style="width:100%;height:${svgH}px;display:block">
-      <rect x="${ML}" y="${MT}" width="${drawW}" height="${drawH}" rx="4" fill="#F5EDD6"/>
+    g.xs.forEach(x => { const gx = ML + x * sx; guides += `<line x1="${gx}" y1="${MT}" x2="${gx}" y2="${MT + drawH}" stroke="rgba(176,173,166,.3)" stroke-width=".4" stroke-dasharray="2,3" opacity=".5"/>`; });
+    g.ys.forEach(y => { const gy = MT + y * sy; guides += `<line x1="${ML}" y1="${gy}" x2="${ML + drawW}" y2="${gy}" stroke="rgba(176,173,166,.3)" stroke-width=".4" stroke-dasharray="2,3" opacity=".5"/>`; });
+    const labels = `<text x="${ML}" y="${MT - 7}" font-size="8" fill="#B0ADA6">0</text>
+      <text x="${ML + drawW}" y="${MT - 7}" text-anchor="end" font-size="8" fill="#F2EEE8" font-weight="600">${dispUnit(g.W)} (X)</text>
+      <text x="${ML - 6}" y="${MT + drawH + 12}" font-size="8" fill="#F2EEE8" font-weight="600" transform="rotate(-90,${ML - 6},${MT + drawH + 12})">${dispUnit(g.H)} (Y)</text>`;
+    return `<svg viewBox="0 0 ${svgW} ${svgH}" style="width:100%;height:${svgH}px;display:block" font-family="sans-serif">
+      <rect x="${ML}" y="${MT}" width="${drawW}" height="${drawH}" rx="4" fill="rgba(46,125,94,.18)"/>
       ${guides}
-      <rect x="${ML}" y="${MT}" width="${drawW}" height="${drawH}" rx="4" fill="none" stroke="#4A4740" stroke-width="1"/>
+      <rect x="${ML}" y="${MT}" width="${drawW}" height="${drawH}" rx="4" fill="none" stroke="#2E7D5E" stroke-width="1"/>
       ${dots}${labels}
     </svg>`;
   }
 
   function copyResult() {
-    if (!result || !result.copyText) return;
-    const txt = result.copyText;
-    const ok = () => showToast(result.kind === 'grid' ? 'Koordinaten kopiert ✓' : 'Positionen kopiert ✓');
+    if (!holesState.result || !holesState.result.copyText) return;
+    const txt = holesState.result.copyText;
+    const ok = () => showToast(holesState.result.kind === 'grid' ? 'Koordinaten kopiert ✓' : 'Positionen kopiert ✓');
     if (navigator.clipboard && navigator.clipboard.writeText) {
       navigator.clipboard.writeText(txt).then(ok).catch(() => fallbackCopy(txt, ok));
     } else fallbackCopy(txt, ok);
@@ -246,37 +279,38 @@
 
   // ── PDF ──
   function holesPDF() {
-    if (!result || result.kind !== 'row') return;
+    if (!holesState.result || holesState.result.kind !== 'row') return;
     loadJsPDF(() => { holesDoExport().catch(e => { if (e?.name === 'AbortError') return; console.error(e); showAlert('PDF konnte nicht erstellt werden.', { title: 'Fehler', icon: 'alert_circle', danger: true }); }); });
   }
 
   async function holesDoExport() {
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF({ unit: 'mm', format: 'a4' });
-    const { L, n, centers, gaps } = result.data;
+    const { L, n, centers, gaps } = holesState.result.data;
     const u = unitLabel();
     let y = 15; const lm = 15, pw = 180;
     const checkY = k => { if (y + k > 272) { doc.addPage(); y = 15; } };
     doc.setFont('helvetica', 'bold'); doc.setFontSize(18);
-    doc.text('betterKerf — Bohrlochplaner (Reihe)', lm, y); y += 9;
-    doc.setFont('helvetica', 'normal'); doc.setFontSize(9); doc.setTextColor(120, 110, 100);
+    const titleOff1 = await addLogoToDoc(doc, lm, y);
+    doc.text('betterKerf — Bohrlochplaner (Reihe)', lm + titleOff1, y); y += 9;
+    doc.setFont('helvetica', 'normal'); doc.setFontSize(9); doc.setTextColor(0);
     doc.text(`Erstellt: ${new Date().toLocaleDateString('de-DE')} | Einheit: ${u}`, lm, y); y += 11; doc.setTextColor(0);
     doc.setFont('helvetica', 'bold'); doc.setFontSize(12); doc.text('\xdcbersicht', lm, y); y += 6;
     doc.setFont('helvetica', 'normal'); doc.setFontSize(9);
     doc.text(`L\xe4nge: ${dispVal(L)} ${u}   L\xf6cher: ${n}   ${gaps.length ? 'Abstand: ' + dispVal(gaps[0]) + ' ' + u : ''}`, lm, y); y += 10;
     const svgEl = visWrap && visWrap.querySelector('svg');
-    if (svgEl) { try { const png = await svgToPng(svgEl, 3); const iw = pw, ih = iw * (png.h / png.w); checkY(ih + 8); doc.addImage(png.data, 'PNG', lm, y, iw, ih, undefined, 'FAST'); y += ih + 8; } catch (e) { /* skip image on error */ } }
+    if (svgEl) { try { const png = await svgToPng(svgEl, 3, true); const iw = pw, ih = iw * (png.h / png.w); checkY(ih + 8); doc.addImage(png.data, 'PNG', lm, y, iw, ih, undefined, 'FAST'); y += ih + 8; } catch (e) { /* skip image on error */ } }
     checkY(20); doc.setFont('helvetica', 'bold'); doc.setFontSize(12);
     doc.text('Lochmittelpunkte', lm, y); y += 6;
     const colW = [14, 70, 70];
     const heads = ['#', `Position (${u})`, `Abstand zum vorigen (${u})`];
-    doc.setFillColor(245, 237, 214); doc.rect(lm, y - 5, pw, 7, 'F');
+    doc.setFillColor(213, 229, 223); doc.rect(lm, y - 5, pw, 7, 'F');
     doc.setFontSize(9); doc.setFont('helvetica', 'bold');
     let x = lm; heads.forEach((h, i) => { doc.text(h, x + 1, y - 1); x += colW[i]; }); y += 4;
     doc.setFont('helvetica', 'normal');
     centers.forEach((c, i) => {
       checkY(6);
-      if (i % 2 === 0) { doc.setFillColor(252, 250, 246); doc.rect(lm, y - 3.5, pw, 5.5, 'F'); }
+      if (i % 2 === 0) { doc.setFillColor(245, 249, 247); doc.rect(lm, y - 3.5, pw, 5.5, 'F'); }
       let xi = lm;
       [String(i + 1), dispVal(c), i > 0 ? dispVal(gaps[i - 1]) : '–'].forEach((v, ci) => { doc.text(String(v), xi + 1, y); xi += colW[ci]; });
       y += 5.5;
@@ -285,26 +319,27 @@
   }
 
   function gridPDF() {
-    if (!result || result.kind !== 'grid') return;
+    if (!holesState.result || holesState.result.kind !== 'grid') return;
     loadJsPDF(() => { gridDoExport().catch(e => { if (e?.name === 'AbortError') return; console.error(e); showAlert('PDF konnte nicht erstellt werden.', { title: 'Fehler', icon: 'alert_circle', danger: true }); }); });
   }
 
   async function gridDoExport() {
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF({ unit: 'mm', format: 'a4' });
-    const { W, H, cols, rows, xs, ys, pts } = result.data;
+    const { W, H, cols, rows, xs, ys, pts } = holesState.result.data;
     const u = unitLabel();
     let y = 15; const lm = 15, pw = 180;
     const checkY = k => { if (y + k > 272) { doc.addPage(); y = 15; } };
     doc.setFont('helvetica', 'bold'); doc.setFontSize(18);
-    doc.text('betterKerf — Lochraster', lm, y); y += 9;
-    doc.setFont('helvetica', 'normal'); doc.setFontSize(9); doc.setTextColor(120, 110, 100);
+    const titleOff2 = await addLogoToDoc(doc, lm, y);
+    doc.text('betterKerf — Lochraster', lm + titleOff2, y); y += 9;
+    doc.setFont('helvetica', 'normal'); doc.setFontSize(9); doc.setTextColor(0);
     doc.text(`Erstellt: ${new Date().toLocaleDateString('de-DE')} | Einheit: ${u}`, lm, y); y += 11; doc.setTextColor(0);
     doc.setFont('helvetica', 'bold'); doc.setFontSize(12); doc.text('\xdcbersicht', lm, y); y += 6;
     doc.setFont('helvetica', 'normal'); doc.setFontSize(9);
     doc.text(`Platte: ${dispVal(W)} \xd7 ${dispVal(H)} ${u}   Raster: ${cols} \xd7 ${rows}   L\xf6cher: ${pts.length}`, lm, y); y += 10;
     const svgEl = visWrap && visWrap.querySelector('svg');
-    if (svgEl) { try { const png = await svgToPng(svgEl, 3); const iw = pw, ih = iw * (png.h / png.w); checkY(ih + 8); doc.addImage(png.data, 'PNG', lm, y, iw, ih, undefined, 'FAST'); y += ih + 8; } catch (e) { /* skip image on error */ } }
+    if (svgEl) { try { const png = await svgToPng(svgEl, 3, true); const iw = pw, ih = iw * (png.h / png.w); checkY(ih + 8); doc.addImage(png.data, 'PNG', lm, y, iw, ih, undefined, 'FAST'); y += ih + 8; } catch (e) { /* skip image on error */ } }
     checkY(16); doc.setFont('helvetica', 'bold'); doc.setFontSize(11);
     doc.text('Spalten-Positionen (X)', lm, y); y += 5; doc.setFont('helvetica', 'normal'); doc.setFontSize(9);
     doc.text(xs.map((v, i) => `S${i + 1}: ${dispVal(v)}`).join('   '), lm, y, { maxWidth: pw }); y += 8;
@@ -314,13 +349,13 @@
     checkY(20); doc.setFont('helvetica', 'bold'); doc.setFontSize(12);
     doc.text(`Alle Bohrpunkte (${u})`, lm, y); y += 6;
     const tc = [14, 40, 55, 55]; const heads = ['#', 'Punkt', 'X', 'Y'];
-    doc.setFillColor(245, 237, 214); doc.rect(lm, y - 5, pw, 7, 'F');
+    doc.setFillColor(213, 229, 223); doc.rect(lm, y - 5, pw, 7, 'F');
     doc.setFontSize(9); doc.setFont('helvetica', 'bold');
     let x = lm; heads.forEach((h, i) => { doc.text(h, x + 1, y - 1); x += tc[i]; }); y += 4;
     doc.setFont('helvetica', 'normal');
     pts.forEach((p, i) => {
       checkY(6);
-      if (i % 2 === 0) { doc.setFillColor(252, 250, 246); doc.rect(lm, y - 3.5, pw, 5.5, 'F'); }
+      if (i % 2 === 0) { doc.setFillColor(245, 249, 247); doc.rect(lm, y - 3.5, pw, 5.5, 'F'); }
       let xi = lm;
       [String(i + 1), `R${p.row} S${p.col}`, dispVal(p.x), dispVal(p.y)].forEach((v, ci) => { doc.text(String(v), xi + 1, y); xi += tc[ci]; });
       y += 5.5;
@@ -417,13 +452,13 @@
       page.bands.forEach((band, bandIdx) => {
         const ox = M + band.px, oy = headerH + band.py;
         const bw = band.x1 - band.x0, bh = band.y1 - band.y0;
-        doc.setDrawColor(180); doc.setLineWidth(0.15);
-        doc.rect(ox, oy, bw, bh);
-        doc.setDrawColor(120); doc.setLineWidth(0.3); const ml = 3.5;
+        doc.setFillColor(213, 229, 223); doc.setDrawColor(74, 122, 100); doc.setLineWidth(0.15);
+        doc.rect(ox, oy, bw, bh, 'FD');
+        doc.setDrawColor(46, 125, 94); doc.setLineWidth(0.3); const ml = 3.5;
         [[ox, oy], [ox + bw, oy], [ox, oy + bh], [ox + bw, oy + bh]].forEach(([cx, cy]) => {
           doc.line(cx - ml, cy, cx + ml, cy); doc.line(cx, cy - ml, cx, cy + ml);
         });
-        doc.setDrawColor(150, 120, 60); doc.setLineWidth(0.45);
+        doc.setDrawColor(46, 125, 94); doc.setLineWidth(0.45);
         if (band.y0 <= eps2(sheetH)) doc.line(ox, oy, ox + bw, oy);
         if (band.y1 >= sheetH - eps2(sheetH)) doc.line(ox, oy + bh, ox + bw, oy + bh);
         if (band.x0 <= eps2(sheetW)) doc.line(ox, oy, ox, oy + bh);
@@ -488,11 +523,11 @@
   }
 
   function holesTemplate() {
-    if (!result || result.kind !== 'row') return;
+    if (!holesState.result || holesState.result.kind !== 'row') return;
     loadJsPDF(() => { holesTemplateExport().catch(e => { if (e?.name === 'AbortError') return; console.error(e); showAlert('Schablone konnte nicht erstellt werden.', { title: 'Fehler', icon: 'alert_circle', danger: true }); }); });
   }
   async function holesTemplateExport() {
-    const { L, centers, width, dia } = result.data;
+    const { L, centers, width, dia } = holesState.result.data;
     const stripH = (width && width > 0) ? width : Math.min(40, Math.max(20, L * 0.05));
     const pts = centers.map(c => ({ x: c, y: stripH / 2 }));
     const doc = buildTemplate(pts, L, stripH, 'Bohrschablone Reihe', dia > 0 ? dia : 0);
@@ -500,11 +535,11 @@
   }
 
   function gridTemplate() {
-    if (!result || result.kind !== 'grid') return;
+    if (!holesState.result || holesState.result.kind !== 'grid') return;
     loadJsPDF(() => { gridTemplateExport().catch(e => { if (e?.name === 'AbortError') return; console.error(e); showAlert('Schablone konnte nicht erstellt werden.', { title: 'Fehler', icon: 'alert_circle', danger: true }); }); });
   }
   async function gridTemplateExport() {
-    const { W, H, pts, dia } = result.data;
+    const { W, H, pts, dia } = holesState.result.data;
     const doc = buildTemplate(pts.map(p => ({ x: p.x, y: p.y })), W, H, 'Bohrschablone Raster', dia > 0 ? dia : 0);
     await savePDF(doc, 'betterkerf-schablone-raster.pdf');
   }
@@ -513,17 +548,29 @@
     const ok = await showConfirm('Zurücksetzen?', 'Die Eingaben werden auf die Standardwerte zurückgesetzt.', { confirmLabel: 'Zurücksetzen', danger: true, icon: 'restart_alt' });
     if (!ok) return;
     hLen = inputVal(1000); hCount = 5; hUseMargin = false; hStart = inputVal(50); hEnd = inputVal(50); hSym = true; hWidth = ''; hDia = '';
-    result = null;
+    holesState.result = null; holesState.hasResult = false; holesState.tab = 'input';
   }
   async function gridReset() {
     const ok = await showConfirm('Zurücksetzen?', 'Die Eingaben werden auf die Standardwerte zurückgesetzt.', { confirmLabel: 'Zurücksetzen', danger: true, icon: 'restart_alt' });
     if (!ok) return;
     gWid = inputVal(800); gHei = inputVal(400); gCols = 4; gRows = 3; gUseMargin = false; gMx = inputVal(50); gMy = inputVal(50); gDia = '';
-    result = null;
+    holesState.result = null; holesState.hasResult = false; holesState.tab = 'input';
   }
 
   // Symmetrie: Endabstand spiegelt Anfang
   $effect(() => { if (hSym) hEnd = hStart; });
+
+  // Tab-Swipe
+  let sx = 0, sy = 0, armed = false;
+  function onTouchStart(e) { const t = e.touches[0]; sx = t.clientX; sy = t.clientY; armed = sx > 30; }
+  function onTouchEnd(e) {
+    if (!armed) return; armed = false;
+    const dx = e.changedTouches[0].clientX - sx, dy = e.changedTouches[0].clientY - sy;
+    if (Math.abs(dx) < 50 || Math.abs(dx) < Math.abs(dy) * 1.5) return;
+    const cur = visibleTabs.indexOf(holesState.tab);
+    const next = dx < 0 ? cur + 1 : cur - 1;
+    if (next >= 0 && next < visibleTabs.length) holesState.tab = visibleTabs[next];
+  }
 
   // Handoff vom Schubladenplaner (Griffbohrung)
   onMount(() => {
@@ -539,84 +586,100 @@
   });
 </script>
 
-<div class="pane active" style="display:block">
-  <div class="hsub-tabs">
-    <button class="hsub-tab" class:active={mode === 'row'} onclick={() => setMode('row')}>
-      <Icon name="adjust" size={14} /> Reihe
-    </button>
-    <button class="hsub-tab" class:active={mode === 'grid'} onclick={() => setMode('grid')}>
-      <Icon name="calculate" size={14} /> Raster
-    </button>
+<div class="screen-inner" style="flex:1;display:flex;flex-direction:column;min-height:0" ontouchstart={onTouchStart} ontouchend={onTouchEnd} role="presentation">
+  <div class="tabs">
+    <button class="tab" class:active={holesState.tab === 'input'} onclick={() => holesState.tab = 'input'}>Eingabe</button>
+    {#if holesState.hasResult}<button class="tab" class:active={holesState.tab === 'plan'} onclick={() => holesState.tab = 'plan'}>Plan</button>{/if}
   </div>
 
-  {#if mode === 'row'}
+  <!-- EINGABE -->
+  <div class="pane" class:active={holesState.tab === 'input'}>
     <div class="section">
-      <div class="slabel">Maße & Anzahl</div>
-      <div class="hint-box">Gib die Strecke an, auf der die Löcher verteilt werden sollen, und wie viele Lochmittelpunkte du brauchst.</div>
-      <div class="srow"><div><div class="srow-label">Gesamtlänge</div><div class="srow-hint">Strecke, auf der verteilt wird</div></div><div class="nm"><input type="number" inputmode="decimal" bind:value={hLen} min="0"><span>{unitLabel()}</span></div></div>
-      <div class="srow"><div><div class="srow-label">Anzahl Löcher</div><div class="srow-hint">Anzahl der Lochmittelpunkte</div></div><div class="nm"><input type="number" inputmode="numeric" bind:value={hCount} min="1" max="200"><span>×</span></div></div>
+      <div class="slabel-row">
+        <div class="slabel">Bohrmuster</div>
+        <button class="info-btn" onclick={() => showPatternInfo = true} aria-label="Erklärung zu den Bohrmustern">ⓘ</button>
+      </div>
+      <div class="kp-seg-label">Art der Bohrungsverteilung</div>
+      <div class="cost-seg kp-seg">
+        <button class:on={mode === 'row'} onclick={() => setMode('row')} style="display:flex;align-items:center;justify-content:center;gap:5px"><Icon name="adjust" size={14} /> Reihe</button>
+        <button class:on={mode === 'grid'} onclick={() => setMode('grid')} style="display:flex;align-items:center;justify-content:center;gap:5px"><Icon name="calculate" size={14} /> Raster</button>
+      </div>
     </div>
-    <div class="section">
-      <div class="slabel">Werkstück &amp; Bohrung</div>
-      <div class="hint-box">Optional, für eine maßstäblich realistische 1:1-Schablone. Die Löcher werden mittig über die Werkstückbreite platziert.</div>
-      <div class="srow"><div><div class="srow-label">Werkstückbreite</div><div class="srow-hint">Breite quer zur Lochreihe</div></div><div class="nm"><input type="number" inputmode="decimal" bind:value={hWidth} placeholder="optional" min="0"><span>{unitLabel()}</span></div></div>
-      <div class="srow"><div><div class="srow-label">Lochdurchmesser</div><div class="srow-hint">Für maßstäbliche Darstellung &amp; Randwarnung</div></div><div class="nm"><input type="number" inputmode="decimal" bind:value={hDia} placeholder="optional" min="0"><span>{unitLabel()}</span></div></div>
-    </div>
-    <div class="section">
-      <div class="slabel">Randabstand</div>
-      <div class="srow"><div><div class="srow-label">Eigener Randabstand</div><div class="srow-hint">Sonst gleichmäßig inkl. Kantenabstand</div></div><input type="checkbox" class="toggle" bind:checked={hUseMargin}></div>
-      {#if hUseMargin}
-        <div class="srow"><div><div class="srow-label">Abstand am Anfang</div><div class="srow-hint">Erste Lochmitte ab linker Kante</div></div><div class="nm"><input type="number" inputmode="decimal" bind:value={hStart} min="0"><span>{unitLabel()}</span></div></div>
-        <div class="srow"><div><div class="srow-label">Abstand am Ende</div><div class="srow-hint">Letzte Lochmitte ab rechter Kante</div></div><div class="nm"><input type="number" inputmode="decimal" bind:value={hEnd} min="0" disabled={hSym}><span>{unitLabel()}</span></div></div>
-        <div class="srow"><div><div class="srow-label">Beide gleich (symmetrisch)</div><div class="srow-hint">Endabstand = Anfangsabstand</div></div><input type="checkbox" class="toggle" bind:checked={hSym}></div>
-      {/if}
-    </div>
-    <button class="calc-btn" onclick={holesCalc}>▶ Bohrlochplaner berechnen</button>
-    <button class="action-btn" onclick={holesReset}><Icon name="restart_alt" size={16} /> Zurücksetzen</button>
-  {:else}
-    <div class="section">
-      <div class="slabel">Plattenmaße</div>
-      <div class="hint-box">Löcher werden als gleichmäßiges Raster über die Fläche verteilt — getrennt in Breite (X) und Höhe (Y).</div>
-      <div class="srow"><div><div class="srow-label">Breite (X)</div><div class="srow-hint">Horizontale Ausdehnung</div></div><div class="nm"><input type="number" inputmode="decimal" bind:value={gWid} min="0"><span>{unitLabel()}</span></div></div>
-      <div class="srow"><div><div class="srow-label">Höhe (Y)</div><div class="srow-hint">Vertikale Ausdehnung</div></div><div class="nm"><input type="number" inputmode="decimal" bind:value={gHei} min="0"><span>{unitLabel()}</span></div></div>
-    </div>
-    <div class="section">
-      <div class="slabel">Anzahl Löcher</div>
-      <div class="srow"><div><div class="srow-label">Spalten (in X)</div><div class="srow-hint">Löcher pro Reihe</div></div><div class="nm"><input type="number" inputmode="numeric" bind:value={gCols} min="1" max="100"><span>×</span></div></div>
-      <div class="srow"><div><div class="srow-label">Reihen (in Y)</div><div class="srow-hint">Anzahl der Reihen</div></div><div class="nm"><input type="number" inputmode="numeric" bind:value={gRows} min="1" max="100"><span>×</span></div></div>
-    </div>
-    <div class="section">
-      <div class="slabel">Bohrung</div>
-      <div class="hint-box">Optional, für eine maßstäblich realistische 1:1-Schablone und eine Randabstands-Warnung.</div>
-      <div class="srow"><div><div class="srow-label">Lochdurchmesser</div><div class="srow-hint">Für maßstäbliche Darstellung &amp; Randwarnung</div></div><div class="nm"><input type="number" inputmode="decimal" bind:value={gDia} placeholder="optional" min="0"><span>{unitLabel()}</span></div></div>
-    </div>
-    <div class="section">
-      <div class="slabel">Randabstand</div>
-      <div class="srow"><div><div class="srow-label">Eigener Randabstand</div><div class="srow-hint">Sonst gleichmäßig inkl. Kantenabstand</div></div><input type="checkbox" class="toggle" bind:checked={gUseMargin}></div>
-      {#if gUseMargin}
-        <div class="srow"><div><div class="srow-label">Rand horizontal (X)</div><div class="srow-hint">Abstand links &amp; rechts</div></div><div class="nm"><input type="number" inputmode="decimal" bind:value={gMx} min="0"><span>{unitLabel()}</span></div></div>
-        <div class="srow"><div><div class="srow-label">Rand vertikal (Y)</div><div class="srow-hint">Abstand oben &amp; unten</div></div><div class="nm"><input type="number" inputmode="decimal" bind:value={gMy} min="0"><span>{unitLabel()}</span></div></div>
-      {/if}
-    </div>
-    <button class="calc-btn" onclick={gridCalc}>▶ Raster berechnen</button>
-    <button class="action-btn" onclick={gridReset}><Icon name="restart_alt" size={16} /> Zurücksetzen</button>
-  {/if}
 
-  {#if result}
-    <div style="margin-top:18px">
-      {#if result.kind === 'error'}
-        <div class="err">{result.msg}</div>
+    {#if mode === 'row'}
+      <div class="section">
+        <div class="slabel">Maße & Anzahl</div>
+        <div class="hint-box">Gib die Strecke an, auf der die Löcher verteilt werden sollen, und wie viele Lochmittelpunkte du brauchst.</div>
+        <div class="srow"><div><div class="srow-label">Gesamtlänge</div><div class="srow-hint">Strecke, auf der verteilt wird</div></div><div class="nm"><input type="number" inputmode="decimal" bind:value={hLen} min="0"><span>{unitLabel()}</span></div></div>
+        <div class="srow"><div><div class="srow-label">Anzahl Löcher</div><div class="srow-hint">Anzahl der Lochmittelpunkte</div></div><div class="nm"><input type="number" inputmode="numeric" bind:value={hCount} min="1" max="200"><span>×</span></div></div>
+      </div>
+      <div class="section">
+        <div class="slabel">Werkstück &amp; Bohrung</div>
+        <div class="hint-box">Optional, für eine maßstäblich realistische 1:1-Schablone. Die Löcher werden mittig über die Werkstückbreite platziert.</div>
+        <div class="srow"><div><div class="srow-label">Werkstückbreite</div><div class="srow-hint">Breite quer zur Lochreihe</div></div><div class="nm"><input type="number" inputmode="decimal" bind:value={hWidth} placeholder="optional" min="0"><span>{unitLabel()}</span></div></div>
+        <div class="srow"><div><div class="srow-label">Lochdurchmesser</div><div class="srow-hint">Für maßstäbliche Darstellung &amp; Randwarnung</div></div><div class="nm"><input type="number" inputmode="decimal" bind:value={hDia} placeholder="optional" min="0"><span>{unitLabel()}</span></div></div>
+      </div>
+      <div class="section">
+        <div class="slabel">Randabstand</div>
+        <div class="srow"><div><div class="srow-label">Eigener Randabstand</div><div class="srow-hint">Sonst gleichmäßig inkl. Kantenabstand</div></div><input type="checkbox" class="toggle" bind:checked={hUseMargin}></div>
+        {#if hUseMargin}
+          <div class="srow"><div><div class="srow-label">Abstand am Anfang</div><div class="srow-hint">Erste Lochmitte ab linker Kante</div></div><div class="nm"><input type="number" inputmode="decimal" bind:value={hStart} min="0"><span>{unitLabel()}</span></div></div>
+          <div class="srow"><div><div class="srow-label">Abstand am Ende</div><div class="srow-hint">Letzte Lochmitte ab rechter Kante</div></div><div class="nm"><input type="number" inputmode="decimal" bind:value={hEnd} min="0" disabled={hSym}><span>{unitLabel()}</span></div></div>
+          <div class="srow"><div><div class="srow-label">Beide gleich (symmetrisch)</div><div class="srow-hint">Endabstand = Anfangsabstand</div></div><input type="checkbox" class="toggle" bind:checked={hSym}></div>
+        {/if}
+      </div>
+      <button class="calc-btn" onclick={holesCalc}>▶ Bohrlochplaner berechnen</button>
+      <button class="action-btn" onclick={holesReset}><Icon name="restart_alt" size={16} /> Zurücksetzen</button>
+    {:else}
+      <div class="section">
+        <div class="slabel">Plattenmaße</div>
+        <div class="hint-box">Löcher werden als gleichmäßiges Raster über die Fläche verteilt — getrennt in Breite (X) und Höhe (Y).</div>
+        <div class="srow"><div><div class="srow-label">Breite (X)</div><div class="srow-hint">Horizontale Ausdehnung</div></div><div class="nm"><input type="number" inputmode="decimal" bind:value={gWid} min="0"><span>{unitLabel()}</span></div></div>
+        <div class="srow"><div><div class="srow-label">Höhe (Y)</div><div class="srow-hint">Vertikale Ausdehnung</div></div><div class="nm"><input type="number" inputmode="decimal" bind:value={gHei} min="0"><span>{unitLabel()}</span></div></div>
+      </div>
+      <div class="section">
+        <div class="slabel">Anzahl Löcher</div>
+        <div class="srow"><div><div class="srow-label">Spalten (in X)</div><div class="srow-hint">Löcher pro Reihe</div></div><div class="nm"><input type="number" inputmode="numeric" bind:value={gCols} min="1" max="100"><span>×</span></div></div>
+        <div class="srow"><div><div class="srow-label">Reihen (in Y)</div><div class="srow-hint">Anzahl der Reihen</div></div><div class="nm"><input type="number" inputmode="numeric" bind:value={gRows} min="1" max="100"><span>×</span></div></div>
+      </div>
+      <div class="section">
+        <div class="slabel">Bohrung</div>
+        <div class="hint-box">Optional, für eine maßstäblich realistische 1:1-Schablone und eine Randabstands-Warnung.</div>
+        <div class="srow"><div><div class="srow-label">Lochdurchmesser</div><div class="srow-hint">Für maßstäbliche Darstellung &amp; Randwarnung</div></div><div class="nm"><input type="number" inputmode="decimal" bind:value={gDia} placeholder="optional" min="0"><span>{unitLabel()}</span></div></div>
+      </div>
+      <div class="section">
+        <div class="slabel">Randabstand</div>
+        <div class="srow"><div><div class="srow-label">Eigener Randabstand</div><div class="srow-hint">Sonst gleichmäßig inkl. Kantenabstand</div></div><input type="checkbox" class="toggle" bind:checked={gUseMargin}></div>
+        {#if gUseMargin}
+          <div class="srow"><div><div class="srow-label">Rand horizontal (X)</div><div class="srow-hint">Abstand links &amp; rechts</div></div><div class="nm"><input type="number" inputmode="decimal" bind:value={gMx} min="0"><span>{unitLabel()}</span></div></div>
+          <div class="srow"><div><div class="srow-label">Rand vertikal (Y)</div><div class="srow-hint">Abstand oben &amp; unten</div></div><div class="nm"><input type="number" inputmode="decimal" bind:value={gMy} min="0"><span>{unitLabel()}</span></div></div>
+        {/if}
+      </div>
+      <button class="calc-btn" onclick={gridCalc}>▶ Raster berechnen</button>
+      <button class="action-btn" onclick={gridReset}><Icon name="restart_alt" size={16} /> Zurücksetzen</button>
+    {/if}
+  </div>
+
+  <!-- PLAN -->
+  {#if holesState.hasResult}
+  <div class="pane" class:active={holesState.tab === 'plan'}>
+    {#if holesState.result}
+      {#if holesState.result.kind === 'error'}
+        <div class="err">{holesState.result.msg}</div>
       {:else}
         <!-- eslint-disable svelte/no-at-html-tags -->
-        {@html result.top}
-        <div class="vis-wrap" bind:this={visWrap} onclick={() => openZoom(result.svg, result.caption)} onkeydown={(e) => { if (e.key === 'Enter' || e.key === ' ') openZoom(result.svg, result.caption); }} style="cursor:zoom-in" role="button" tabindex="0">
-          {@html result.svg}
+        {@html holesState.result.top}
+        <div class="vis-wrap" bind:this={visWrap} onclick={() => openZoom(holesState.result.svg, holesState.result.caption)} onkeydown={(e) => { if (e.key === 'Enter' || e.key === ' ') openZoom(holesState.result.svg, holesState.result.caption); }} style="cursor:zoom-in" role="button" tabindex="0">
+          {@html holesState.result.svg}
         </div>
-        {@html result.bottom}
-        <button class="action-btn" onclick={copyResult}><Icon name="content_copy" size={16} /> {result.kind === 'grid' ? 'Koordinaten' : 'Positionen'} kopieren</button>
-        <button class="action-btn" onclick={result.kind === 'row' ? holesPDF : gridPDF}><Icon name="download" size={16} /> Als PDF exportieren</button>
-        <button class="action-btn" onclick={result.kind === 'row' ? holesTemplate : gridTemplate}><Icon name="straighten" size={16} /> 1:1-Bohrschablone (PDF)</button>
+        {@html holesState.result.bottom}
+        <button class="action-btn" onclick={copyResult}><Icon name="content_copy" size={16} /> {holesState.result.kind === 'grid' ? 'Koordinaten' : 'Positionen'} kopieren</button>
+        <button class="action-btn" onclick={holesState.result.kind === 'row' ? holesPDF : gridPDF}><Icon name="download" size={16} /> Als PDF exportieren</button>
+        <button class="action-btn" onclick={holesState.result.kind === 'row' ? holesTemplate : gridTemplate}><Icon name="straighten" size={16} /> 1:1-Bohrschablone (PDF)</button>
       {/if}
-    </div>
+    {/if}
+  </div>
   {/if}
 </div>
+
+<InfoSheet bind:open={showPatternInfo} title="Bohrmuster" items={patternInfoItems} />

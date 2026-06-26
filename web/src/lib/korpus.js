@@ -105,12 +105,13 @@ export function korpusSketch(H, B, T, s, sr, constr, back, nut, shelves, divider
   const sd = T * scale;
   const t = Math.max(2, s * scale);
   const tr = Math.max(1.5, sr * scale);
-  const svgW = pad * 2 + fW + gap + sd;
-  const svgH = pad * 2 + fH + 28;
+  const backDimW = back !== 'none' ? 30 : 0;
+  const backDimH = back !== 'none' ? 14 : 0;
+  const svgW = pad * 2 + fW + gap + sd + backDimW;
+  const svgH = pad * 2 + fH + 28 + backDimH;
   const ox = pad, oy = pad;
   const sx = pad + fW + gap;
-
-  const col = { body: '#2E7D5E', bodyFill: 'rgba(46,125,94,.18)', back: '#9B6B9B', backFill: 'rgba(155,107,155,.28)', shelf: '#5090BE', div: '#C07A2E', line: '#7A7268', txt: '#B8AF9E' };
+  const col = { body: '#2E7D5E', bodyFill: 'rgba(46,125,94,.18)', back: '#C07A2E', backFill: 'rgba(192,122,46,.28)', shelf: '#5090BE', div: '#9B6B9B', line: '#B0ADA6', txt: '#F2EEE8' };
   let p = '';
   p += `<rect x="${ox}" y="${oy}" width="${fW}" height="${fH}" fill="${col.bodyFill}" stroke="${col.body}" stroke-width="1.2"/>`;
   if (constr === 'sides') {
@@ -166,20 +167,44 @@ export function korpusSketch(H, B, T, s, sr, constr, back, nut, shelves, divider
       });
     });
   }
-  p += `<text x="${ox + fW / 2}" y="${oy + fH + 22}" text-anchor="middle" font-size="10" fill="${col.txt}">Vorderansicht</text>`;
+  const viewLabelY = oy + fH + 22 + backDimH;
+  p += `<text x="${ox + fW / 2}" y="${viewLabelY}" text-anchor="middle" font-size="10" fill="${col.txt}">Vorderansicht</text>`;
 
   p += `<rect x="${sx}" y="${oy}" width="${sd}" height="${fH}" fill="${col.bodyFill}" stroke="${col.body}" stroke-width="1.2"/>`;
   p += `<rect x="${sx}" y="${oy}" width="${sd}" height="${t}" fill="${col.body}" opacity=".55"/>`;
   p += `<rect x="${sx}" y="${oy + fH - t}" width="${sd}" height="${t}" fill="${col.body}" opacity=".55"/>`;
+  let bX = 0, bY = 0, bW_px = 0, bH_px = 0, bH_mm = 0;
   if (back === 'overlay') {
-    p += `<rect x="${sx + sd}" y="${oy}" width="${tr}" height="${fH}" fill="${col.backFill}" stroke="${col.back}" stroke-width="1"/>`;
+    bX = sx + sd; bY = oy; bW_px = tr; bH_px = fH; bH_mm = H;
+    p += `<rect x="${bX}" y="${bY}" width="${bW_px}" height="${bH_px}" fill="${col.backFill}" stroke="${col.back}" stroke-width="1"/>`;
   } else if (back === 'inset') {
     const inset = Math.max(1.5, nut * scale);
-    p += `<rect x="${sx + sd - tr - inset}" y="${oy + t}" width="${tr}" height="${fH - 2 * t}" fill="${col.backFill}" stroke="${col.back}" stroke-width="1"/>`;
+    bX = sx + sd - tr - inset; bY = oy + t; bW_px = tr; bH_px = fH - 2 * t; bH_mm = H - 2 * s;
+    p += `<rect x="${bX}" y="${bY}" width="${bW_px}" height="${bH_px}" fill="${col.backFill}" stroke="${col.back}" stroke-width="1"/>`;
   } else if (back === 'framed') {
-    p += `<rect x="${sx + sd - tr}" y="${oy + t}" width="${tr}" height="${fH - 2 * t}" fill="${col.backFill}" stroke="${col.back}" stroke-width="1"/>`;
+    bX = sx + sd - tr; bY = oy + t; bW_px = tr; bH_px = fH - 2 * t; bH_mm = H - 2 * s;
+    p += `<rect x="${bX}" y="${bY}" width="${bW_px}" height="${bH_px}" fill="${col.backFill}" stroke="${col.back}" stroke-width="1"/>`;
   }
-  p += `<text x="${sx + sd / 2}" y="${oy + fH + 22}" text-anchor="middle" font-size="10" fill="${col.txt}">Seite</text>`;
+  if (back !== 'none') {
+    const dC2 = col.back;
+    // Rückwandhöhe: vertical dim to the right of the backwall / side view
+    const hvX = (back === 'overlay' ? bX + bW_px : sx + sd) + 8;
+    p += `<line x1="${hvX}" y1="${bY.toFixed(1)}" x2="${hvX}" y2="${(bY + bH_px).toFixed(1)}" stroke="${dC2}" stroke-width="0.7"/>`;
+    p += `<line x1="${(hvX - 3)}" y1="${bY.toFixed(1)}" x2="${(hvX + 3)}" y2="${bY.toFixed(1)}" stroke="${dC2}" stroke-width="0.7"/>`;
+    p += `<line x1="${(hvX - 3)}" y1="${(bY + bH_px).toFixed(1)}" x2="${(hvX + 3)}" y2="${(bY + bH_px).toFixed(1)}" stroke="${dC2}" stroke-width="0.7"/>`;
+    if (bH_px > 15) p += `<text x="${(hvX + 5)}" y="${(bY + bH_px / 2).toFixed(1)}" font-size="7" fill="${dC2}" text-anchor="start" dominant-baseline="middle">${dispVal(bH_mm)}</text>`;
+    // Rückwandstärke: horizontal dim below the side view
+    const srDimY = oy + fH + 10;
+    p += `<line x1="${bX.toFixed(1)}" y1="${srDimY}" x2="${(bX + bW_px).toFixed(1)}" y2="${srDimY}" stroke="${dC2}" stroke-width="0.7"/>`;
+    p += `<line x1="${bX.toFixed(1)}" y1="${(srDimY - 2)}" x2="${bX.toFixed(1)}" y2="${(srDimY + 2)}" stroke="${dC2}" stroke-width="0.7"/>`;
+    p += `<line x1="${(bX + bW_px).toFixed(1)}" y1="${(srDimY - 2)}" x2="${(bX + bW_px).toFixed(1)}" y2="${(srDimY + 2)}" stroke="${dC2}" stroke-width="0.7"/>`;
+    if (bW_px >= 8) {
+      p += `<text x="${((bX + bX + bW_px) / 2).toFixed(1)}" y="${(srDimY + 8)}" font-size="7" fill="${dC2}" text-anchor="middle">${dispVal(sr)}</text>`;
+    } else {
+      p += `<text x="${(bX + bW_px + 3).toFixed(1)}" y="${srDimY}" font-size="7" fill="${dC2}" text-anchor="start" dominant-baseline="middle">${dispVal(sr)}</text>`;
+    }
+  }
+  p += `<text x="${sx + sd / 2}" y="${viewLabelY}" text-anchor="middle" font-size="10" fill="${col.txt}">Seite</text>`;
 
   const _sYC = [], _sMM = [];
   if (_shelfPos) {
@@ -225,5 +250,5 @@ export function korpusSketch(H, B, T, s, sr, constr, back, nut, shelves, divider
   if (back !== 'none') legend += `<span class="kp-leg"><i style="background:${col.back}"></i>Rückwand</span>`;
   legend += `</div>`;
 
-  return `<div class="kp-sketch"><svg viewBox="0 0 ${svgW.toFixed(0)} ${svgH.toFixed(0)}" width="100%" preserveAspectRatio="xMidYMid meet">${p}</svg></div>${legend}`;
+  return `<div class="kp-sketch"><svg viewBox="0 0 ${svgW.toFixed(0)} ${svgH.toFixed(0)}" width="100%" preserveAspectRatio="xMidYMid meet" font-family="sans-serif">${p}</svg></div>${legend}`;
 }

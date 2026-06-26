@@ -70,7 +70,7 @@ export function drawerSketch(o, geo) {
   const blockH = Math.max(fH, frH, dH);
   const svgW = pad * 2 + colW + gap + fW;
   const svgH = oy + blockH + 26;
-  const col = { body: '#5B8DB8', bodyFill: 'rgba(91,141,184,.16)', bottom: '#2E7D5E', front: '#C07A2E', txt: '#B8AF9E' };
+  const col = { body: '#2E7D5E', bodyFill: 'rgba(46,125,94,.18)', bottom: '#2E7D5E', front: '#C07A2E', txt: '#F2EEE8' };
   let p = '';
   if (o.hasFront) {
     const frx = cx - frW / 2, fry = oy + (blockH - frH) / 2;
@@ -113,7 +113,7 @@ export function drawerSketch(o, geo) {
   }
   p += `<text x="${(sx + fW / 2).toFixed(1)}" y="${(oy + blockH + 16).toFixed(1)}" text-anchor="middle" font-size="10" fill="${col.txt}">Draufsicht (vorne unten)</text>`;
   p += `<text x="${(sx + fW + 7).toFixed(1)}" y="${(ty + dH / 2).toFixed(1)}" text-anchor="middle" font-size="9.5" fill="${col.txt}" transform="rotate(-90 ${(sx + fW + 7).toFixed(1)} ${(ty + dH / 2).toFixed(1)})">T ${dispVal(BD)}</text>`;
-  const svg = `<svg viewBox="0 0 ${Math.ceil(svgW)} ${Math.ceil(svgH)}" width="100%" preserveAspectRatio="xMidYMid meet">${p}</svg>`;
+  const svg = `<svg viewBox="0 0 ${Math.ceil(svgW)} ${Math.ceil(svgH)}" width="100%" preserveAspectRatio="xMidYMid meet" font-family="sans-serif">${p}</svg>`;
   let legend = `<div class="kp-legend"><span class="kp-leg"><i style="background:${col.body}"></i>Schubkasten</span><span class="kp-leg"><i style="background:${col.bottom}"></i>Boden</span>`;
   if (o.hasFront) legend += `<span class="kp-leg"><i style="background:${col.front}"></i>Frontblende</span>`;
   legend += `</div>`;
